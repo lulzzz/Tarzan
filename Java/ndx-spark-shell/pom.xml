@@ -29,7 +29,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ndx.spark</groupId>
-			<artifactId>ndx-spark-pshark</artifactId>
+			<artifactId>ndx-spark-tshark</artifactId>
 			<version>0.9-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
