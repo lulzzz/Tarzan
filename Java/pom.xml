@@ -9,13 +9,13 @@
 	<modules>
 		<module>ndx-spark-model</module>
 		<module>ndx-spark-pcap</module>
-		<module>ndx-spark-pshark</module>
+		<module>ndx-spark-tshark</module>
 		<module>ndx-spark-shell</module>
   	</modules>
 
 	<properties>
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 	</properties>
 

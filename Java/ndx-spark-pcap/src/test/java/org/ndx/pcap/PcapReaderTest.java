@@ -19,9 +19,9 @@ public class PcapReaderTest extends TestCase {
                 Iterator<PacketModel.RawFrame> itr = reader.iterator();
                 int count = 0;
                 while(itr.hasNext()) {
-                   PacketModel.RawFrame frame = itr.next();
-                   System.out.println(frame);
-                   count++;
+                        PacketModel.RawFrame frame = itr.next();
+                        System.out.println(frame);
+                        count++;
                 }
                 assertEquals(count, 40);
         }
