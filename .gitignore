@@ -30,3 +30,7 @@ Java/repository/com.parse2.aparse/aparse-maven-plugin/2.5/aparse-maven-plugin-2.
 Java/repository/com.parse2.aparse/aparse/2.5/aparse-2.5.jar
 
 *.class
+
+Java/ndx-spark-pcap/target/surefire-reports/org.ndx.pcap.PcapReaderTest.txt
+
+Java/ndx-spark-pcap/target/surefire-reports/TEST-org.ndx.pcap.PcapReaderTest.xml
