@@ -19,7 +19,7 @@ import org.ndx.model.Packet;
 import org.ndx.model.PacketPayload;
 import org.ndx.model.PacketModel.RawFrame;
 import org.ndx.model.Statistics;
-import org.ndx.tshark.HttpRequest;
+import org.ndx.http.HttpRequest;
 
 val frames = sc.hadoopFile("hdfs://neshpc1.fit.vutbr.cz/user/rysavy/cap/*.cap", 
                             classOf[org.ndx.pcap.PcapInputFormat], 
