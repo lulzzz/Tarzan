@@ -1,4 +1,4 @@
-# NDX.Hadoop
+# NDX.Spark
 
 This solution consists of several Java modules for analysis of PCAP files in Apache SPARK. 
 
