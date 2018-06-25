@@ -1,10 +1,18 @@
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "TARZAN WUI";
 }
 
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
 <script src="~/dist/vendor.js" asp-append-version="true"></script>
+
+
+    <footer>
+        <p>&copy; Tarzan 2018</p>
+    </footer>
+
+
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
 }
+

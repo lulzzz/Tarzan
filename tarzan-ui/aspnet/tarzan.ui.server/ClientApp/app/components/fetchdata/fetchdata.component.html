@@ -1,24 +1,37 @@
-<h1>Weather forecast</h1>
+<h1>Top Flow Records</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
+<p *ngIf="!flowRecords"><em>Loading...</em></p>
 
-<table class='table' *ngIf="forecasts">
+<table class='table' *ngIf="flowRecords">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <th>Id</th>
+            <th>Protocol</th>
+            <th>Src Address</th>
+            <th>Src Port</th>
+            <th>Dst Address</th>
+            <th>Dst Port</th>
+            <th>First</th>
+            <th>Last</th>
+            <th>Packets</th>
+            <th>Octets</th>
+
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let forecast of forecasts">
-            <td>{{ forecast.dateFormatted }}</td>
-            <td>{{ forecast.temperatureC }}</td>
-            <td>{{ forecast.temperatureF }}</td>
-            <td>{{ forecast.summary }}</td>
+        <tr *ngFor="let record of flowRecords">
+            <td>{{ record.id }}</td>
+            <td>{{ record.protocol }}</td>
+            <td>{{ record.sourceAddress }}</td>
+            <td>{{ record.sourcePort }}</td>
+            <td>{{ record.destinationAddress }}</td>
+            <td>{{ record.destinationPort }}</td>
+            <td>{{ record.firstSeen }}</td>
+            <td>{{ record.lastSeen }}</td>    
+            <td>{{ record.packets }}</td>
+            <td>{{ record.octets }}</td>                     
         </tr>
     </tbody>
 </table>
