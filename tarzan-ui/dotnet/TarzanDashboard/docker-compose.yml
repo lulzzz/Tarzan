@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  tarzandashboard:
+    image: ${DOCKER_REGISTRY}tarzandashboard
+    build:
+      context: .
+      dockerfile: src/TarzanDashboard/Dockerfile

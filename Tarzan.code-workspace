@@ -7,7 +7,10 @@
 			"path": "docs"
 		},
 		{
-			"path": "tarzan-ui\\aspnet"
+			"path": "tarzan-ui\\dotnet\\TarzanDashboard"
 		}
-	]
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
 }

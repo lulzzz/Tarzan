@@ -1,0 +1,46 @@
+<div *ngIf="data">
+  <h2>{{ data.name }} Details</h2>
+  <div>
+    <span>Id: </span>{{data.id}}</div>
+  <div>
+    <span>Protocol: </span>{{data.protocol}}</div>
+  <div>
+    <span>Src: </span>{{data.sourceAddress}}:{{data.sourcePort}}</div>
+  <div>
+    <span>Dst: </span>{{data.destinationAddress}}:{{data.destinationPort}}</div>
+  <div>
+    <span>Time: </span>{{data.firstSeen}} - {{data.lastSeen}}</div>
+  <div>
+    <span>Size: </span>{{data.packets}} packet(s) / {{data.octets}} octet(s)</div>
+
+  <label>Notes:
+    <input [(ngModel)]="data.notes" placeholder="">
+  </label>
+</div>
+
+
+<table mat-table [dataSource]="items" width="100%">
+
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef> Id </th>
+    <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="protocol">
+    <th mat-header-cell *matHeaderCellDef> Proto </th>
+    <td mat-cell *matCellDef="let element"> {{element.protocol}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sourceAddress">
+    <th mat-header-cell *matHeaderCellDef> Src Addr </th>
+    <td mat-cell *matCellDef="let element"> {{element.sourceAddress}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sourcePort">
+    <th mat-header-cell *matHeaderCellDef> Src Port</th>
+    <td mat-cell *matCellDef="let element"> {{element.sourcePort}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
