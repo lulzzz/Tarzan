@@ -1,11 +1,5 @@
 # Developer's Notes
 
-
-
-
-
-
-
 * We use Cassandra in Docker: https://docs.docker.com/samples/library/cassandra/
 
 
@@ -20,6 +14,19 @@ docker exec -it netdx_db /bin/bash
 #cqlsh
 ```
 
+
+# Outlook
+The structure of the application:
+User Management Module
+
+Case Management Module
+- Cases: case management is separated module from the analytical module. When the cases is open the application switch to analytical module.
+
+Analytical Module:
+- Captures
+- Flows: Table, Map, ...
+- Views: Hosts, Files, Images, Messages, Credentials, Sessions, Domain Names, Parameters, SSL/TLS
+- Results: Keywords, Anomalies, ...
 
 
 # ASP.NET + Angular Material
