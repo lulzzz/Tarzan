@@ -1,16 +1,26 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { MatTableModule, MatCardModule, MatButtonModule, MatMenuModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
+import { MatTableModule, MatCardModule, MatButtonModule, MatMenuModule } from '@angular/material';
+
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { AppRoutingModule } from './/app-routing.module';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import { AppRoutingModule } from './app-routing.module';
+import { HomeComponent } from './components/home/home.component';
+import { CapturesComponent } from './components/captures/captures.component';
+import { FlowsComponent } from './components/flows/flows.component';
+import { ViewsComponent } from './components/views/views.component';
+import { ResultsComponent } from './components/results/results.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    CapturesComponent,
+    FlowsComponent,
+    ViewsComponent,
+    ResultsComponent
   ],
   imports: [
     BrowserModule,
