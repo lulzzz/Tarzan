@@ -16,17 +16,26 @@ namespace Tarzan.UI.Server.Controllers
         FlowRecordDataAccess m_dataAccess = new FlowRecordDataAccess(new IPEndPoint(IPAddress.Loopback, 9042) , "flowstat");
 
 
+        /// <summary>
+        /// Gets all flow records.
+        /// </summary>
+        /// <returns>A collection of all available flow records.</returns>
         [HttpGet]
         [Route("api/flows/index")]
-        public IActionResult Index()
+        public IEnumerable<FlowRecord> Index()
         {                        
-            return Json(m_dataAccess.GetAllFlowRecords());
+            return m_dataAccess.GetAllFlowRecords();
         }
+        /// <summary>
+        /// Gets the flow record of the specified id.
+        /// </summary>
+        /// <param name="id">Flow record identifier.</param>
+        /// <returns>A flow record of the specified id.</returns>
         [HttpGet]
         [Route("api/flows/item")]  
-        public IActionResult FetchRecordById(int id)
+        public FlowRecord FetchRecordById(int id)
         {
-            return Json(m_dataAccess.GetFlowRecord(id));
+            return m_dataAccess.GetFlowRecord(id);
         }
     }
 }

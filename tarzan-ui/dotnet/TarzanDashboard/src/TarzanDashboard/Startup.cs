@@ -31,8 +31,8 @@ namespace TarzanDashboard
         {
           Version = "v1",
           Title = "TarzanDashboard API",
-          Description = "A simple example ASP.NET Core Web API",
-          Contact = new Contact { Name = "Juan García Carmona", Email = "d.jgc.it@gmail.com", Url = "https://wisegeckos.com" },
+          Description = "TarzanDashboard ASP.NET Core Web API",
+          Contact = new Contact { Name = "Ondrej Rysavy", Email = "rysavy@fit.vutbr.cz", Url = "https://tarzan.fit.vutbr.cz" },
         });
         // Set the comments path for the Swagger JSON and UI.
         var basePath = AppContext.BaseDirectory;

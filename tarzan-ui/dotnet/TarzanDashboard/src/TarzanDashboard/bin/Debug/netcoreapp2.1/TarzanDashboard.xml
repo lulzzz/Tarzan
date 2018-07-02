@@ -4,6 +4,88 @@
         <name>TarzanDashboard</name>
     </assembly>
     <members>
+        <member name="M:Tarzan.UI.Server.Controllers.FlowRecordController.Index">
+            <summary>
+            Gets all flow records.
+            </summary>
+            <returns>A collection of all available flow records.</returns>
+        </member>
+        <member name="M:Tarzan.UI.Server.Controllers.FlowRecordController.FetchRecordById(System.Int32)">
+            <summary>
+            Gets the flow record of the specified id.
+            </summary>
+            <param name="id">Flow record identifier.</param>
+            <returns>A flow record of the specified id.</returns>
+        </member>
+        <member name="T:Tarzan.UI.Server.Models.FlowRecord">
+            <summary>
+            Represents a single flow record.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.Id">
+            <summary>
+            A unique identifier of the flow record.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.Protocol">
+            <summary>
+            Type of transport (or internet) protocol of the flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.SourceAddress">
+            <summary>
+            The network source address of the flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.SourcePort">
+            <summary>
+            Source port (if any) of the flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.DestinationAddress">
+            <summary>
+            The network destination address of the flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.DestinationPort">
+            <summary>
+            The destination port of the flow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.FirstSeen">
+            <summary>
+            Unix time stamp of the start of flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.LastSeen">
+            <summary>
+            The unix time stamp of the end of flow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.Packets">
+            <summary>
+            Number of packets carried by the flow.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.FlowRecord.Octets">
+            <summary>
+            Total number of octets carried by the flow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Tarzan.UI.Server.Models.FlowRecord.#ctor">
+            <summary>
+            Creates an empty flow record.
+            </summary>
+        </member>
+        <member name="M:Tarzan.UI.Server.Models.FlowRecord.#ctor(Cassandra.Row)">
+            <summary>
+            Creates new flow record reding vlues from Cassandra row.null 
+            </summary>
+            <param name="row"></param>
+        </member>
         <member name="T:TarzanDashboard.Controllers.ValuesController">
             <summary>
             Values Controller
