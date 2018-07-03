@@ -1,3 +1,12 @@
-<p>
-  flows works!
-</p>
+
+<mat-sidenav-container class="flows-container">
+    <mat-sidenav #sidenav mode="side" opened class="flows-sidenav"
+                 [fixedInViewport]="false" [fixedTopGap]="true"
+                 [fixedBottomGap]="false">
+      <h1>Sidenav</h1>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <h1>CONTENT</h1>
+    </mat-sidenav-content>
+  </mat-sidenav-container>

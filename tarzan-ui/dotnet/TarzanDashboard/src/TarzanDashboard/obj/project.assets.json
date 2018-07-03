@@ -13861,24 +13861,27 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\rysavy\\.nuget\\packages\\": {},
+    "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\TarzanDashboard.csproj",
+      "projectUniqueName": "c:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\TarzanDashboard.csproj",
       "projectName": "TarzanDashboard",
-      "projectPath": "c:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\TarzanDashboard.csproj",
-      "packagesPath": "C:\\Users\\rysavy\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\obj\\",
+      "projectPath": "c:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\TarzanDashboard.csproj",
+      "packagesPath": "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\",
+      "outputPath": "c:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ui\\dotnet\\TarzanDashboard\\src\\TarzanDashboard\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Ondrej Rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.1"

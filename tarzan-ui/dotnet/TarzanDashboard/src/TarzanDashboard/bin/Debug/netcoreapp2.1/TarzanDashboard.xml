@@ -17,6 +17,67 @@
             <param name="id">Flow record identifier.</param>
             <returns>A flow record of the specified id.</returns>
         </member>
+        <member name="T:Tarzan.UI.Server.Models.Capture">
+            <summary>
+            Represents a single flow record.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Id">
+            <summary>
+            A unique identifier of the capture file.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Name">
+            <summary>
+            The name of the capture file..
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Type">
+            <summary>
+            A type of the capture file. It can be pcap, pcapng, etc.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Size">
+            <summary>
+            The total size of the capture file.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.CreatedOn">
+            <summary>
+            Timestamp when the file was originally created.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.UploadOn">
+            <summary>
+            Timestamp when the file was upload to the system.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Hash">
+            <summary>
+            Hash value computed by MD5 algorithm.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Author">
+            <summary>
+            Name of the person who captured the file.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Notes">
+            <summary>
+            Arbitrary notes associated with the capture.
+            </summary>
+        </member>
+        <member name="P:Tarzan.UI.Server.Models.Capture.Tags">
+            <summary>
+            List of tags that label the capture.
+            </summary>
+        </member>
+        <member name="M:Tarzan.UI.Server.Models.Capture.#ctor">
+            <summary>
+            Creates an empty flow record.
+            </summary>
+        </member>
         <member name="T:Tarzan.UI.Server.Models.FlowRecord">
             <summary>
             Represents a single flow record.
@@ -86,13 +147,13 @@
             </summary>
             <param name="row"></param>
         </member>
-        <member name="T:TarzanDashboard.Controllers.ValuesController">
+        <member name="T:TarzanDashboard.Controllers.CapturesController">
             <summary>
             Values Controller
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
         </member>
-        <member name="M:TarzanDashboard.Controllers.ValuesController.Get">
+        <member name="M:TarzanDashboard.Controllers.CapturesController.Get">
             <summary>
             Gets some values.
             </summary>

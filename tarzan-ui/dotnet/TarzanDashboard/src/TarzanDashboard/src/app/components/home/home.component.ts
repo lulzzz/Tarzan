@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FlowRecord } from '../../model/flowRecord';
-import { ITEMS } from '../../mock/mock_data';
+import { FlowRecord } from 'src/api/index';
+import { ITEMS } from 'src/app/mock/mock_data';
 
 @Component({
   selector: 'app-home',

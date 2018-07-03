@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Configuration } from './configuration';
 
+import { CapturesService } from './api/captures.service';
 import { FlowRecordService } from './api/flowRecord.service';
-import { ValuesService } from './api/values.service';
 
 @NgModule({
   imports:      [ CommonModule, HttpClientModule ],
   declarations: [],
   exports:      [],
   providers: [
-    FlowRecordService,
-    ValuesService ]
+    CapturesService,
+    FlowRecordService ]
 })
 export class ApiModule {
     public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders {

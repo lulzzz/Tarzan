@@ -1,58 +1,42 @@
-<nav class="navbar navbar-fixed-top navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">TARZAN</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-    aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" [routerLink]="['/home']">Home
-          <span class="sr-only">(current)</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/captures']">Captures</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/flows']">
-          Flows
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/views']">
-          Views
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/results']">
-          Results
-        </a>
-      </li>
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
+<div class="tarzan-app">
+  <mat-toolbar class="app-navbar">
+    <a mat-button class="app-button" routerLink="/" aria-label="Tarzan Dashboard">
+      <i class="material-icons">title</i>
+      <span>TARZAN</span>
+    </a>
+    <a mat-button class="app-button" routerLink="captures">
+      <i class="material-icons">camera_roll</i>
+      <span>Captures</span>
+    </a>
+    <a mat-button class="app-button" routerLink="flows">
+      <i class="material-icons">view_list</i>
+      <span>Flows</span>
+    </a>
+    <a mat-button class="app-button" routerLink="explore">
+      <i class="material-icons">explore</i>
+      <span>Explore</span>
+    </a>
+    <a mat-button class="app-button" routerLink="results">
+      <i class="material-icons">fingerprint</i>
+      <span>Results</span>
+    </a>
+    <div class="flex-spacer"></div>
+    <a mat-button class="app-button" routerLink="settings">
+      <i class="material-icons">settings</i>
+      Settings
+    </a>
+    <a mat-button class="app-button" routerLink="profile">
+      <i class="material-icons">portrait</i>
+      Ondrej Rysavy
+    </a>
+  </mat-toolbar>
+  <div class="app-content-container">
+  <router-outlet></router-outlet>
   </div>
-</nav>
-<!-- main content-->
-<main>
-    <div class="container">
-        <div class="row row-offcanvas row-offcanvas-right">
-            <div class="col-xs-12 col-sm-9">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a routerLink="/home">Home</a></li>
-                    <li class="breadcrumb-item active">Courses</li>
-                </ol>
-                <div class="jumbotron">
-                    <h1>Course Categories!</h1>
-                    <p>This is a list of course categories, click on each to see a list of courses for a given category.</p>
-                </div>
-                <router-outlet></router-outlet>
-            </div>
-            <router-outlet name="sidemenu"></router-outlet>
-        </div>
+  <mat-toolbar class="app-footer">
+    <div class="version-info">
+        <mat-icon>info</mat-icon>
+        Tarzan Dashboard Version 0.1
     </div>
-</main>
+  </mat-toolbar>
+</div>

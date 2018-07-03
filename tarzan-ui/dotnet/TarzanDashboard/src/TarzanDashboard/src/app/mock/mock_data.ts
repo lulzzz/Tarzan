@@ -1,4 +1,4 @@
-import { FlowRecord } from '../model/flowRecord';
+import { FlowRecord } from 'src/api/index';
 
 const input = 
 '649 |      192.168.2.106 |            3106 | 1970-01-01 00:04:53.830000+0000 | 1970-01-01 00:07:12.241000+0000 |    3359 |       6 |      TCP |   208.111.160.6 |         80 $' +
@@ -30,8 +30,8 @@ export const ITEMS: FlowRecord[] = input.split('$').map( line =>
       id : Number.parseInt(t[0]),
       destinationAddress : t[1],
       destinationPort : Number.parseInt(t[2]),
-      firstSeen : t[3],
-      lastSeen : t[4],
+      firstSeen : 0,
+      lastSeen : 0,
       octets: Number.parseInt(t[5]),
       packets: Number.parseInt(t[6]),
       protocol : t[7],
