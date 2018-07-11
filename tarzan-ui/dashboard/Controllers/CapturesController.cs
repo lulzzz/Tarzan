@@ -5,32 +5,33 @@ using Tarzan.UI.Server.Models;
 
 namespace TarzanDashboard.Controllers
 {
-  /// <summary>
-  /// Values Controller
-  /// </summary>
-  /// <seealso cref="Microsoft.AspNetCore.Mvc.Controller" />
-  public class CapturesController : Controller
-  {
+    /// <summary>
+    /// Values Controller
+    /// </summary>
+    /// <seealso cref="Microsoft.AspNetCore.Mvc.Controller" />
+    [Route("api/[controller]")]
+    public class CapturesController : Controller
+    {
         /// <summary>
         /// Gets some values.
         /// </summary>
         /// <returns>A collection of values</returns>
-        [HttpGet]
-        [Route("api/captures/index")]
+        [HttpGet()]
         public IEnumerable<Capture> Get()
-    {
-      return new Capture[] { 
-        new Capture() {
-          Id = 1,
-          Name = "testbed-11jun.pcap",
-          Type = "pcap",
-          Size = 17306938543,
-          CreatedOn = DateTime.Parse("2016-01-21T18:57:51"),
-          UploadOn = DateTime.Now,
-          Author = "Alice Smith",
-          Notes = "",
-          Tags = new string [] {}
-        } };
+        {
+            return new Capture[] {
+                new Capture() {
+                  Id = 1,
+                  Name = "testbed-11jun.pcap",
+                  Type = "pcap",
+                  Size = 17306938543,
+                  CreatedOn = DateTime.Parse("2016-01-21T18:57:51"),
+                  UploadOn = DateTime.Now,
+                  Author = "Alice Smith",
+                  Hash = System.Text.Encoding.ASCII.GetBytes("c88628f2878d309300662feae9336c2b"),
+                  Notes = "",
+                  Tags = new string [] {}
+                } };
+        }
     }
-  }
 }

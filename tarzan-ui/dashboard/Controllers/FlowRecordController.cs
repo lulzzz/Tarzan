@@ -8,9 +8,8 @@ using System.Net;
 using Tarzan.UI.Server.Models;
 
 namespace Tarzan.UI.Server.Controllers
-{
-    
-    [Produces("application/json")]
+{       
+    [Route("api/[controller]")]
     public class FlowRecordController : Controller
     {
         FlowRecordDataAccess m_dataAccess = new FlowRecordDataAccess(new IPEndPoint(IPAddress.Loopback, 9042) , "flowstat");
@@ -20,8 +19,7 @@ namespace Tarzan.UI.Server.Controllers
         /// Gets all flow records.
         /// </summary>
         /// <returns>A collection of all available flow records.</returns>
-        [HttpGet]
-        [Route("api/flows/index")]
+        [HttpGet()]
         public IEnumerable<FlowRecord> Index()
         {                        
             return m_dataAccess.GetAllFlowRecords();
@@ -31,8 +29,7 @@ namespace Tarzan.UI.Server.Controllers
         /// </summary>
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
-        [HttpGet]
-        [Route("api/flows/item")]  
+        [HttpGet("{id}")]
         public FlowRecord FetchRecordById(int id)
         {
             return m_dataAccess.GetFlowRecord(id);
