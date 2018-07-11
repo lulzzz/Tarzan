@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "es6",
+    "lib": [ "es2015", "es2017", "dom" ],
+    "sourceMap": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
+    "types": [ "webpack-env" ]
+  },
+  "exclude": [
+      "bin",
+      "node_modules"
+  ]
+}

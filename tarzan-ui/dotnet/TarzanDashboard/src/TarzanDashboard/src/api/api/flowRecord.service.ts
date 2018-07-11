@@ -27,7 +27,7 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class FlowRecordService {
 
-    protected basePath = 'https://localhost';
+    protected basePath = BASE_PATH.toString();
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 

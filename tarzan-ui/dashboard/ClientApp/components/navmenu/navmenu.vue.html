@@ -1,0 +1,62 @@
+<template>
+    <div class="main-nav">
+        <nav class="navbar navbar-fixed-top">
+            <ul class="nav navbar-nav navbar-left">
+                <li>
+                    <router-link to="captures" :exact="true">
+                        <span class="glyphicon glyphicon-cd"></span>Captures
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/flows">
+                        <span class="glyphicon glyphicon-tasks"></span>Flows
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/explore">
+                        <span class="glyphicon glyphicon-tags"></span>Explore
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/results">
+                        <span class="glyphicon glyphicon-grain"></span>Results
+                    </router-link>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <router-link to="/fetchdata">
+                        <span class="glyphicon glyphicon-cog"></span> Settings
+                    </router-link>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-user" />
+                        Ondrej Rysavy
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul class="nav">
+                            <li>
+                                <router-link to="/user/profile">
+                                    <span class="glyphicon glyphicon-th-large" />Profile
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/user/messages">
+                                    <span class="glyphicon glyphicon-inbox" /> Messages
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/user/messages">
+                                    <span class="glyphicon glyphicon-off" /> Logout
+                                </router-link>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</template>
+
+<style src="./navmenu.css" />

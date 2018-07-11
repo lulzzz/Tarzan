@@ -20,9 +20,12 @@ namespace TarzanDashboard
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddMvc();
+      // enables cross site requests:
+      services.AddCors();
+
       services.AddSpaStaticFiles(c =>
       {
-        c.RootPath = "wwwroot";
+        c.RootPath = "dist/tarzanDashboard"; // "wwwroot";
       });
 
       services.AddSwaggerGen(c =>
@@ -53,6 +56,9 @@ namespace TarzanDashboard
         app.UseDeveloperExceptionPage();
       }
 
+      app.UseCors(builder =>
+        builder.WithOrigins("http://localhost").AllowAnyHeader());
+
       app.UseDefaultFiles();
       app.UseStaticFiles();
 
@@ -76,10 +82,11 @@ namespace TarzanDashboard
         // To learn more about options for serving an Angular SPA from ASP.NET Core,
         // see https://go.microsoft.com/fwlink/?linkid=864501
 
-        spa.Options.SourcePath = "wwwroot";
+        spa.Options.SourcePath = "dist/tarzanDashboard"; //"wwwroot";
 
         if (env.IsDevelopment())
         {
+          //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
           spa.UseAngularCliServer(npmScript: "start");
         }
       });

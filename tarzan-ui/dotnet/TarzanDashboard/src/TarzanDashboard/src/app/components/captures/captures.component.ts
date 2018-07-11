@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Capture } from 'src/api';
+import { Capture, CapturesService } from 'src/api';
+
+
+const TEST_DATA = [{"id":1,"name":"testbed-11jun.pcap","type":"pcap","size":17306938543,"createdOn": new Date("2016-01-21T18:57:51"),"uploadOn": new Date("2018-07-11T10:09:47.9398066+02:00"),"hash":null,"author":"Alice Smith","notes":"","tags":[]}];
 
 @Component({
   selector: 'app-captures',
@@ -7,13 +10,21 @@ import { Capture } from 'src/api';
   styleUrls: ['./captures.component.css']
 })
 export class CapturesComponent implements OnInit {
-  dataSource : Capture[];
+  dataSource : Capture[] = TEST_DATA;
   current : Capture = null;
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private capturesService: CapturesService) 
+  { 
   }
 
-  displayedColumns: string[] = ['position', 'name', 'type', 'size', 'createdOn', 'uploadedOn', 'hash'];
+  ngOnInit() {
+    console.log("CaptureComponent.ngOnInit");
+    this.capturesService.apiCapturesGet("body", false).subscribe(
+      (data:Capture[]) => {
+        this.dataSource = data;
+        console.log(`CaptureComponent.apiCapturesGet: Completed, ${ data.length }.`);  
+      });
+  }
+
+  displayedColumns: string[] = ['id', 'name', 'type', 'size', 'createdOn', 'uploadedOn', 'hash'];
 }
  

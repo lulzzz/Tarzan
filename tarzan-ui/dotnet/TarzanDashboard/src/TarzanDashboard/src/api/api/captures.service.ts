@@ -27,7 +27,7 @@ import { Configuration }                                     from '../configurat
 @Injectable()
 export class CapturesService {
 
-    protected basePath = 'https://localhost';
+    protected basePath = BASE_PATH.toString();
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 
@@ -71,7 +71,7 @@ export class CapturesService {
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            'text/plain',
+           // 'text/plain',
             'application/json',
             'text/json'
         ];
@@ -83,7 +83,7 @@ export class CapturesService {
         // to determine the Content-Type header
         let consumes: string[] = [
         ];
-
+        console.info(`T> httpClient.GET ${this.basePath}/api/Captures`);
         return this.httpClient.get<Array<Capture>>(`${this.basePath}/api/Captures`,
             {
                 withCredentials: this.configuration.withCredentials,

@@ -4,6 +4,54 @@
         <name>TarzanDashboard</name>
     </assembly>
     <members>
+        <member name="T:TarzanDashboard.Controllers.CapturesController">
+            <summary>
+            Values Controller
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+        </member>
+        <member name="M:TarzanDashboard.Controllers.CapturesController.Get">
+            <summary>
+            Gets some values.
+            </summary>
+            <returns>A collection of values</returns>
+        </member>
+        <member name="T:TarzanDashboard.Program">
+            <summary>
+            Main App entry point
+            </summary>
+        </member>
+        <member name="M:TarzanDashboard.Program.Main(System.String[])">
+            <summary>
+            Defines the entry point of the application.
+            </summary>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:TarzanDashboard.Program.BuildWebHost(System.String[])">
+            <summary>
+            Builds the web host.
+            </summary>
+            <param name="args">The arguments.</param>
+            <returns>The web host, ready to be run.</returns>
+        </member>
+        <member name="T:TarzanDashboard.Startup">
+            <summary>
+            Startup class
+            </summary>
+        </member>
+        <member name="M:TarzanDashboard.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Configures app the services.
+            </summary>
+            <param name="services">The services.</param>
+        </member>
+        <member name="M:TarzanDashboard.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Configures the application.
+            </summary>
+            <param name="app">The application.</param>
+            <param name="env">The hosting environment</param>
+        </member>
         <member name="M:Tarzan.UI.Server.Controllers.FlowRecordController.Index">
             <summary>
             Gets all flow records.
@@ -146,54 +194,6 @@
             Creates new flow record reding vlues from Cassandra row.null 
             </summary>
             <param name="row"></param>
-        </member>
-        <member name="T:TarzanDashboard.Controllers.CapturesController">
-            <summary>
-            Values Controller
-            </summary>
-            <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
-        </member>
-        <member name="M:TarzanDashboard.Controllers.CapturesController.Get">
-            <summary>
-            Gets some values.
-            </summary>
-            <returns>A collection of values</returns>
-        </member>
-        <member name="T:TarzanDashboard.Program">
-            <summary>
-            Main App entry point
-            </summary>
-        </member>
-        <member name="M:TarzanDashboard.Program.Main(System.String[])">
-            <summary>
-            Defines the entry point of the application.
-            </summary>
-            <param name="args">The arguments.</param>
-        </member>
-        <member name="M:TarzanDashboard.Program.BuildWebHost(System.String[])">
-            <summary>
-            Builds the web host.
-            </summary>
-            <param name="args">The arguments.</param>
-            <returns>The web host, ready to be run.</returns>
-        </member>
-        <member name="T:TarzanDashboard.Startup">
-            <summary>
-            Startup class
-            </summary>
-        </member>
-        <member name="M:TarzanDashboard.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            Configures app the services.
-            </summary>
-            <param name="services">The services.</param>
-        </member>
-        <member name="M:TarzanDashboard.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
-            <summary>
-            Configures the application.
-            </summary>
-            <param name="app">The application.</param>
-            <param name="env">The hosting environment</param>
         </member>
     </members>
 </doc>

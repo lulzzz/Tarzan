@@ -1,0 +1,24 @@
+
+body {
+    font-family: Roboto, Arial, sans-serif;
+    margin: 0;
+    font-size: 10pt;
+    padding-top: 50px;
+}
+
+.version-info {
+    font-size: 8pt;
+    float: right;
+}
+
+.flex-spacer {
+    flex-grow: 1;
+}
+
+.app-content-container {
+    top: 60px;
+    position: fixed;
+    bottom: 20px;
+    left: 0px;
+    right: 0px;
+}
