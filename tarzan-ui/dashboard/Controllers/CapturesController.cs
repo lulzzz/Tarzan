@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Tarzan.UI.Server.DataAccess;
 using Tarzan.UI.Server.Models;
 
 namespace TarzanDashboard.Controllers
@@ -12,6 +13,12 @@ namespace TarzanDashboard.Controllers
     [Route("api/[controller]")]
     public class CapturesController : Controller
     {
+        ICaptureDataAccess m_dataAccess;
+
+        public CapturesController(ICaptureDataAccess dataAccess)
+        {
+            m_dataAccess = dataAccess;
+        }
         /// <summary>
         /// Gets some values.
         /// </summary>
@@ -19,19 +26,7 @@ namespace TarzanDashboard.Controllers
         [HttpGet()]
         public IEnumerable<Capture> Get()
         {
-            return new Capture[] {
-                new Capture() {
-                  Id = 1,
-                  Name = "testbed-11jun.pcap",
-                  Type = "pcap",
-                  Size = 17306938543,
-                  CreatedOn = DateTime.Parse("2016-01-21T18:57:51"),
-                  UploadOn = DateTime.Now,
-                  Author = "Alice Smith",
-                  Hash = System.Text.Encoding.ASCII.GetBytes("c88628f2878d309300662feae9336c2b"),
-                  Notes = "",
-                  Tags = new string [] {}
-                } };
+            return m_dataAccess.GetAllCaptures();
         }
     }
 }

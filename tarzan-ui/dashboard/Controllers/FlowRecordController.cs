@@ -6,14 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 using Cassandra;
 using System.Net;
 using Tarzan.UI.Server.Models;
+using Tarzan.UI.Server.DataAccess;
 
 namespace Tarzan.UI.Server.Controllers
 {       
     [Route("api/[controller]")]
     public class FlowRecordController : Controller
     {
-        FlowRecordDataAccess m_dataAccess = new FlowRecordDataAccess(new IPEndPoint(IPAddress.Loopback, 9042) , "flowstat");
+        IFlowRecordDataAccess m_dataAccess;
 
+        public FlowRecordController(IFlowRecordDataAccess dataAccess)
+        {
+            m_dataAccess = dataAccess;
+        }
 
         /// <summary>
         /// Gets all flow records.

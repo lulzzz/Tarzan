@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Cassandra;
-namespace Tarzan.UI.Server.Models
+using Tarzan.UI.Server.Models;
+
+namespace Tarzan.UI.Server.DataAccess.Cassandra
 {
-    public class FlowRecordDataAccess 
+    public class FlowRecordDataAccess : IFlowRecordDataAccess
     {
         ISession m_session;
-        public FlowRecordDataAccess(IPEndPoint cassandraDb, string keyspace)
+        public FlowRecordDataAccess(Cluster cluster, string keyspace)
         {
-            var cluster = Cluster.Builder()
-            .AddContactPoints(cassandraDb)
-            .Build();
             m_session = cluster.Connect(keyspace);
         }
 

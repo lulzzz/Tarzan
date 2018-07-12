@@ -62,7 +62,7 @@ namespace Tarzan.UI.Server.Models
 
         }
         /// <summary>
-        /// Creates new flow record reding vlues from Cassandra row.null 
+        /// Creates new flow record reding values from Cassandra row.null 
         /// </summary>
         /// <param name="row"></param>
         public FlowRecord(Cassandra.Row row)
