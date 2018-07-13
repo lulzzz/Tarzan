@@ -12,6 +12,7 @@
     <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.17.20" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,12 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\providers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="DataAccess\Mock\flowstat.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

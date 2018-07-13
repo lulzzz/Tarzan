@@ -1,26 +1,2 @@
-.main-nav li .glyphicon {
-    margin-right: 8px;
-}
-
-/* Highlighting rules for nav menu items */
-.main-nav li a.router-link-active,
-.main-nav li a.router-link-active:hover,
-.main-nav li a.router-link-active:focus {
-    background-color: #4189C7;
-    color: white;
-}
-
-/* Keep the nav menu independent of scrolling and on top of other items */
-.main-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
-}
-
-.main-nav .navbar li a {
-    padding: 16px 16px 8px 8px;
-}
 
 

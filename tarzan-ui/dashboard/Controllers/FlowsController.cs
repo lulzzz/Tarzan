@@ -6,33 +6,41 @@ using Microsoft.AspNetCore.Mvc;
 using Cassandra;
 using System.Net;
 using Tarzan.UI.Server.Models;
+using Tarzan.UI.Server.DataAccess;
 
 namespace Tarzan.UI.Server.Controllers
 {
-    
-    [Produces("application/json")]
-    public class FlowRecordController : Controller
+    [Route("api/[controller]")]
+    public class FlowsController : Controller
     {
-        FlowRecordDataAccess m_dataAccess = new FlowRecordDataAccess(new IPEndPoint(IPAddress.Loopback, 9042) , "flowstat");
+        IFlowRecordDataAccess m_dataAccess;
 
+        public FlowsController(IFlowRecordDataAccess dataAccess)
+        {
+            m_dataAccess = dataAccess;
+        }
 
         /// <summary>
         /// Gets all flow records.
         /// </summary>
         /// <returns>A collection of all available flow records.</returns>
-        [HttpGet]
-        [Route("api/flows/index")]
-        public IEnumerable<FlowRecord> Index()
-        {                        
-            return m_dataAccess.GetAllFlowRecords();
+        [HttpGet("count")]
+        public int FetchRecordCount()
+        {
+            return m_dataAccess.RecordCount();
+        }
+
+        [HttpGet("range/{start}/count/{length}")]
+        public IEnumerable<FlowRecord> FetchRecordRange(int start, int length)
+        {
+            return m_dataAccess.GetAllFlowRecords(start, length);
         }
         /// <summary>
         /// Gets the flow record of the specified id.
         /// </summary>
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
-        [HttpGet]
-        [Route("api/flows/item")]  
+        [HttpGet("item/{id}")]
         public FlowRecord FetchRecordById(int id)
         {
             return m_dataAccess.GetFlowRecord(id);

@@ -1,28 +1,34 @@
 <template>
     <div>
-        <h1>Weather forecast</h1>
+        <h1>Flow Table</h1>
 
-        <p>This component demonstrates fetching data from the server.</p>
-
-        <table v-if="forecasts.length" class="table">
+        <b-pagination :total-rows="totalFlows" v-model="currentPage" :per-page="perPage" v-on:change="reload" />
+        <table v-if="dataSource.length" class="table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
+                    <th>Id</th>
+                    <th>Protocol</th>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>First</th>
+                    <th>Last</th>
+                    <th>Packets</th>
+                    <th>Octets</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in forecasts">
-                    <td>{{ item.dateFormatted }}</td>
-                    <td>{{ item.temperatureC }}</td>
-                    <td>{{ item.temperatureF }}</td>
-                    <td>{{ item.summary }}</td>
+                <tr v-for="flow in dataSource">
+                    <td> {{flow.id}}        </td>
+                    <td> {{flow.protocol}}      </td>
+                    <td> {{flow.sourceAddress}} : {{flow.sourcePort}} </td>
+                    <td> {{flow.destinationAddress}} : {{flow.destinationPort}} </td>
+                    <td> {{flow.firstSeen}}  </td>
+                    <td> {{flow.lastSeen}}      </td>
+                    <td> {{flow.packets}}  </td>
+                    <td> {{flow.octets}}      </td>
                 </tr>
             </tbody>
         </table>
-
         <p v-else><em>Loading...</em></p>
     </div>
 </template>

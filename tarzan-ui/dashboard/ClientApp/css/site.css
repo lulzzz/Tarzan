@@ -25,7 +25,39 @@ body {
 .app-content-container {
     top: 60px;
     position: fixed;
-    bottom: 20px;
-    left: 0px;
-    right: 0px;
+    left: 10px;
+    right: 10px;
+}
+
+
+
+/* Keep the nav menu independent of scrolling and on top of other items */
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+nav.navbar.navbar-fixed-top {
+    background-color: #eeeeee;
+    height: 44px;
+}
+/* Highlighting rules for nav menu items */
+.main-nav li a.router-link-active,
+.main-nav li a.router-link-active:hover,
+.main-nav li a.router-link-active:focus {
+    background-color: #4189C7;
+    color: white;
+}
+.main-nav li .glyphicon {
+        margin-right: 8px;
+}
+
+/* TABLES */
+.table {
+    border: solid;
+    border-color: GrayText;
+    border-width: 1px;
 }

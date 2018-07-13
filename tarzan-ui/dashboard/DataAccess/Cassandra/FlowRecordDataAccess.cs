@@ -15,9 +15,9 @@ namespace Tarzan.UI.Server.DataAccess.Cassandra
             m_session = cluster.Connect(keyspace);
         }
 
-        public IEnumerable<FlowRecord> GetAllFlowRecords(int limit = Int32.MaxValue)        
+        public IEnumerable<FlowRecord> GetAllFlowRecords(int start = 0, int limit = Int32.MaxValue)        
         {
-            var rs = m_session.Execute("select * from flows").Take(limit);
+            var rs = m_session.Execute("select * from flows").Skip(start).Take(limit);
             foreach (var row in rs)
             {
                 yield return new FlowRecord(row);
@@ -29,6 +29,11 @@ namespace Tarzan.UI.Server.DataAccess.Cassandra
             var rs = m_session.Execute($"select * from flows where id={id}");
             var row = rs.FirstOrDefault();
             return (row!=null) ? new FlowRecord(row) : null;
+        }
+
+        public int RecordCount()
+        {
+            throw new NotImplementedException();
         }
     }
 }
