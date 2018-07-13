@@ -22,17 +22,9 @@ namespace Tarzan.UI.Server.DataAccess.Mock
             }
         }
 
-        public IEnumerable<FlowRecord> GetAllFlowRecords(int start = 0, int length = Int32.MaxValue)        
+        public IEnumerable<FlowRecord> GetFlowRecords(int start = 0, int length = Int32.MaxValue)        
         {
-            if (start >=0 && start < m_data.Count)
-            {
-                var count = Math.Min(m_data.Count - (start), length);
-                return m_data.GetRange(start, count);
-            }
-            else
-            {
-                return new FlowRecord[0];
-            } 
+            return m_data.Skip(start).Take(length);
         }  
 
         public FlowRecord GetFlowRecord(int id)

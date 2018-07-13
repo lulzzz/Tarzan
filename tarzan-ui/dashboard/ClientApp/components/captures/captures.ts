@@ -1,16 +1,25 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-const TEST_DATA = [{ "id": 1, "name": "testbed-11jun.pcap", "type": "pcap", "size": 17306938543, "createdOn": new Date("2016-01-21T18:57:51"), "uploadOn": new Date("2018-07-11T10:09:47.9398066+02:00"), "hash": "", "author": "Alice Smith", "notes": "", "tags": [] }];
 
 import { Capture } from '../../api/capture';
 
 @Component
 export default class CapturesComponent extends Vue {
-    dataSource: Capture[] = TEST_DATA;
+    dataSource: Capture[] = [];
+    currentPage: number = 1;
+    totalCaptures: number = 0;
+    perPage = 10;
 
     mounted() {
-        fetch('/api/captures')
+        fetch('api/captures/count').then(response => response.text().then(value => this.totalCaptures = parseInt(value)));
+        this.reload(1);
+    }
+    reload(page: number) {
+        let offset = (page - 1) * this.perPage;
+        let fetchString = `api/captures/range/${offset}/count/${this.perPage}`;
+        console.log(fetchString);
+        fetch(fetchString)
             .then(response => response.json() as Promise<Capture[]>)
             .then(data => {
                 this.dataSource = data;

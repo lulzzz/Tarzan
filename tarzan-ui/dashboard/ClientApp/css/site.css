@@ -1,63 +1,52 @@
-
+@import "https://unpkg.com/bootstrap/dist/css/bootstrap.min.css";       
+@import "https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css";
+    
 h1 {
-    font-size: 14pt;
+    font-family: 'Roboto';
+}
+h2 {
     font-family: 'Roboto';
 }
 
-
-
 body {
-    font-family: Roboto, Arial, sans-serif;
-    margin: 10px;
-    font-size: 10pt;
-    padding-top: 50px;
+    font-family: Roboto, Arial, sans-serif;    
+    font-size: 12px;
 }
 
-.version-info {
-    font-size: 8pt;
-    float: right;
-}
-
-.flex-spacer {
-    flex-grow: 1;
-}
 
 .app-content-container {
-    top: 60px;
-    position: fixed;
+    position:page;
+    margin-top:80px;
     left: 10px;
     right: 10px;
+    text-align: left;
 }
-
-
 
 /* Keep the nav menu independent of scrolling and on top of other items */
 .main-nav {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1;
-}
-
-nav.navbar.navbar-fixed-top {
-    background-color: #eeeeee;
-    height: 44px;
-}
-/* Highlighting rules for nav menu items */
-.main-nav li a.router-link-active,
-.main-nav li a.router-link-active:hover,
-.main-nav li a.router-link-active:focus {
-    background-color: #4189C7;
-    color: white;
+    z-index: 0;
+    border-radius: 0px;
 }
 .main-nav li .glyphicon {
-        margin-right: 8px;
+    margin-right: 0.3em;
 }
 
 /* TABLES */
 .table {
     border: solid;
-    border-color: GrayText;
+    border-color: #dddddd;
     border-width: 1px;
 }
+.table td {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #dddddd;
+}
+    .table th {
+        background-color: #4189C7;
+        color: white;
+    }

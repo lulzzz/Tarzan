@@ -5,7 +5,8 @@ namespace Tarzan.UI.Server.DataAccess
 {
     public interface ICaptureDataAccess
     {
-        IEnumerable<Capture> GetAllCaptures(int limit = int.MaxValue);
+        IEnumerable<Capture> GetCaptures(int start = 0, int length = int.MaxValue);
         Capture GetCapture(int id);
+        int CaptureCount();
     }
 }

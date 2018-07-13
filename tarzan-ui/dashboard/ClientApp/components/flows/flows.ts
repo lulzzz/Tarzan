@@ -8,7 +8,7 @@ export default class FetchDataComponent extends Vue {
     currentPage: number = 1;
     totalFlows: number = 0;
     perPage = 10;
-    fields = ['id', 'protocol', 'sourceAddress', 'sourcePort'];
+
     mounted() {
         fetch('api/flows/count').then(response => response.text().then(value => this.totalFlows = parseInt(value)));
 

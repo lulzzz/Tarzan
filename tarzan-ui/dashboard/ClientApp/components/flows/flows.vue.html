@@ -1,8 +1,24 @@
 <template>
     <div>
         <h1>Flow Table</h1>
+        <b-container fluid>
+            <b-row align-v="center">
+                <b-col  cols="8">
+                    <b-input-group style="vertical-align:central" prepend="Filter">
+                        <b-form-input></b-form-input>
+                        <b-input-group-append>
+                            <b-btn>Apply</b-btn>
+                            <b-btn>Cancel</b-btn>
+                        </b-input-group-append>
+                    </b-input-group>
+                </b-col>
 
-        <b-pagination :total-rows="totalFlows" v-model="currentPage" :per-page="perPage" v-on:change="reload" />
+                <b-col>
+                    <b-pagination style="vertical-align:central" :total-rows="totalFlows" v-model="currentPage" :per-page="perPage" v-on:change="reload" />
+                </b-col>
+            </b-row>
+        </b-container>
+
         <table v-if="dataSource.length" class="table">
             <thead>
                 <tr>

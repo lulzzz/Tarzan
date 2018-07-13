@@ -17,12 +17,18 @@ namespace Tarzan.UI.Server.DataAccess.Cassandra
             m_session = cluster.Connect(keyspace);
         }
 
-        public IEnumerable<Capture> GetAllCaptures(int limit = int.MaxValue)
+ 
+        public Capture GetCapture(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Capture GetCapture(int id)
+        public IEnumerable<Capture> GetCaptures(int start = 0, int limit = int.MaxValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int CaptureCount()
         {
             throw new NotImplementedException();
         }

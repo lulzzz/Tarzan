@@ -15,7 +15,7 @@ namespace Tarzan.UI.Server.DataAccess.Cassandra
             m_session = cluster.Connect(keyspace);
         }
 
-        public IEnumerable<FlowRecord> GetAllFlowRecords(int start = 0, int limit = Int32.MaxValue)        
+        public IEnumerable<FlowRecord> GetFlowRecords(int start = 0, int limit = Int32.MaxValue)        
         {
             var rs = m_session.Execute("select * from flows").Skip(start).Take(limit);
             foreach (var row in rs)

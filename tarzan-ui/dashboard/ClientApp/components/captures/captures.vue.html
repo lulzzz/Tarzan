@@ -1,14 +1,10 @@
 <template>
-    <b-card title="Capture Files"
-            tag="captures"
-            style="max-width: 20rem;"
-            class="mb-2">
-
+    <div>
+        <h1> Capture Files</h1>
         <p v-if="dataSource == null">
-            Sorry, no capture files have been uploaded yet. Please add some capture files to start investigation.
+            Sorry, no capture files have been uploaded yet. Use caploader to add capture files to the investigation.
         </p>
-        <!--<b-table striped hover :items="dataSource"></b-table>-->
-
+        <b-pagination :total-rows="totalCaptures" v-model="currentPage" :per-page="perPage" v-on:change="reload" />
         <table v-if="dataSource != null" class="table" style="width:100%">
             <thead>
                 <tr>
@@ -31,16 +27,7 @@
                 </tr>
             </tbody>
         </table>
-
-            <b-btn variant="primary">
-                <span class="glyphicon glyphicon-upload" />
-                Upload
-            </b-btn>
-            <b-btn>
-                <span class="glyphicon glyphicon-trash" />
-                Delete
-            </b-btn>
-    </b-card>
+    </div>
 </template>
 
 <script src="./captures.ts"></script>

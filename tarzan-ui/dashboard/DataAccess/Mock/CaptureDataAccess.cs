@@ -7,19 +7,19 @@ namespace Tarzan.UI.Server.DataAccess.Mock
 {
     public class CaptureDataAccess : ICaptureDataAccess
     {
-
-        public CaptureDataAccess()
-        {
-        }
-
-        public IEnumerable<Capture> GetAllCaptures(int limit = int.MaxValue)
-        {
-            return m_data;
-        }
-
         public Capture GetCapture(int id)
         {
             return m_data.FirstOrDefault(x => x.Id == id);
+        }
+
+        public IEnumerable<Capture> GetCaptures(int start = 0, int length = int.MaxValue)
+        {
+            return m_data.Skip(start).Take(length);
+        }
+
+        public int CaptureCount()
+        {
+            return m_data.Count();
         }
 
         Capture[] m_data = new Capture[]

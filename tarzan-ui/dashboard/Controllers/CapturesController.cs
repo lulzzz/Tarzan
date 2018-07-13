@@ -23,10 +23,19 @@ namespace TarzanDashboard.Controllers
         /// Gets some values.
         /// </summary>
         /// <returns>A collection of values</returns>
-        [HttpGet()]
-        public IEnumerable<Capture> Get()
+        [HttpGet("range/{start}/count/{length}")]
+        public IEnumerable<Capture> FetchRange(int start, int length)
         {
-            return m_dataAccess.GetAllCaptures();
+            return m_dataAccess.GetCaptures(start, length);
+        }
+        /// <summary>
+        /// Gets all flow records.
+        /// </summary>
+        /// <returns>A collection of all available flow records.</returns>
+        [HttpGet("count")]
+        public int FetchCount()
+        {
+            return m_dataAccess.CaptureCount();
         }
     }
 }

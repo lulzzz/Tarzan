@@ -31,9 +31,9 @@ namespace Tarzan.UI.Server.Controllers
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<FlowRecord> FetchRecordRange(int start, int length)
+        public IEnumerable<FlowRecord> FetchRange(int start, int length)
         {
-            return m_dataAccess.GetAllFlowRecords(start, length);
+            return m_dataAccess.GetFlowRecords(start, length);
         }
         /// <summary>
         /// Gets the flow record of the specified id.

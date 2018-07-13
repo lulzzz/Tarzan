@@ -1,4 +1,25 @@
 <template>
+    <b-navbar class="main-nav" toggleable="md" type="dark" variant="dark">
+        <b-navbar-nav>
+            <b-nav-item to="/captures"><span class="glyphicon glyphicon-cd"/>Captures</b-nav-item>
+            <b-nav-item to="/flows"><span class="glyphicon glyphicon-tasks"/>Flows</b-nav-item>
+            <b-nav-item to="/explore"><span class="glyphicon glyphicon-tags"/>Explore</b-nav-item>
+            <b-nav-item to="/results"><span class="glyphicon glyphicon-grain"/>Results</b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav class="ml-auto">
+
+            <b-nav-item to="/settings"><span class="glyphicon glyphicon-cog"/>Settings</b-nav-item>
+            <b-nav-item-dropdown text="User" right>
+                <b-dropdown-item href="/user/profile"><span class="glyphicon glyphicon-th-large" />Profile</b-dropdown-item>
+                <b-dropdown-item href="/user/messages"> <span class="glyphicon glyphicon-inbox" />Messages</b-dropdown-item>
+                <b-dropdown-item href="/user/logout"><span class="glyphicon glyphicon-off" />Logout</b-dropdown-item>
+            </b-nav-item-dropdown>
+
+        </b-navbar-nav>
+    </b-navbar>
+
+        <!--
+
     <div class="main-nav">
         <nav class="navbar navbar-fixed-top">
             <ul class="nav navbar-nav navbar-left">
@@ -57,6 +78,6 @@
             </ul>
         </nav>
     </div>
+        -->
 </template>
 
-<style src="./navmenu.css" />
