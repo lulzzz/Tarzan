@@ -1,83 +1,21 @@
 <template>
-    <b-navbar class="main-nav" toggleable="md" type="dark" variant="dark">
-        <b-navbar-nav>
-            <b-nav-item to="/captures"><span class="glyphicon glyphicon-cd"/>Captures</b-nav-item>
-            <b-nav-item to="/flows"><span class="glyphicon glyphicon-tasks"/>Flows</b-nav-item>
-            <b-nav-item to="/explore"><span class="glyphicon glyphicon-tags"/>Explore</b-nav-item>
-            <b-nav-item to="/results"><span class="glyphicon glyphicon-grain"/>Results</b-nav-item>
-        </b-navbar-nav>
-        <b-navbar-nav class="ml-auto">
 
-            <b-nav-item to="/settings"><span class="glyphicon glyphicon-cog"/>Settings</b-nav-item>
-            <b-nav-item-dropdown text="User" right>
-                <b-dropdown-item href="/user/profile"><span class="glyphicon glyphicon-th-large" />Profile</b-dropdown-item>
-                <b-dropdown-item href="/user/messages"> <span class="glyphicon glyphicon-inbox" />Messages</b-dropdown-item>
-                <b-dropdown-item href="/user/logout"><span class="glyphicon glyphicon-off" />Logout</b-dropdown-item>
-            </b-nav-item-dropdown>
-
-        </b-navbar-nav>
-    </b-navbar>
-
-        <!--
-
-    <div class="main-nav">
-        <nav class="navbar navbar-fixed-top">
-            <ul class="nav navbar-nav navbar-left">
-                <li>
-                    <router-link to="captures" :exact="true">
-                        <span class="glyphicon glyphicon-cd"></span>Captures
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/flows">
-                        <span class="glyphicon glyphicon-tasks"></span>Flows
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/explore">
-                        <span class="glyphicon glyphicon-tags"></span>Explore
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/results">
-                        <span class="glyphicon glyphicon-grain"></span>Results
-                    </router-link>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <router-link to="/fetchdata">
-                        <span class="glyphicon glyphicon-cog"></span> Settings
-                    </router-link>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="glyphicon glyphicon-user" />
-                        Ondrej Rysavy
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <ul class="nav">
-                            <li>
-                                <router-link to="/user/profile">
-                                    <span class="glyphicon glyphicon-th-large" />Profile
-                                </router-link>
-                            </li>
-                            <li>
-                                <router-link to="/user/messages">
-                                    <span class="glyphicon glyphicon-inbox" /> Messages
-                                </router-link>
-                            </li>
-                            <li>
-                                <router-link to="/user/messages">
-                                    <span class="glyphicon glyphicon-off" /> Logout
-                                </router-link>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-    </div>
-        -->
+    <el-menu :router="true" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+        <el-menu-item index="/captures" >Captures</el-menu-item>
+        <el-menu-item index="/flows">Flows</el-menu-item>
+        <el-menu-item index="/explore">Explore</el-menu-item>
+        <el-menu-item index="/files">Files</el-menu-item>
+        <el-menu-item index="/timeline">Timeline</el-menu-item>
+        <el-menu-item index="/results">Results</el-menu-item>
+        <el-menu-item index="/settings">Settings</el-menu-item>
+        <el-submenu index="/user">
+            <template slot="title">
+                User
+            </template>
+            <el-menu-item index="/user/profile">Profile</el-menu-item>
+            <el-menu-item index="/user/messages">Messages</el-menu-item>
+            <el-menu-item index="/user/logout">Logout</el-menu-item>
+        </el-submenu>
+    </el-menu>
 </template>
 

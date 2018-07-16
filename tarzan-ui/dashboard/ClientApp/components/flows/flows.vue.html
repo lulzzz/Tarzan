@@ -1,51 +1,40 @@
 <template>
     <div>
         <h1>Flow Table</h1>
-        <b-container fluid>
-            <b-row align-v="center">
-                <b-col  cols="8">
-                    <b-input-group style="vertical-align:central" prepend="Filter">
-                        <b-form-input></b-form-input>
-                        <b-input-group-append>
-                            <b-btn>Apply</b-btn>
-                            <b-btn>Cancel</b-btn>
-                        </b-input-group-append>
-                    </b-input-group>
-                </b-col>
+        <el-container>
+            <el-header>
 
-                <b-col>
-                    <b-pagination style="vertical-align:central" :total-rows="totalFlows" v-model="currentPage" :per-page="perPage" v-on:change="reload" />
-                </b-col>
-            </b-row>
-        </b-container>
+                <el-input v-model="flowFilter">
+                    <template slot="prepend">
+                        Filter:
+                    </template>
+                    <el-button slot="append" icon="el-icon-check"></el-button>
+                    <el-button slot="append" icon="el-icon-close"></el-button>
+                </el-input>
 
-        <table v-if="dataSource.length" class="table">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Protocol</th>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th>First</th>
-                    <th>Last</th>
-                    <th>Packets</th>
-                    <th>Octets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="flow in dataSource">
-                    <td> {{flow.id}}        </td>
-                    <td> {{flow.protocol}}      </td>
-                    <td> {{flow.sourceAddress}} : {{flow.sourcePort}} </td>
-                    <td> {{flow.destinationAddress}} : {{flow.destinationPort}} </td>
-                    <td> {{flow.firstSeen}}  </td>
-                    <td> {{flow.lastSeen}}      </td>
-                    <td> {{flow.packets}}  </td>
-                    <td> {{flow.octets}}      </td>
-                </tr>
-            </tbody>
-        </table>
-        <p v-else><em>Loading...</em></p>
+            </el-header>
+            <el-main>
+                <el-table :data="dataSource" border style="width: 100%">
+                    <el-table-column prop="id" label="Id" />
+                    <el-table-column prop="protocol" label="Proto" />
+                    <el-table-column :prop="???.sourceAddress + ':' + ???.sourcePort" label="Source" />
+                    <el-table-column prop="destinationAddress" label="Dst Addr" />
+                    <el-table-column prop="destinationPort" label="Dst Port" />
+                    <el-table-column prop="firstSeen" label="First" />
+                    <el-table-column prop="lastSeen" label="Last" />
+                    <el-table-column prop="packets" label="Packets" />
+                    <el-table-column prop="octets" label="Octets" />
+                </el-table>
+            </el-main>
+            <el-footer>
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalFlows"
+                               curent-page="currentPage"
+                               @current-change="reload" />
+            </el-footer>
+        </el-container>
     </div>
 </template>
 

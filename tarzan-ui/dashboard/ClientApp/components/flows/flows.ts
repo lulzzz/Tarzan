@@ -7,6 +7,7 @@ export default class FetchDataComponent extends Vue {
     dataSource: FlowRecord[] = [];
     currentPage: number = 1;
     totalFlows: number = 0;
+    flowFilter: string = "*";
     perPage = 10;
 
     mounted() {

@@ -1,6 +1,3 @@
-@import "https://unpkg.com/bootstrap/dist/css/bootstrap.min.css";       
-@import "https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css";
-    
 h1 {
     font-family: 'Roboto';
 }
@@ -13,6 +10,10 @@ body {
     font-size: 12px;
 }
 
+.card-body {
+    color: red;
+    z-index: 0;
+}
 
 .app-content-container {
     position:page;
@@ -32,7 +33,8 @@ body {
     border-radius: 0px;
 }
 .main-nav li .glyphicon {
-    margin-right: 0.3em;
+    margin-right: 0.5em;
+    margin-left: 1em
 }
 
 /* TABLES */
