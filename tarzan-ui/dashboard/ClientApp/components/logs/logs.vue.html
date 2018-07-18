@@ -1,0 +1,27 @@
+<template>
+    <div>
+        <h1>Logs</h1>
+       
+        <el-container style="border: 1px solid #eee">
+                <el-header>
+                    <!-- filters -->
+                    Filter:
+                    
+                </el-header>
+
+                <el-main>
+                    <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                        <el-table-column prop="id" label="Id" width="100" />
+                        <el-table-column prop="module" label="Module" />
+                        <el-table-column prop="subject" label="Subject" />
+                        <el-table-column prop="timestamp" label="Timestamp" />
+                    </el-table>
+
+                </el-main>
+                <el-footer>
+                </el-footer>
+        </el-container>
+    </div>                         
+</template>
+
+<script src="./logs.ts"></script>

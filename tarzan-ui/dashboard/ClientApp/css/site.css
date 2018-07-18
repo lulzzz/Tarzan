@@ -1,5 +1,6 @@
 h1 {
     font-family: 'Roboto';
+    font-size: 20px;
 }
 h2 {
     font-family: 'Roboto';
@@ -10,45 +11,22 @@ body {
     font-size: 12px;
 }
 
-.card-body {
-    color: red;
-    z-index: 0;
+.el-header {
+    background-color: whitesmoke;
+    color: #333;
+    padding-top: 10px;
 }
 
-.app-content-container {
-    position:page;
-    margin-top:80px;
-    left: 10px;
-    right: 10px;
-    text-align: left;
+.el-footer {
+    padding-top: 10px;
+    background-color: whitesmoke;
+    color: #333;
 }
 
-/* Keep the nav menu independent of scrolling and on top of other items */
-.main-nav {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 0;
-    border-radius: 0px;
-}
-.main-nav li .glyphicon {
-    margin-right: 0.5em;
-    margin-left: 1em
+.el-aside {
+    color: #333;
 }
 
-/* TABLES */
-.table {
-    border: solid;
-    border-color: #dddddd;
-    border-width: 1px;
+.el-container {
+    border: 1px solid #eee;
 }
-.table td {
-    border-style: solid;
-    border-width: 1px;
-    border-color: #dddddd;
-}
-    .table th {
-        background-color: #4189C7;
-        color: white;
-    }

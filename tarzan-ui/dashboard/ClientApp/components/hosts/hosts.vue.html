@@ -1,0 +1,46 @@
+<template>
+    <div>
+        <h1>Hosts</h1>
+
+        <el-container>
+            <el-header>
+
+                <el-input v-model="flowFilter" style="width:500px">
+                    <template slot="prepend">
+                        Filter:
+                    </template>
+                    <el-button slot="append" icon="el-icon-check"></el-button>
+                    <el-button slot="append" icon="el-icon-close"></el-button>
+                </el-input>
+
+            </el-header>
+
+            <el-main>
+                <el-table :data="dataSource" border style="width: 100%">
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <p>IP: {{ props.row.address }}</p>
+                            <p>MAC: {{ props.row.nicMac }}</p>
+                            <p>NIC Vendor: {{ props.row.nicVendor }}</p>
+                            <p>Hostname: {{ props.row.hostname }}</p>
+                            <p>OS: {{ props.row.os }}</p>
+                            <p>TTL: {{ props.row.ttl }}</p>
+                            <p>Location: {{ props.row.location }}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="Id" width="100" />
+                    <el-table-column prop="address" label="Address" />
+                    <el-table-column prop="hostname" label="Hostname" />
+                    <el-table-column prop="sessions" label="Sessions" />
+                    <el-table-column prop="sent" label="Sent" />
+                    <el-table-column prop="received" label="Received" />
+                </el-table>
+
+            </el-main>
+            <el-footer>
+            </el-footer>
+        </el-container>
+    </div>
+</template>
+
+<script src="./hosts.ts"></script>

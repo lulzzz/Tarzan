@@ -1,25 +1,86 @@
 <template>
     <div>
         <h1>Files</h1>
+       
+        <el-container style="border: 1px solid #eee">
 
-        <b-card no-body>
-            <b-tabs pills card vertical>
-                <b-tab title="Images" active>
-                    Tab Contents 1
-                </b-tab>
-                <b-tab title="Videos">
-                    Tab Contents 2
-                </b-tab>
-                <b-tab title="Audio">
-                    Tab Contents 3
-                </b-tab>
-                <b-tab title="Documents">
-                    Tab Contents 3
-                </b-tab>
-            </b-tabs>
-        </b-card>
+            <el-aside width="200px">
+                <el-menu>
+                    <el-submenu index="files/application">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>Application
+                        </template>
+                        <el-menu-item index="files/application/octet-stream"><i class="el-icon-picture" />octet-stream</el-menu-item>
+                        <el-menu-item index="files/application/x-bzip"><i class="el-icon-picture" />x-bzip</el-menu-item>
+                        <el-menu-item index="files/application/ms-word"><i class="el-icon-picture" />ms-word</el-menu-item>
+                        <el-menu-item index="files/application/javascript"><i class="el-icon-picture" />javascript</el-menu-item>
 
+                    </el-submenu>
+                    <el-submenu index="files/image">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>Image
+                        </template>
+                        <el-menu-item index="files/image/bmp"><i class="el-icon-picture" />bmp</el-menu-item>
+                        <el-menu-item index="files/image/x-icon"><i class="el-icon-picture" />x-icon</el-menu-item>
+                        <el-menu-item index="files/image/jpeg"><i class="el-icon-picture" />jpeg</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="files/autio">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>Audio
+                        </template>
+                        <el-menu-item index="files/audio/ogg"><i class="el-icon-picture" />ogg</el-menu-item>
+                        <el-menu-item index="files/audio/wav"><i class="el-icon-picture" />wav</el-menu-item>
+                        <el-menu-item index="files/audio/aac"><i class="el-icon-picture" />aac</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="files/video">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>Video
+                        </template>
+                        <el-menu-item index="files/video/ogg"><i class="el-icon-picture" />ogg</el-menu-item>
+                        <el-menu-item index="files/video/mpeg"><i class="el-icon-picture" />mpeg</el-menu-item>
+                        <el-menu-item index="files/video/webm"><i class="el-icon-picture" />webm</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="files/text">
+                        <template slot="title">
+                            <i class="el-icon-document"></i>Text
+                        </template>
+                        <el-menu-item index="files/text/ogg"><i class="el-icon-picture" />plain</el-menu-item>
+                        <el-menu-item index="files/text/html"><i class="el-icon-picture" />html</el-menu-item>
+                        <el-menu-item index="files/text/csv"><i class="el-icon-picture" />csv</el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-aside>
 
+            <el-container style="border: 0px">
+                <el-header>
+                    <!-- filters -->
+                    File Size:
+                    <el-select v-model="fileSizeFilter" placeholder="Select">
+                        <el-option v-for="item in fileSizes"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-header>
+
+                <el-main>
+                    <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                        <el-table-column prop="id" label="Id" width="100" />
+                        <el-table-column prop="name" label="Name" />
+                        <el-table-column prop="extension" label="Extension" />
+                        <el-table-column prop="size" label="Size" />
+                        <el-table-column prop="location" label="Location" /> <!-- flow reference -->
+                        <el-table-column prop="protocol" label="Protocol" /> <!-- info about protocol/event/message, e.g., HTTP GET -->
+                        <el-table-column prop="timestamp" label="Timestamp" />
+                        <el-table-column prop="path" label="Reconstructed Path" />
+                        <el-table-column prop="info" label="Info" /> <!-- File specific information - for images, it may be picture and resolution -->
+                    </el-table>
+                </el-main>
+                <el-footer>
+                </el-footer>
+            </el-container>
+        </el-container>
     </div>                         
 </template>
 
