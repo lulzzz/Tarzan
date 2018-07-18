@@ -14,6 +14,7 @@ const routes = [
     { path: '/', component: require('./components/about/about.vue.html') },
     { path: '/captures', component: require('./components/captures/captures.vue.html') },
     { path: '/flows/flowtable', component: require('./components/flowtable/flowtable.vue.html') },
+    { name: 'flowinfo', path: '/flows/details/:id', component: require('./components/flow/flow.vue.html') },
     { path: '/flows/details', component: require('./components/flow/flow.vue.html') },
     { path: '/flows/sessions', component: require('./components/sessions/sessions.vue.html') },
 

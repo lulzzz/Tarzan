@@ -4,8 +4,12 @@
 
         <el-container>
             <el-header>
-
-
+                <el-input v-model="currentFlow">
+                    <template slot="prepend">
+                        Flow:
+                    </template>
+                    <el-button slot="append" icon="el-icon-check"></el-button>                    
+                </el-input>
             </el-header>
 
             <el-main>
