@@ -3,13 +3,62 @@
         <h1>Flow Details</h1>
 
         <el-container>
-            <el-header>
-                <el-input v-model="currentFlow">
-                    <template slot="prepend">
-                        Flow:
-                    </template>
-                    <el-button slot="append" icon="el-icon-check"></el-button>                    
-                </el-input>
+            <el-header style="height:200px">
+                <el-form ref="form" :model="flowRecord" label-width="100px">
+                    <el-row>
+                        <el-col :span="4">
+                            <el-form-item label="Protocol:">
+                                <el-input v-model="flowRecord.protocol" readonly></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="Source:">
+                                <el-col :span="16"><el-input v-model="flowRecord.sourceAddress" readonly /></el-col>
+                                <el-col class="line" :span="1"><div style="text-align:center">:</div></el-col>
+                                <el-col :span="6"><el-input v-model="flowRecord.sourcePort" readonly /></el-col>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="Destination:">
+                                <el-col :span="16"><el-input v-model="flowRecord.destinationAddress" readonly /></el-col>
+                                <el-col class="line" :span="1"><div style="text-align:center">:</div></el-col>
+                                <el-col :span="6"><el-input v-model="flowRecord.destinationPort" readonly /></el-col>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="10">
+                            <el-form-item label="Tags:">
+                                <el-tag :key="tag"
+                                        v-for="tag in flowRecord.tags"
+                                        closable
+                                        :disable-transitions="false"
+                                        @close="tagHandleClose(tag)">
+                                    {{tag}}
+                                </el-tag>
+                                <el-input class="input-new-tag"
+                                          v-if="newTagInputVisible"
+                                          v-model="newTagInputValue"
+                                          ref="saveTagInput"
+                                          size="mini"
+                                          @keyup.enter.native="tagHandleInputConfirm"
+                                          @blur="tagHandleInputConfirm">
+                                </el-input>
+                                <el-button v-else class="button-new-tag" size="small" @click="tagShowInput">+ New Tag</el-button>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="Notes">
+                                <el-input type="textarea" v-model="flowRecord.notes"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item>
+                                <el-button type="primary" @click="onUpdateFlow">Update</el-button>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>                   
             </el-header>
 
             <el-main>
@@ -26,3 +75,4 @@
 </template>
 
 <script src="./flow.ts"></script>
+<style src="./flow.css"></style>

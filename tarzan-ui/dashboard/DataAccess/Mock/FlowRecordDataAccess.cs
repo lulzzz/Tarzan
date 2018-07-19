@@ -13,7 +13,7 @@ namespace Tarzan.UI.Server.DataAccess.Mock
         List<FlowRecord> m_data;
         public FlowRecordDataAccess(IHostingEnvironment hostingEnvironment)
         {
-            var path = Path.Combine(hostingEnvironment.ContentRootPath, "DataAccess", "Mock", "flowstat.json");
+            var path = Path.Combine(hostingEnvironment.ContentRootPath, "DataAccess", "Mock", "testbed-12jun-000.json");
             using (var r = new StreamReader(path))
             {
                 var json = r.ReadToEnd();                                

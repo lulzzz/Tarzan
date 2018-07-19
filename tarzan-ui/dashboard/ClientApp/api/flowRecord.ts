@@ -43,6 +43,10 @@ export class FlowRecord {
     */
     'octets': number;
 
+    'tags': string[];
+
+    'notes' : string;
+
     static discriminator = undefined;
 
     static attributeTypeMap: Array<{ name: string, baseName: string, type: string }> = [
