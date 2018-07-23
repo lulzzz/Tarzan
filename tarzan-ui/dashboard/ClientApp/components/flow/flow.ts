@@ -57,7 +57,7 @@ export default class FlowComponent extends Vue {
         //todo: set focus to input field ~ following has type error:
         // this.$nextTick().then(_ => this.$refs.saveTagInput.$refs.input.focus());        
     }
-
+    // END
 }
 
 
