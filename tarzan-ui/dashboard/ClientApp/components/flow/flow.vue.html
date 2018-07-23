@@ -3,7 +3,7 @@
         <h1>Flow Details</h1>
 
         <el-container>
-            <el-header style="height:200px">
+            <el-header style="height:220px">
                 <el-form ref="form" :model="flowRecord" label-width="100px">
                     <el-row>
                         <el-col :span="4">
@@ -23,6 +23,28 @@
                                 <el-col :span="16"><el-input v-model="flowRecord.destinationAddress" readonly /></el-col>
                                 <el-col class="line" :span="1"><div style="text-align:center">:</div></el-col>
                                 <el-col :span="6"><el-input v-model="flowRecord.destinationPort" readonly /></el-col>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="5">
+                            <el-form-item label="Packets:">
+                                <el-input v-model="flowRecord.packets" readonly></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="Octets:">
+                                <el-input v-model="flowRecord.octets" readonly></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="First:">
+                                <el-input v-model="flowRecord.firstSeen" readonly></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="Last:">
+                                <el-input v-model="flowRecord.lastSeen" readonly></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -58,7 +80,7 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                </el-form>                   
+                </el-form>
             </el-header>
 
             <el-main>
