@@ -3,12 +3,11 @@
   <parent>
     <artifactId>ndx-spark</artifactId>
     <groupId>org.ndx.spark</groupId>
-    <version>0.9-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.ndx.spark</groupId>
   <artifactId>ndx-spark-shell</artifactId>
-  <version>0.9-SNAPSHOT</version>
+  <version>1.0</version>
   <build>
     <plugins>
       <plugin>
@@ -31,6 +30,9 @@
                 <includes>
                   <include>*:*</include>
                 </includes>
+                <excludes>
+                  <exclude>commons-beanutils</exclude>
+                </excludes>
               </artifactSet>
             </configuration>
           </execution>

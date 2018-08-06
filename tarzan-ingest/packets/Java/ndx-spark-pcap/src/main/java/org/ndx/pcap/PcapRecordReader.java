@@ -5,22 +5,24 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
-import org.ndx.model.PacketModel.RawFrame;
+import org.ndx.model.pcap.PacketModel.RawFrame;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
 public class PcapRecordReader implements RecordReader<LongWritable, ObjectWritable> {
-    PcapReader pcapReader;
-    Iterator<RawFrame> pcapReaderIterator;
-    Seekable baseStream;
-    DataInputStream stream;
-    Reporter reporter;
+    private PcapReader pcapReader;
+    private Iterator<RawFrame> pcapReaderIterator;
+    private Seekable baseStream;
+    private DataInputStream stream;
+    private Reporter reporter;
 
-    long packetCount = 0;
-    long start, end;
+    private long packetCount = 0;
+    private long start, end;
 
-    public PcapRecordReader(PcapReader pcapReader, long start, long end, Seekable baseStream, DataInputStream stream, Reporter reporter) throws IOException {
+    public PcapRecordReader(PcapReader pcapReader, long start, long end, Seekable baseStream, DataInputStream stream,
+                            Reporter reporter) {
         this.pcapReader = pcapReader;
         this.baseStream = baseStream;
         this.stream = stream;
@@ -69,6 +71,7 @@ public class PcapRecordReader implements RecordReader<LongWritable, ObjectWritab
     public float getProgress() throws IOException {
         if (start == end)
             return 0;
-        return Math.min(1.0f, (getPos() - start) / (float)(end - start));
+        return Math.min(1.0f, (getPos() - start) / (float) (end - start));
     }
+
 }
