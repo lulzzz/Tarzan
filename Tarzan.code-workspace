@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "tarzan-ui\\dotnet\\TarzanDashboard"
+		},
+		{
+			"path": "cmd"
 		}
 	],
 	"settings": {

@@ -1,0 +1,48 @@
+version: "2"
+
+services:
+  # HDFS:
+  namenode:
+    image: singularities/hadoop
+    command: start-hadoop namenode
+    hostname: namenode
+    environment:
+      HDFS_USER: hdfsuser
+    ports:
+      - "8020:8020"
+      - "14000:14000"
+      - "50070:50070" # WEB UI
+      - "50075:50075"
+      - "10020:10020"
+      - "13562:13562"
+      - "19888:19888"
+  datanode:
+    image: singularities/hadoop
+    command: start-hadoop datanode namenode
+    environment:
+      HDFS_USER: hdfsuser
+    links:
+      - namenode
+  # SPARK:
+  master:
+    image: singularities/spark
+    command: start-spark master
+    hostname: master
+    ports:
+      - "6066:6066"
+      - "7070:7070"
+      - "8080:8080"   # WEB UI
+  worker:
+    image: singularities/spark
+    command: start-spark worker master
+    environment:
+      SPARK_WORKER_CORES: 1
+      SPARK_WORKER_MEMORY: 2g
+    links:
+      - master  
+  # CASSANDRA
+  cassandra:
+    image: cassandra
+    hostname: cassandra
+    ports:  
+      - "9042:9042"

@@ -33,8 +33,9 @@ namespace dashboard
             var cluster = Cluster.Builder()
                 .AddContactPoints(new IPEndPoint(IPAddress.Loopback, 9042))
                 .Build();
+            var flowsDataAccess = new Tarzan.UI.Server.DataAccess.Cassandra.FlowRecordDataAccess(cluster, "flowstat");
             var hostingEnvironment = services[0].ImplementationInstance as IHostingEnvironment;
-            services.AddSingleton<IFlowRecordDataAccess>(new Tarzan.UI.Server.DataAccess.Mock.FlowRecordDataAccess(hostingEnvironment));
+            services.AddSingleton<IFlowRecordDataAccess>(flowsDataAccess); // new Tarzan.UI.Server.DataAccess.Mock.FlowRecordDataAccess(hostingEnvironment));
             services.AddSingleton<ICaptureDataAccess>(new Tarzan.UI.Server.DataAccess.Mock.CaptureDataAccess());
 
         }

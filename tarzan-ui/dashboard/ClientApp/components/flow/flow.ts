@@ -11,10 +11,10 @@ export default class FlowComponent extends Vue {
 
     mounted() {
         if (this.$route.params.id) {
-            this.loadRecord(parseInt(this.$route.params.id));
+            this.loadRecord(this.$route.params.id);
         }        
     }
-    loadRecord(flowId: number) {
+    loadRecord(flowId: string) {
         let fetchString = `api/flows/item/${flowId}`;   
         console.log(fetchString);
         fetch(fetchString)

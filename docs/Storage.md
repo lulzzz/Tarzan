@@ -12,8 +12,21 @@ The primary key can be defined by several columns:
 * Clustering columns order data within a partition. The database uses the clustering information to identify where the data is within the partition.
 
 ## Database Schema 
+The Cassandra DB is used for storing extracted data. When processing input pcap files
+extended flow records are created. The flow records are extended with application specific data
+and additional information on flows (entropy, TCP flags, and other relevant information).
+
+### Extended Flows
+Extended flow information is always related to the basic flow record. The basic flow record
+is stored in `flows` table. Each flow has a unique identifier (uuid) which serves as the flow 
+key. Each flow has an attribute that lists its protocols, e.g., `[ether, ip, tcp, http]`. This
+information can be used to search for other relevant information specific for the particular protocol. Information related to http protocol is stored in `flows_http` table and can be find 
+by searching for flow id. 
 
 
+
+
+### Case 
 First, we need to select a keyspace. The keyspace will correspond to the name of the case. 
 ```cql
 CREATE KEYSPACE Case01 WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
@@ -33,24 +46,82 @@ CREATE TABLE captures (
     uploadedOn timestamp, 
     hash text, 
     author text,
-    notes text,
-    tags set<text>
 );
 ```
 
 ### Flows
 ```cql
+
+CREATE TYPE ipendpoint (
+    address inet,
+    port int
+);
+
 CREATE TABLE flows (
-    id uuid PRIMARY KEY, 
-    protocols set<text>, 
-    sourceAddress inet, 
-    sourcePort int, 
-    destinationAddress inet, 
-    destinationPort int, 
+    protocol text, 
+    source frozen<ipendpoint>, 
+    destination frozen<ipendpoint>, 
+    flow_id uuid, 
     firstSeen timestamp, 
     lastSeen timestamp, 
     packets int, 
-    octets bigint
+    octets bigint,
+    layers set<text>,
+    PRIMARY KEY ((protocol, source, destination), flowid)
+);
+
+CREATE INDEX ON flows(flowid);
+```
+
+### Flow Statistics
+```cql
+CREATE TABLE flows_stats (
+
+);
+```
+
+### DNS
+```cql
+CREATE TYPE dns_record (
+  class text,
+  type text,
+  name text
+);
+
+CREATE TABLE flows_dns (
+    flowref uuid PRIMARY KEY,    
+    question list<frozen<dns_record>>,
+    answer list<frozen<dns_record>>,
+    authority list<frozen<dns_record>>,
+    additional list<frozen<dns_record>>
+);
+```
+
+### HTTP 
+```cql
+CREATE TYPE http_request (
+
+);
+
+
+CREATE TYPE http_response (
+
+);
+
+CREATE TABLE flows_http (
+    flowref uuid PRIMARY KEY, 
+
+);
+```
+
+### TLS
+```cql
+CREATE TYPE tls_record (
+
+);
+
+CREATE TABLE flows_tls (
+    flowref uuid PRIMARY KEY, 
 );
 ```
 
@@ -59,7 +130,8 @@ CREATE TABLE flows (
 CREATE TABLE hosts (
     address inet PRIMARY KEY,
     hostname text, 
-    sessions int,
+    upflows int,
+    downflows int,
     octetsSent bigint,
     octetsRecv bigint,
     packetsSent int,
@@ -81,22 +153,5 @@ CREATE TABLE services (
     durationMin int,
     durationMax int,
     durationAvg int
-);
-```
-### DNS
-```cql
-
-CREATE TYPE dns_record (
-  class text,
-  type text,
-  name text
-);
-
-CREATE TABLE dns (
-    flowId uuid PRIMARY KEY,    
-    question list<dns_record>,
-    answer list<dns_record>,
-    authority list<dns_record>,
-    additional list<dns_record>
 );
 ```

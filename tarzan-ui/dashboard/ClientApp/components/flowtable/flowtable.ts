@@ -30,7 +30,7 @@ export default class FlowTableComponent extends Vue {
     }
 
     selectFlow(row:FlowRecord) {
-        console.log('Double Click, row.id=' + row.id);
-        this.$router.push({ name: 'flowinfo', params: { id: row.id.toString() } })
+        console.log('Double Click, row.flowid=' + row.flowId);
+        this.$router.push({ name: 'flowinfo', params: { id: row.flowId } })
     }
 }

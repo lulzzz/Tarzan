@@ -12,7 +12,7 @@ namespace Tarzan.UI.Server.Models
         /// <summary>
         /// A unique identifier of the flow record.
         /// </summary>
-        public int Id { get; set; }
+        public string FlowId { get; set; }
         /// <summary>
         /// Type of transport (or internet) protocol of the flow.
         /// </summary>
@@ -67,16 +67,24 @@ namespace Tarzan.UI.Server.Models
         /// <param name="row"></param>
         public FlowRecord(Cassandra.Row row)
         {
-            Id = row.GetValue<int>("id");
+            FlowId = row.GetValue<Guid>("flowid").ToString();
             Protocol = row.GetValue<string>("protocol");
-            SourceAddress = row.GetValue<IPAddress>("sourceaddress").ToString();
-            SourcePort = row.GetValue<int>("sourceport");
-            DestinationAddress = row.GetValue<IPAddress>("destinationaddress").ToString();
-            DestinationPort = row.GetValue<int>("destinationport");
+            var source = row.GetValue<IpEndPoint>("source");
+            SourceAddress = source.Address.ToString();
+            SourcePort = source.Port;
+            var destination = row.GetValue<IpEndPoint>("destination");
+            DestinationAddress = destination.Address.ToString();
+            DestinationPort = destination.Port;
             FirstSeen = new DateTimeOffset(row.GetValue<DateTime>("firstseen")).ToUnixTimeMilliseconds();
             LastSeen = new DateTimeOffset(row.GetValue<DateTime>("lastseen")).ToUnixTimeMilliseconds();
             Octets = row.GetValue<Int64>("octets");
             Packets = row.GetValue<int>("packets");
+        }
+
+        public class IpEndPoint : IPEndPoint
+        {
+            public IpEndPoint() : base(IPAddress.Any, 0) { }
+            public IpEndPoint(IPEndPoint ep) : base(ep.Address, ep.Port) { }
         }
     }
 }

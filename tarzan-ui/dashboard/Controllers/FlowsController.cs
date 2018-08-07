@@ -41,9 +41,10 @@ namespace Tarzan.UI.Server.Controllers
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
         [HttpGet("item/{id}")]
-        public FlowRecord FetchRecordById(int id)
+        public FlowRecord FetchRecordById(string id)
         {
-            return m_dataAccess.GetFlowRecord(id);
+            var uuid = Guid.Parse(id);
+            return m_dataAccess.GetFlowRecord(uuid);
         }
     }
 }

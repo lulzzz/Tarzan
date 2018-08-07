@@ -27,9 +27,9 @@ namespace Tarzan.UI.Server.DataAccess.Mock
             return m_data.Skip(start).Take(length);
         }  
 
-        public FlowRecord GetFlowRecord(int id)
+        public FlowRecord GetFlowRecord(Guid id)
         {
-            return m_data.FirstOrDefault(x => x.Id == id);
+            return m_data.FirstOrDefault(x => x.FlowId.Equals(id));
         }
 
         public int RecordCount()

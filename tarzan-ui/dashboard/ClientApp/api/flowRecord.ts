@@ -5,7 +5,7 @@ export class FlowRecord {
     /**
     * A unique identifier of the flow record.
     */
-    'id': number;
+    'flowId': string;
     /**
     * Type of transport (or internet) protocol of the flow.
     */
@@ -51,9 +51,9 @@ export class FlowRecord {
 
     static attributeTypeMap: Array<{ name: string, baseName: string, type: string }> = [
         {
-            "name": "id",
-            "baseName": "id",
-            "type": "number"
+            "name": "flowid",
+            "baseName": "flowid",
+            "type": "string"
         },
         {
             "name": "protocol",
