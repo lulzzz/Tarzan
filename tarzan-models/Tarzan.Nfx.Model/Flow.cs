@@ -20,7 +20,9 @@ namespace Tarzan.Nfx.Model
                 .TableName("flows")
                 .PartitionKey("protocol", "sourceAddress", "sourcePort", "destinationAddress", "destinationPort")
                 .ClusteringKey(x => x.FlowId)
-                .Column<IPAddress>(f => f.SourceIpAddress, cc => cc.Ignore())
-                .Column<IPAddress>(f => f.DestinationIpAddress, cc => cc.Ignore());
+                .Column(f=>f.FlowId, cc => cc.WithSecondaryIndex())
+                .Column(f => f.SourceIpAddress, cc => cc.Ignore())
+                .Column(f => f.DestinationIpAddress, cc => cc.Ignore())
+                .Column(f => f.__isset, cc => cc.Ignore());
     }
 }

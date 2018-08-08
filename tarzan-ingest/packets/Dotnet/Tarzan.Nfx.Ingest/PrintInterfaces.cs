@@ -2,7 +2,7 @@
 using Microsoft.Extensions.CommandLineUtils;
 using SharpPcap;
 
-namespace Flowify
+namespace Tarzan.Nfx.Ingest
 {
     internal class PrintInterfaces
     {

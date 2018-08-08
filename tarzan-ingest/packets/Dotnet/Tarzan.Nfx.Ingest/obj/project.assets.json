@@ -2371,6 +2371,21 @@
         "runtime": {
           "lib/netstandard1.3/Tnidea.Thrift.dll": {}
         }
+      },
+      "Tarzan.Nfx.Model/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "CassandraCSharpDriver": "3.6.0",
+          "Newtonsoft.Json": "11.0.2",
+          "Tnidea.Thrift": "0.9.3"
+        },
+        "compile": {
+          "bin/placeholder/Tarzan.Nfx.Model.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tarzan.Nfx.Model.dll": {}
+        }
       }
     }
   },
@@ -6934,6 +6949,11 @@
         "tnidea.thrift.0.9.3.nupkg.sha512",
         "tnidea.thrift.nuspec"
       ]
+    },
+    "Tarzan.Nfx.Model/1.0.0": {
+      "type": "project",
+      "path": "../../../../tarzan-models/Tarzan.Nfx.Model/Tarzan.Nfx.Model.csproj",
+      "msbuildProject": "../../../../tarzan-models/Tarzan.Nfx.Model/Tarzan.Nfx.Model.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -6944,7 +6964,8 @@
       "Netdx.ConversationTracker >= 1.0.0",
       "Newtonsoft.Json >= 11.0.2",
       "PacketDotNet.Standard >= 0.16.0",
-      "SharpPcap.Standard >= 4.4.0"
+      "SharpPcap.Standard >= 4.4.0",
+      "Tarzan.Nfx.Model >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -6979,7 +7000,11 @@
       },
       "frameworks": {
         "netcoreapp2.0": {
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj": {
+              "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

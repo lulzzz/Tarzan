@@ -13,7 +13,8 @@
           "Netdx.ConversationTracker": "1.0.0",
           "Newtonsoft.Json": "11.0.2",
           "PacketDotNet.Standard": "0.16.0",
-          "SharpPcap.Standard": "4.4.0"
+          "SharpPcap.Standard": "4.4.0",
+          "Tarzan.Nfx.Model": "1.0.0"
         },
         "runtime": {
           "Tarzan.Nfx.Ingest.dll": {}
@@ -1247,6 +1248,16 @@
             "fileVersion": "0.9.3.0"
           }
         }
+      },
+      "Tarzan.Nfx.Model/1.0.0": {
+        "dependencies": {
+          "CassandraCSharpDriver": "3.6.0",
+          "Newtonsoft.Json": "11.0.2",
+          "Tnidea.Thrift": "0.9.3"
+        },
+        "runtime": {
+          "Tarzan.Nfx.Model.dll": {}
+        }
       }
     }
   },
@@ -1899,6 +1910,11 @@
       "sha512": "sha512-1+cF+117xniNP9o0Zr0pnPh9zeduR1ROfq5yd0PRU73P3xf2utMBVvcLBtxN4OYkJtqqjNpUivetLq+yZZ59pg==",
       "path": "tnidea.thrift/0.9.3",
       "hashPath": "tnidea.thrift.0.9.3.nupkg.sha512"
+    },
+    "Tarzan.Nfx.Model/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

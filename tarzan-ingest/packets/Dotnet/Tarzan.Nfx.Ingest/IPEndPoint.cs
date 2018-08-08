@@ -4,10 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Flowify
+namespace Tarzan.Nfx.Ingest
 {
-    public static class IPEndPoint_Extensions
+    public class IPEndPoint : System.Net.IPEndPoint
     {
+        public IPEndPoint(IPAddress address, int port) : base(address, port)
+        {
+        }
+
         public static IPEndPoint Parse(string endpointstring)
         {
             return Parse(endpointstring, -1);

@@ -9,7 +9,7 @@ using System.Threading;
 using System.IO;
 using System.Linq;
 
-namespace Flowify
+namespace Tarzan.Nfx.Ingest
 {
 
     class FlowRecordWithPackets : FlowRecord

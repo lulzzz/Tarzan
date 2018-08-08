@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Netdx.ConversationTracker;
-namespace Flowify
+namespace Tarzan.Nfx.Ingest
 {
     /// <summary>
     /// A flow index based on bloom filters. Packets are organized into blocks. For each block 

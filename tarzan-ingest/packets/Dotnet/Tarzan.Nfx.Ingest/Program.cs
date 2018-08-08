@@ -10,7 +10,7 @@ using System.Threading;
 using Cassandra;
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace Flowify
+namespace Tarzan.Nfx.Ingest
 {
     /// <summary>
     /// Computes the flow statististics for the given input pcap file.

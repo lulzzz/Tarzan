@@ -11,6 +11,7 @@ namespace Tarzan.Nfx.Model
         public static Map<Host> Mapping =>
             new Map<Host>()
                 .TableName("hosts")
-                .PartitionKey("address");
+                .PartitionKey("address")
+                .Column(f => f.__isset, cc => cc.Ignore());
     }
 }

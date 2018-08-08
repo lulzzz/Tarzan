@@ -14,6 +14,7 @@ using Thrift.Collections;
 using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
+using Cassandra.Mapping;
 
 namespace Tarzan.Nfx.Model
 {
@@ -177,9 +178,9 @@ namespace Tarzan.Nfx.Model
         this._AvgDuration = value;
       }
     }
+        
 
-
-    public Isset __isset;
+        public Isset __isset;
     #if !SILVERLIGHT
     [Serializable]
     #endif

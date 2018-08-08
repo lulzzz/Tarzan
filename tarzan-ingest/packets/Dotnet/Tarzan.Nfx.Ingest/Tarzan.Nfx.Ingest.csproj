@@ -14,12 +14,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="service-names-port-numbers.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="service-names-port-numbers.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Netdx.ConversationTracker" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
   </ItemGroup>
 
 </Project>
