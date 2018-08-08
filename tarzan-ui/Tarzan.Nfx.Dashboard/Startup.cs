@@ -34,17 +34,17 @@ namespace Tarzan.Nfx.Dashboard
                 .AddContactPoints(new IPEndPoint(IPAddress.Loopback, 9042))
                 .Build();
             var session = cluster.Connect(keyspace);
+
+
+            var capturesDataAccess = new DataAccess.Mock.CapturesDataAccess();
             var flowsDataAccess = new FlowsDataAccess(session);
             var hostsDataAccess = new HostsDataAccesss(session);
             var servicesDataAccess = new ServicesDataAccesss(session);
 
-            var hostingEnvironment = services[0].ImplementationInstance as IHostingEnvironment;
-
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Flow, Guid>>(flowsDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Host, string>>(hostsDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Service, string>>(servicesDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(new DataAccess.Mock.CapturesDataAccess());
-
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(capturesDataAccess);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

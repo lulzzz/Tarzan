@@ -6,7 +6,7 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
 {
     public class CapturesDataAccess : TableDataAccess<Capture, Guid>
     {
-        public CapturesDataAccess(ISession session) : base(session,nameof(Capture.Id).ToLowerInvariant())
+        public CapturesDataAccess(ISession session) : base(session, "captures", nameof(Capture.Id).ToLowerInvariant())
         {
         }
     }

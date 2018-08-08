@@ -11,7 +11,7 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
 {
     public class FlowsDataAccess : TableDataAccess<Flow, Guid>
     {
-        public FlowsDataAccess(ISession session) : base(session, nameof(Flow.FlowId).ToLowerInvariant())
+        public FlowsDataAccess(ISession session) : base(session, "flows", nameof(Flow.FlowId).ToLowerInvariant())
         {
         }  
     }

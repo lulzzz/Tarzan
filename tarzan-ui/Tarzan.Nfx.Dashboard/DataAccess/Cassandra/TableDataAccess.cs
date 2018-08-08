@@ -14,12 +14,12 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
         private IMapper m_mapper;
         private string m_tableName;
         private string m_keyProperty;
-        public TableDataAccess(ISession session, string keyProperty)
+        public TableDataAccess(ISession session, string tableName, string keyProperty)
         {
             m_session = session;
             m_mapper = new Mapper(m_session);
-            var table = new Table<TRowType>(m_session);
-            m_tableName = table.Name;
+            m_tableName = tableName;
+            m_keyProperty = keyProperty;
         }
 
         public int Count()
@@ -29,12 +29,12 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
 
         public TRowType FetchItem(TKey key)
         {
-            return m_mapper.SingleOrDefault<TRowType>($"WHERE {m_keyProperty}=?", key.ToString());
+            return m_mapper.SingleOrDefault<TRowType>($"SELECT * FROM {m_tableName} WHERE {m_keyProperty}=?", key.ToString());
         }
 
         public IEnumerable<TRowType> FetchRange(int start, int count)
         {
-            return m_mapper.Fetch<TRowType>().Skip(start).Take(count);
+            return m_mapper.Fetch<TRowType>($"SELECT * FROM {m_tableName}").Skip(start).Take(count);
         }
     }
 }
