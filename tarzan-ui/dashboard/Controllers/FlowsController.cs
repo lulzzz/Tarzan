@@ -31,7 +31,7 @@ namespace Tarzan.UI.Server.Controllers
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<FlowRecord> FetchRange(int start, int length)
+        public IEnumerable<Flow> FetchRange(int start, int length)
         {
             return m_dataAccess.GetFlowRecords(start, length);
         }
@@ -41,7 +41,7 @@ namespace Tarzan.UI.Server.Controllers
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
         [HttpGet("item/{id}")]
-        public FlowRecord FetchRecordById(string id)
+        public Flow FetchRecordById(string id)
         {
             var uuid = Guid.Parse(id);
             return m_dataAccess.GetFlowRecord(uuid);

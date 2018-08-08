@@ -12,7 +12,7 @@ namespace Tarzan.UI.Server.Models
         /// <summary>
         /// A unique identifier of the capture file.
         /// </summary>
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         /// <summary>
         /// The name of the capture file..
         /// </summary>
@@ -33,7 +33,7 @@ namespace Tarzan.UI.Server.Models
         /// Timestamp when the file was upload to the system.
         /// </summary>
         /// <returns></returns>
-        public DateTime UploadOn { get; set; }
+        public DateTime UploadedOn { get; set; }
         /// <summary>
         /// Hash value computed by MD5 algorithm.
         /// </summary>

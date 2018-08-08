@@ -6,8 +6,8 @@ namespace Tarzan.UI.Server.DataAccess
 {
     public interface IFlowRecordDataAccess
     {
-        IEnumerable<FlowRecord> GetFlowRecords(int start = 0, int length = int.MaxValue);
-        FlowRecord GetFlowRecord(Guid id);
+        IEnumerable<Flow> GetFlowRecords(int start = 0, int length = int.MaxValue);
+        Flow GetFlowRecord(Guid id);
         int RecordCount();
     }
 }

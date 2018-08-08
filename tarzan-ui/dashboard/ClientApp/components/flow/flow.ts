@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { FlowRecord } from '../../api/flowRecord';
+import { Flow } from '../../api/flow';
 
 @Component
 export default class FlowComponent extends Vue {
     loading: boolean = true;
-    flowRecord: FlowRecord = new FlowRecord();
+    flowRecord: Flow = new Flow();
     newTagInputValue = '';
     newTagInputVisible = false;
 
@@ -18,7 +18,7 @@ export default class FlowComponent extends Vue {
         let fetchString = `api/flows/item/${flowId}`;   
         console.log(fetchString);
         fetch(fetchString)
-            .then(response => response.json() as Promise<FlowRecord>)
+            .then(response => response.json() as Promise<Flow>)
             .then(data => {
                 this.flowRecord = data;
                 this.loading = false;

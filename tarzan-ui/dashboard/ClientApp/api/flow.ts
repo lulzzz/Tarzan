@@ -1,7 +1,7 @@
 /**
 * Represents a single flow record.
 */
-export class FlowRecord {
+export class Flow {
     /**
     * A unique identifier of the flow record.
     */
@@ -102,6 +102,6 @@ export class FlowRecord {
         }];
 
     static getAttributeTypeMap() {
-        return FlowRecord.attributeTypeMap;
+        return Flow.attributeTypeMap;
     }
 }

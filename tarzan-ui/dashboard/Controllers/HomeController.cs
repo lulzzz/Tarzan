@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dashboard.Controllers
 {
+
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -13,20 +14,21 @@ namespace dashboard.Controllers
             return View();
         }
 
+        [HttpGet("About")]
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "TARZAN NFX";
 
             return View();
         }
-
+        [HttpGet("Contact")]
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
 
             return View();
         }
-
+        [HttpGet("Error")]
         public IActionResult Error()
         {
             return View();

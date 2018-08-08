@@ -29,6 +29,7 @@ namespace dashboard
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSwagger();
 
             var cluster = Cluster.Builder()
                 .AddContactPoints(new IPEndPoint(IPAddress.Loopback, 9042))
@@ -56,7 +57,7 @@ namespace dashboard
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
+            //app.UseStaticFiles();
 
             app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
             {
@@ -64,16 +65,7 @@ namespace dashboard
                     PropertyNameHandling.CamelCase;
             });
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
