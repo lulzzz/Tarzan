@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using Tarzan.Nfx.Model;
-
-namespace Tarzan.UI.Server.DataAccess.Mock
+using ICapturesDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.Capture, System.Guid>;
+namespace Tarzan.Nfx.Dashboard.DataAccess.Mock
 {
     public class CapturesDataAccess : ICapturesDataAccess
     {
-        public Capture GetCapture(Guid id)
+        public Capture FetchItem(Guid id)
         {
             return m_data.FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        public IEnumerable<Capture> GetCaptures(int start = 0, int length = int.MaxValue)
+        public IEnumerable<Capture> FetchRange(int start = 0, int length = int.MaxValue)
         {
             return m_data.Skip(start).Take(length);
         }
 
-        public int CaptureCount()
+        public int Count()
         {
             return m_data.Count();
         }

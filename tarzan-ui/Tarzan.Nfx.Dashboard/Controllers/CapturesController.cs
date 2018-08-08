@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using Tarzan.UI.Server.DataAccess;
 using Tarzan.Nfx.Model;
-
-namespace TarzanDashboard.Controllers
+using ICapturesDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.Capture, System.Guid>;
+namespace Tarzan.Nfx.Dashboard.Controllers
 {
 
     [Produces("application/json")]
@@ -22,9 +21,15 @@ namespace TarzanDashboard.Controllers
         /// </summary>
         /// <returns>A collection of values</returns>
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<Capture> FetchRange(int start, int length)
+        public IEnumerable<Capture> Get(int start, int length)
         {
-            return m_dataAccess.GetCaptures(start, length);
+            return m_dataAccess.FetchRange(start, length);
+        }
+        [HttpGet("item/{id}")]
+        public Capture Get(string id)
+        {
+            var uuid = Guid.Parse(id);
+            return m_dataAccess.FetchItem(uuid);
         }
         /// <summary>
         /// Gets all flow records.
@@ -33,7 +38,7 @@ namespace TarzanDashboard.Controllers
         [HttpGet("count")]
         public int FetchCount()
         {
-            return m_dataAccess.CaptureCount();
+            return m_dataAccess.Count();
         }
     }
 }

@@ -1,14 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Cassandra;
-using System.Net;
 using Tarzan.Nfx.Model;
-using Tarzan.UI.Server.DataAccess;
-
-namespace Tarzan.UI.Server.Controllers
+using IFlowsDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.Flow, System.Guid>;
+namespace Tarzan.Nfx.Dashboard.Controllers
 {
     [Produces("application/json")]
     [Route("api/Flows")]
@@ -28,13 +23,13 @@ namespace Tarzan.UI.Server.Controllers
         [HttpGet("count")]
         public int FetchRecordCount()
         {
-            return m_dataAccess.RecordCount();
+            return m_dataAccess.Count();
         }
 
         [HttpGet("range/{start}/count/{length}")]
         public IEnumerable<Flow> FetchRange(int start, int length)
         {
-            return m_dataAccess.GetFlowRecords(start, length);
+            return m_dataAccess.FetchRange(start, length);
         }
         /// <summary>
         /// Gets the flow record of the specified id.
@@ -45,7 +40,7 @@ namespace Tarzan.UI.Server.Controllers
         public Flow FetchRecordById(string id)
         {
             var uuid = Guid.Parse(id);
-            return m_dataAccess.GetFlowRecord(uuid);
+            return m_dataAccess.FetchItem(uuid);
         }
     }
 }

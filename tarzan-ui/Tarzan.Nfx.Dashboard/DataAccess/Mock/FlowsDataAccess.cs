@@ -6,9 +6,9 @@ using System.IO;
 using System.Linq;
 using Tarzan.Nfx.Model;
 
-namespace Tarzan.UI.Server.DataAccess.Mock
+namespace Tarzan.Nfx.Dashboard.DataAccess.Mock
 {
-    public class FlowsDataAccess : IFlowsDataAccess
+    public class FlowsDataAccess : ITableDataAccess<Flow, Guid>
     {
         List<Flow> m_data;
         public FlowsDataAccess(IHostingEnvironment hostingEnvironment)
@@ -22,17 +22,17 @@ namespace Tarzan.UI.Server.DataAccess.Mock
             }
         }
 
-        public IEnumerable<Flow> GetFlowRecords(int start = 0, int length = Int32.MaxValue)        
+        public IEnumerable<Flow> FetchRange(int start, int count)        
         {
-            return m_data.Skip(start).Take(length);
+            return m_data.Skip(start).Take(count);
         }  
 
-        public Flow GetFlowRecord(Guid id)
+        public Flow FetchItem(Guid id)
         {
             return m_data.FirstOrDefault(x => x.FlowId.Equals(id));
         }
 
-        public int RecordCount()
+        public int Count()
         {
             return m_data.Count;
         }

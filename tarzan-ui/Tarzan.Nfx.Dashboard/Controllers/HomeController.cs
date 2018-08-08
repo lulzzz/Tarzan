@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace dashboard.Controllers
+namespace Tarzan.Nfx.Dashboard
 {
 
     public class HomeController : Controller

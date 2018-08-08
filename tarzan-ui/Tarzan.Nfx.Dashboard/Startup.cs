@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using Cassandra;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,9 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NSwag.AspNetCore;
-using Tarzan.UI.Server.DataAccess;
+using System;
+using System.Net;
+using System.Reflection;
+using Tarzan.Nfx.Dashboard.DataAccess;
+using Tarzan.Nfx.Dashboard.DataAccess.Cassandra;
 
-namespace dashboard
+namespace Tarzan.Nfx.Dashboard
 {
     public class Startup
     {
@@ -31,18 +29,21 @@ namespace dashboard
             services.AddMvc();
             services.AddSwagger();
 
+            var keyspace = "testbed";
             var cluster = Cluster.Builder()
                 .AddContactPoints(new IPEndPoint(IPAddress.Loopback, 9042))
                 .Build();
-            var flowsDataAccess = new Tarzan.UI.Server.DataAccess.Cassandra.FlowsDataAccess(cluster, "testbed");
-            var hostsDataAccess = new Tarzan.UI.Server.DataAccess.Cassandra.HostsDataAccesss(cluster, "testbed");
-
+            var session = cluster.Connect(keyspace);
+            var flowsDataAccess = new FlowsDataAccess(session);
+            var hostsDataAccess = new HostsDataAccesss(session);
+            var servicesDataAccess = new ServicesDataAccesss(session);
 
             var hostingEnvironment = services[0].ImplementationInstance as IHostingEnvironment;
-            services.AddSingleton<IFlowsDataAccess>(flowsDataAccess);
-            services.AddSingleton<IHostsDataAccess>(hostsDataAccess);
 
-            services.AddSingleton<ICapturesDataAccess>(new Tarzan.UI.Server.DataAccess.Mock.CapturesDataAccess());
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Flow, Guid>>(flowsDataAccess);
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Host, string>>(hostsDataAccess);
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Service, string>>(servicesDataAccess);
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(new DataAccess.Mock.CapturesDataAccess());
 
         }
 

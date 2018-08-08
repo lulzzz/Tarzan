@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace dashboard
+namespace Tarzan.Nfx.Dashboard
 {
     public class Program
     {
