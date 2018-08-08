@@ -1,0 +1,40 @@
+<template>
+    <div>
+
+        <h1> Capture Files</h1>
+        <p v-if="dataSource == null">
+            Sorry, no capture files have been uploaded yet. Use caploader to add capture files to the investigation.
+        </p>
+
+
+        <el-container>
+            <el-header>
+            </el-header>
+
+            <el-main>
+                <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <el-table-column prop="name" label="Name" />
+                    <el-table-column prop="size" label="Size" width="100"/>
+                    <el-table-column type="expand" prop="id" label="Details" width="80">
+                        <template slot-scope="props">
+                            <p>Created On: {{ props.row.createdOn }}</p>
+                            <p>Uploaded On: {{ props.row.uploadOn }}</p>
+                            <p>Hash: {{ props.row.hash }}</p>
+                            <p>Author: {{ props.row.author }}</p>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-main>
+            <el-footer>
+                <el-pagination :background="true"
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalCaptures"
+                               curent-page="currentPage"
+                               @current-change="reload" />
+            </el-footer>
+        </el-container>
+    </div>
+</template>
+
+<script src="./captures.ts"></script>

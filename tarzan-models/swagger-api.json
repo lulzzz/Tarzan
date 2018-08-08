@@ -1,0 +1,579 @@
+{
+  "x-generator": "NSwag v11.17.20.0 (NJsonSchema v9.10.63.0 (Newtonsoft.Json v11.0.0.0))",
+  "swagger": "2.0",
+  "info": {
+    "title": "My Title",
+    "version": "1.0.0"
+  },
+  "host": "localhost:57542",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/Home": {
+      "post": {
+        "tags": [
+          "Home"
+        ],
+        "operationId": "Home_Index",
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/About": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "operationId": "Home_About",
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/Contact": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "operationId": "Home_Contact",
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/Error": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "operationId": "Home_Error",
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/api/hosts/count": {
+      "get": {
+        "tags": [
+          "Hosts"
+        ],
+        "operationId": "Hosts_GetCount",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      }
+    },
+    "/api/hosts/range/{start}/count/{length}": {
+      "get": {
+        "tags": [
+          "Hosts"
+        ],
+        "operationId": "Hosts_GetAll",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "start",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          },
+          {
+            "type": "integer",
+            "name": "length",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Host"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/hosts/item/{address}": {
+      "get": {
+        "tags": [
+          "Hosts"
+        ],
+        "operationId": "Hosts_Get",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Host"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Hosts"
+        ],
+        "operationId": "Hosts_Put",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "x-nullable": false
+          },
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Host"
+            },
+            "x-nullable": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Flows/count": {
+      "get": {
+        "tags": [
+          "Flows"
+        ],
+        "operationId": "Flows_FetchRecordCount",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      }
+    },
+    "/api/Flows/range/{start}/count/{length}": {
+      "get": {
+        "tags": [
+          "Flows"
+        ],
+        "operationId": "Flows_FetchRange",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "start",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          },
+          {
+            "type": "integer",
+            "name": "length",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Flow"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Flows/item/{id}": {
+      "get": {
+        "tags": [
+          "Flows"
+        ],
+        "operationId": "Flows_FetchRecordById",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Flow"
+            }
+          }
+        }
+      }
+    },
+    "/api/captures/range/{start}/count/{length}": {
+      "get": {
+        "tags": [
+          "Captures"
+        ],
+        "operationId": "Captures_FetchRange",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "start",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          },
+          {
+            "type": "integer",
+            "name": "length",
+            "in": "path",
+            "required": true,
+            "format": "int32",
+            "x-nullable": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "x-nullable": true,
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capture"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/captures/count": {
+      "get": {
+        "tags": [
+          "Captures"
+        ],
+        "operationId": "Captures_FetchCount",
+        "responses": {
+          "200": {
+            "x-nullable": false,
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "__isset",
+        "upFlows",
+        "downFlows",
+        "octetsSent",
+        "octetsRecv",
+        "packetsSent",
+        "packetsRecv"
+      ],
+      "properties": {
+        "__isset": {
+          "$ref": "#/definitions/Isset"
+        },
+        "address": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "upFlows": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "downFlows": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "octetsSent": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "octetsRecv": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "packetsSent": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "packetsRecv": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "Isset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "hostname",
+        "upFlows",
+        "downFlows",
+        "octetsSent",
+        "octetsRecv",
+        "packetsSent",
+        "packetsRecv"
+      ],
+      "properties": {
+        "address": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "boolean"
+        },
+        "upFlows": {
+          "type": "boolean"
+        },
+        "downFlows": {
+          "type": "boolean"
+        },
+        "octetsSent": {
+          "type": "boolean"
+        },
+        "octetsRecv": {
+          "type": "boolean"
+        },
+        "packetsSent": {
+          "type": "boolean"
+        },
+        "packetsRecv": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "__isset",
+        "sourcePort",
+        "destinationPort",
+        "firstSeen",
+        "lastSeen",
+        "packets",
+        "octets"
+      ],
+      "properties": {
+        "__isset": {
+          "$ref": "#/definitions/Isset2"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "sourceAddress": {
+          "type": "string"
+        },
+        "sourcePort": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "destinationAddress": {
+          "type": "string"
+        },
+        "destinationPort": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "flowId": {
+          "type": "string"
+        },
+        "firstSeen": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "lastSeen": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "packets": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "octets": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Isset2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "sourceAddress",
+        "sourcePort",
+        "destinationAddress",
+        "destinationPort",
+        "flowId",
+        "firstSeen",
+        "lastSeen",
+        "packets",
+        "octets"
+      ],
+      "properties": {
+        "protocol": {
+          "type": "boolean"
+        },
+        "sourceAddress": {
+          "type": "boolean"
+        },
+        "sourcePort": {
+          "type": "boolean"
+        },
+        "destinationAddress": {
+          "type": "boolean"
+        },
+        "destinationPort": {
+          "type": "boolean"
+        },
+        "flowId": {
+          "type": "boolean"
+        },
+        "firstSeen": {
+          "type": "boolean"
+        },
+        "lastSeen": {
+          "type": "boolean"
+        },
+        "packets": {
+          "type": "boolean"
+        },
+        "octets": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "size",
+        "createdOn",
+        "uploadedOn"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "guid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "uploadedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hash": {
+          "type": "string",
+          "format": "byte"
+        },
+        "author": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

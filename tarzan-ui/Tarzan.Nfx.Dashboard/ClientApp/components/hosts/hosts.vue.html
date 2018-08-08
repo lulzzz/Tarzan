@@ -1,0 +1,78 @@
+<template>
+    <div>
+        <h1>Hosts</h1>
+
+        <el-container>
+            <el-header>
+
+                <el-input v-model="flowFilter" style="width:500px">
+                    <template slot="prepend">
+                        Filter:
+                    </template>
+                    <el-button slot="append" icon="el-icon-check"></el-button>
+                    <el-button slot="append" icon="el-icon-close"></el-button>
+                </el-input>
+
+            </el-header>
+
+            <el-main>
+                <el-table :data="dataSource" border style="width: 100%">
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <p>IP: {{ props.row.address }}</p>
+                            <p>MAC: {{ props.row.nicMac }}</p>
+                            <p>NIC Vendor: {{ props.row.nicVendor }}</p>
+                            <p>Hostname: {{ props.row.hostname }}</p>
+                            <p>OS: {{ props.row.os }}</p>
+                            <p>TTL: {{ props.row.ttl }}</p>
+                            <p>Location: {{ props.row.location }}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="address" label="Address" width="150" />
+                    <el-table-column prop="hostname" label="Hostname" />
+
+                    <el-table-column label="Flows">
+                        <el-table-column prop="upFlows" label="Up" width="60" />
+                        <el-table-column prop="downFlows" label="Down" width="60" />
+                        <el-table-column label="Sum" width="60">
+                            <template slot-scope="scope">
+                                {{ dataSource[scope.$index].upFlows + dataSource[scope.$index].downFlows }} 
+                            </template>
+                        </el-table-column>
+                    </el-table-column>
+
+                    <el-table-column label="Packets">
+                        <el-table-column prop="packetsSent" label="Sent" width="80" />
+                        <el-table-column prop="packetsRecv" label="Recv" width="80" />
+                        <el-table-column prop="packets" label="Sum" width="80">
+                            <template slot-scope="scope">
+                                {{ dataSource[scope.$index].packetsSent + dataSource[scope.$index].packetsRecv }}
+                            </template>
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="Octets">
+                        <el-table-column prop="octetsSent" label="Sent" width="100"/>
+                        <el-table-column prop="octetsRecv" label="Received" width="100"/>
+                        <el-table-column prop="octets" label="Sum" width="100">
+                            <template slot-scope="scope">
+                                {{ dataSource[scope.$index].octetsSent + dataSource[scope.$index].octetsRecv }}
+                            </template>
+                        </el-table-column>
+                    </el-table-column>
+
+                </el-table>
+
+            </el-main>
+            <el-footer>
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalItems"
+                               curent-page="currentPage"
+                               @current-change="reload" />
+            </el-footer>
+        </el-container>
+    </div>
+</template>
+
+<script src="./hosts.ts"></script>
