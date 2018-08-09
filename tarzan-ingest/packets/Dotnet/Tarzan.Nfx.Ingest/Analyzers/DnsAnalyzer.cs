@@ -12,7 +12,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class DnsAnalyzer
     {    
-        public static IEnumerable<Model.Dns> Inspect(FlowKey flowKey, FlowRecordWithPackets flowRecord)
+        public static IEnumerable<Model.DnsInfo> Inspect(FlowKey flowKey, FlowRecordWithPackets flowRecord)
         {
             // DNS response?
             if (flowKey.Protocol == ProtocolType.UDP && flowKey.SourceEndpoint.Port == 53)
@@ -27,11 +27,11 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 var dns = InspectPackets(flowKey.SourceEndpoint, flowKey.DestinationEndpoint, flowRecord.FlowId, flowRecord.PacketList);
                 return dns;
             }
-            return Array.Empty<Model.Dns>();
+            return Array.Empty<Model.DnsInfo>();
         }
 
 
-        private static IEnumerable<Model.Dns> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, Guid flowId, IEnumerable<(Packet packet, PosixTimeval time)> packetList)
+        private static IEnumerable<Model.DnsInfo> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, Guid flowId, IEnumerable<(Packet packet, PosixTimeval time)> packetList)
         {
             foreach ((var packet, var time) in packetList)
             {
@@ -40,7 +40,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 var dnsPacket = new Netdx.Packets.Core.DnsPacket(stream);
                 foreach (var (answer, index) in dnsPacket.Answers.Select((x,i) => (x,i+1)))
                 {
-                    var dnsModel = new Model.Dns
+                    var dnsModel = new Model.DnsInfo
                     {
                         Client = client.ToString(),
                         Server = server.ToString(),

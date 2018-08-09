@@ -23,7 +23,7 @@ namespace Tarzan.Nfx.Ingest
         private Table<Model.Flow> m_flowTable;
         private Table<Model.Host> m_hostTable;
         private Table<Model.Service> m_serviceTable;
-        private Table<Model.Dns> m_dnsTable;
+        private Table<Model.DnsInfo> m_dnsTable;
 
         public CassandraWriter(IPEndPoint endpoint, string keyspace)
         {
@@ -54,7 +54,7 @@ namespace Tarzan.Nfx.Ingest
             m_hostTable.CreateIfNotExists();
             m_serviceTable = new Table<Model.Service>(m_session);
             m_serviceTable.CreateIfNotExists();
-            m_dnsTable = new Table<Model.Dns>(m_session);
+            m_dnsTable = new Table<Model.DnsInfo>(m_session);
             m_dnsTable.CreateIfNotExists();
         }
 

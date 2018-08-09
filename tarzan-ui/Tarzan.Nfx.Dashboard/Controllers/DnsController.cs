@@ -10,8 +10,8 @@ namespace Tarzan.Nfx.Dashboard
     [Route("api/dns")]
     public class DnsController : Controller
     {
-        ITableDataAccess<Dns, Guid, string> m_dataAccess;
-        public DnsController(ITableDataAccess<Dns, Guid,string> dataAccess)
+        ITableDataAccess<DnsInfo, Guid, string> m_dataAccess;
+        public DnsController(ITableDataAccess<DnsInfo, Guid,string> dataAccess)
         {
             m_dataAccess = dataAccess;
         }
@@ -23,13 +23,13 @@ namespace Tarzan.Nfx.Dashboard
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<Dns> Get(int start, int length)
+        public IEnumerable<DnsInfo> Get(int start, int length)
         {
             return m_dataAccess.FetchRange(start, length); 
         }
 
         [HttpGet("item/{flow-id}/{dns-id}")]
-        public Dns Get(string flowId, string dnsId)
+        public DnsInfo Get(string flowId, string dnsId)
         {
             var uuid = Guid.Parse(flowId);
             return m_dataAccess.FetchItem(uuid, dnsId);
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Dashboard
                 
         // PUT: api/hosts/5
         [HttpPut("item/{address}")]
-        public void Put(string address, [FromBody]Dns value)
+        public void Put(string address, [FromBody]DnsInfo value)
         {
         }        
     }

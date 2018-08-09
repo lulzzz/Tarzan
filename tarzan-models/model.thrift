@@ -40,7 +40,7 @@ struct Service {
 11: i64 AvgDuration;
 }
 
-struct Dns {
+struct DnsInfo {
 1: string FlowId;
 2: string DnsId;
 5: i64 Timestamp;
@@ -50,4 +50,24 @@ struct Dns {
 9: string DnsType;
 10: string DnsQuery;
 11: string DnsAnswer;
+}
+
+struct HttpInfo {
+1: string FlowId;
+2: string Rid;
+3: string Method;
+4: string Host;
+5: string Uri;
+6: string Referrer;
+7: string Version;
+8: string UserAgent;
+9: i32 RequestBodyLenght;
+10: i32 ResponseBodyLength;
+11: string StatusCode;
+12: string StatusMessage;
+13: string InfoCode;
+14: string InfoMessage;
+15: string Username;
+16: string Password;
+17: list<string> Headers;
 }

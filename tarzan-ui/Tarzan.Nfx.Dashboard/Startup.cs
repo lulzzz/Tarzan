@@ -46,7 +46,7 @@ namespace Tarzan.Nfx.Dashboard
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Host, string>>(hostsDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Service, string>>(servicesDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(capturesDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Dns, Guid, string>>(dnsDataAccess);
+            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.DnsInfo, Guid, string>>(dnsDataAccess);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

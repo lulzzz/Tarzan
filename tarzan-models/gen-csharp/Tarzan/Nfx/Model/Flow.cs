@@ -21,43 +21,120 @@ namespace Tarzan.Nfx.Model
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class Service : TBase
+  public partial class Flow : TBase
   {
-    private string _Name;
-    private int _Flows;
+    private string _Protocol;
+    private string _SourceAddress;
+    private int _SourcePort;
+    private string _DestinationAddress;
+    private int _DestinationPort;
+    private string _FlowId;
+    private long _FirstSeen;
+    private long _LastSeen;
     private int _Packets;
-    private int _MinPackets;
-    private int _MaxPackets;
     private long _Octets;
-    private long _MinOctets;
-    private long _MaxOctets;
-    private long _MinDuration;
-    private long _MaxDuration;
-    private long _AvgDuration;
 
-    public string Name
+    public string Protocol
     {
       get
       {
-        return _Name;
+        return _Protocol;
       }
       set
       {
-        __isset.Name = true;
-        this._Name = value;
+        __isset.Protocol = true;
+        this._Protocol = value;
       }
     }
 
-    public int Flows
+    public string SourceAddress
     {
       get
       {
-        return _Flows;
+        return _SourceAddress;
       }
       set
       {
-        __isset.Flows = true;
-        this._Flows = value;
+        __isset.SourceAddress = true;
+        this._SourceAddress = value;
+      }
+    }
+
+    public int SourcePort
+    {
+      get
+      {
+        return _SourcePort;
+      }
+      set
+      {
+        __isset.SourcePort = true;
+        this._SourcePort = value;
+      }
+    }
+
+    public string DestinationAddress
+    {
+      get
+      {
+        return _DestinationAddress;
+      }
+      set
+      {
+        __isset.DestinationAddress = true;
+        this._DestinationAddress = value;
+      }
+    }
+
+    public int DestinationPort
+    {
+      get
+      {
+        return _DestinationPort;
+      }
+      set
+      {
+        __isset.DestinationPort = true;
+        this._DestinationPort = value;
+      }
+    }
+
+    public string FlowId
+    {
+      get
+      {
+        return _FlowId;
+      }
+      set
+      {
+        __isset.FlowId = true;
+        this._FlowId = value;
+      }
+    }
+
+    public long FirstSeen
+    {
+      get
+      {
+        return _FirstSeen;
+      }
+      set
+      {
+        __isset.FirstSeen = true;
+        this._FirstSeen = value;
+      }
+    }
+
+    public long LastSeen
+    {
+      get
+      {
+        return _LastSeen;
+      }
+      set
+      {
+        __isset.LastSeen = true;
+        this._LastSeen = value;
       }
     }
 
@@ -74,32 +151,6 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public int MinPackets
-    {
-      get
-      {
-        return _MinPackets;
-      }
-      set
-      {
-        __isset.MinPackets = true;
-        this._MinPackets = value;
-      }
-    }
-
-    public int MaxPackets
-    {
-      get
-      {
-        return _MaxPackets;
-      }
-      set
-      {
-        __isset.MaxPackets = true;
-        this._MaxPackets = value;
-      }
-    }
-
     public long Octets
     {
       get
@@ -113,91 +164,25 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public long MinOctets
-    {
-      get
-      {
-        return _MinOctets;
-      }
-      set
-      {
-        __isset.MinOctets = true;
-        this._MinOctets = value;
-      }
-    }
-
-    public long MaxOctets
-    {
-      get
-      {
-        return _MaxOctets;
-      }
-      set
-      {
-        __isset.MaxOctets = true;
-        this._MaxOctets = value;
-      }
-    }
-
-    public long MinDuration
-    {
-      get
-      {
-        return _MinDuration;
-      }
-      set
-      {
-        __isset.MinDuration = true;
-        this._MinDuration = value;
-      }
-    }
-
-    public long MaxDuration
-    {
-      get
-      {
-        return _MaxDuration;
-      }
-      set
-      {
-        __isset.MaxDuration = true;
-        this._MaxDuration = value;
-      }
-    }
-
-    public long AvgDuration
-    {
-      get
-      {
-        return _AvgDuration;
-      }
-      set
-      {
-        __isset.AvgDuration = true;
-        this._AvgDuration = value;
-      }
-    }
-
 
     public Isset __isset;
     #if !SILVERLIGHT
     [Serializable]
     #endif
     public struct Isset {
-      public bool Name;
-      public bool Flows;
+      public bool Protocol;
+      public bool SourceAddress;
+      public bool SourcePort;
+      public bool DestinationAddress;
+      public bool DestinationPort;
+      public bool FlowId;
+      public bool FirstSeen;
+      public bool LastSeen;
       public bool Packets;
-      public bool MinPackets;
-      public bool MaxPackets;
       public bool Octets;
-      public bool MinOctets;
-      public bool MaxOctets;
-      public bool MinDuration;
-      public bool MaxDuration;
-      public bool AvgDuration;
     }
 
-    public Service() {
+    public Flow() {
     }
 
     public void Read (TProtocol iprot)
@@ -217,77 +202,70 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                Name = iprot.ReadString();
+                Protocol = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 2:
-              if (field.Type == TType.I32) {
-                Flows = iprot.ReadI32();
+              if (field.Type == TType.String) {
+                SourceAddress = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 3:
               if (field.Type == TType.I32) {
-                Packets = iprot.ReadI32();
+                SourcePort = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 4:
-              if (field.Type == TType.I32) {
-                MinPackets = iprot.ReadI32();
+              if (field.Type == TType.String) {
+                DestinationAddress = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 5:
               if (field.Type == TType.I32) {
-                MaxPackets = iprot.ReadI32();
+                DestinationPort = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 6:
-              if (field.Type == TType.I64) {
-                Octets = iprot.ReadI64();
+              if (field.Type == TType.String) {
+                FlowId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 7:
               if (field.Type == TType.I64) {
-                MinOctets = iprot.ReadI64();
+                FirstSeen = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 8:
               if (field.Type == TType.I64) {
-                MaxOctets = iprot.ReadI64();
+                LastSeen = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 9:
-              if (field.Type == TType.I64) {
-                MinDuration = iprot.ReadI64();
+              if (field.Type == TType.I32) {
+                Packets = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 10:
               if (field.Type == TType.I64) {
-                MaxDuration = iprot.ReadI64();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 11:
-              if (field.Type == TType.I64) {
-                AvgDuration = iprot.ReadI64();
+                Octets = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -310,95 +288,87 @@ namespace Tarzan.Nfx.Model
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("Service");
+        TStruct struc = new TStruct("Flow");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (Name != null && __isset.Name) {
-          field.Name = "Name";
+        if (Protocol != null && __isset.Protocol) {
+          field.Name = "Protocol";
           field.Type = TType.String;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(Name);
+          oprot.WriteString(Protocol);
           oprot.WriteFieldEnd();
         }
-        if (__isset.Flows) {
-          field.Name = "Flows";
-          field.Type = TType.I32;
+        if (SourceAddress != null && __isset.SourceAddress) {
+          field.Name = "SourceAddress";
+          field.Type = TType.String;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Flows);
+          oprot.WriteString(SourceAddress);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.SourcePort) {
+          field.Name = "SourcePort";
+          field.Type = TType.I32;
+          field.ID = 3;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI32(SourcePort);
+          oprot.WriteFieldEnd();
+        }
+        if (DestinationAddress != null && __isset.DestinationAddress) {
+          field.Name = "DestinationAddress";
+          field.Type = TType.String;
+          field.ID = 4;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(DestinationAddress);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.DestinationPort) {
+          field.Name = "DestinationPort";
+          field.Type = TType.I32;
+          field.ID = 5;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI32(DestinationPort);
+          oprot.WriteFieldEnd();
+        }
+        if (FlowId != null && __isset.FlowId) {
+          field.Name = "FlowId";
+          field.Type = TType.String;
+          field.ID = 6;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(FlowId);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.FirstSeen) {
+          field.Name = "FirstSeen";
+          field.Type = TType.I64;
+          field.ID = 7;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI64(FirstSeen);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.LastSeen) {
+          field.Name = "LastSeen";
+          field.Type = TType.I64;
+          field.ID = 8;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI64(LastSeen);
           oprot.WriteFieldEnd();
         }
         if (__isset.Packets) {
           field.Name = "Packets";
           field.Type = TType.I32;
-          field.ID = 3;
+          field.ID = 9;
           oprot.WriteFieldBegin(field);
           oprot.WriteI32(Packets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MinPackets) {
-          field.Name = "MinPackets";
-          field.Type = TType.I32;
-          field.ID = 4;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(MinPackets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MaxPackets) {
-          field.Name = "MaxPackets";
-          field.Type = TType.I32;
-          field.ID = 5;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(MaxPackets);
           oprot.WriteFieldEnd();
         }
         if (__isset.Octets) {
           field.Name = "Octets";
           field.Type = TType.I64;
-          field.ID = 6;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(Octets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MinOctets) {
-          field.Name = "MinOctets";
-          field.Type = TType.I64;
-          field.ID = 7;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(MinOctets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MaxOctets) {
-          field.Name = "MaxOctets";
-          field.Type = TType.I64;
-          field.ID = 8;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(MaxOctets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MinDuration) {
-          field.Name = "MinDuration";
-          field.Type = TType.I64;
-          field.ID = 9;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(MinDuration);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.MaxDuration) {
-          field.Name = "MaxDuration";
-          field.Type = TType.I64;
           field.ID = 10;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI64(MaxDuration);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.AvgDuration) {
-          field.Name = "AvgDuration";
-          field.Type = TType.I64;
-          field.ID = 11;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(AvgDuration);
+          oprot.WriteI64(Octets);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -411,19 +381,55 @@ namespace Tarzan.Nfx.Model
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("Service(");
+      StringBuilder __sb = new StringBuilder("Flow(");
       bool __first = true;
-      if (Name != null && __isset.Name) {
+      if (Protocol != null && __isset.Protocol) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Name: ");
-        __sb.Append(Name);
+        __sb.Append("Protocol: ");
+        __sb.Append(Protocol);
       }
-      if (__isset.Flows) {
+      if (SourceAddress != null && __isset.SourceAddress) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Flows: ");
-        __sb.Append(Flows);
+        __sb.Append("SourceAddress: ");
+        __sb.Append(SourceAddress);
+      }
+      if (__isset.SourcePort) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("SourcePort: ");
+        __sb.Append(SourcePort);
+      }
+      if (DestinationAddress != null && __isset.DestinationAddress) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("DestinationAddress: ");
+        __sb.Append(DestinationAddress);
+      }
+      if (__isset.DestinationPort) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("DestinationPort: ");
+        __sb.Append(DestinationPort);
+      }
+      if (FlowId != null && __isset.FlowId) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("FlowId: ");
+        __sb.Append(FlowId);
+      }
+      if (__isset.FirstSeen) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("FirstSeen: ");
+        __sb.Append(FirstSeen);
+      }
+      if (__isset.LastSeen) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("LastSeen: ");
+        __sb.Append(LastSeen);
       }
       if (__isset.Packets) {
         if(!__first) { __sb.Append(", "); }
@@ -431,53 +437,11 @@ namespace Tarzan.Nfx.Model
         __sb.Append("Packets: ");
         __sb.Append(Packets);
       }
-      if (__isset.MinPackets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MinPackets: ");
-        __sb.Append(MinPackets);
-      }
-      if (__isset.MaxPackets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MaxPackets: ");
-        __sb.Append(MaxPackets);
-      }
       if (__isset.Octets) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
         __sb.Append("Octets: ");
         __sb.Append(Octets);
-      }
-      if (__isset.MinOctets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MinOctets: ");
-        __sb.Append(MinOctets);
-      }
-      if (__isset.MaxOctets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MaxOctets: ");
-        __sb.Append(MaxOctets);
-      }
-      if (__isset.MinDuration) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MinDuration: ");
-        __sb.Append(MinDuration);
-      }
-      if (__isset.MaxDuration) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("MaxDuration: ");
-        __sb.Append(MaxDuration);
-      }
-      if (__isset.AvgDuration) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("AvgDuration: ");
-        __sb.Append(AvgDuration);
       }
       __sb.Append(")");
       return __sb.ToString();

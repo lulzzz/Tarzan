@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.Model
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class Dns : TBase
+  public partial class DnsInfo : TBase
   {
     private string _FlowId;
     private string _DnsId;
@@ -167,7 +167,7 @@ namespace Tarzan.Nfx.Model
       public bool DnsAnswer;
     }
 
-    public Dns() {
+    public DnsInfo() {
     }
 
     public void Read (TProtocol iprot)
@@ -266,7 +266,7 @@ namespace Tarzan.Nfx.Model
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("Dns");
+        TStruct struc = new TStruct("DnsInfo");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
         if (FlowId != null && __isset.FlowId) {
@@ -351,7 +351,7 @@ namespace Tarzan.Nfx.Model
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("Dns(");
+      StringBuilder __sb = new StringBuilder("DnsInfo(");
       bool __first = true;
       if (FlowId != null && __isset.FlowId) {
         if(!__first) { __sb.Append(", "); }
