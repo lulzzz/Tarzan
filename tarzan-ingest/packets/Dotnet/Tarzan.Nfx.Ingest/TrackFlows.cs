@@ -78,6 +78,8 @@ namespace Tarzan.Nfx.Ingest
 
                     var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(cassandraNode.Value() ?? "localhost:9042", 9042), cassandraKeyspace.Value() ?? $"ingest_{DateTime.Now.ToString()}");
 
+                    cassandraWriter.DeleteKeyspace();
+
                     cassandraWriter.Setup();
 
                     cassandraWriter.Write(flowTracker.Table);

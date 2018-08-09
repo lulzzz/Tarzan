@@ -13,6 +13,7 @@ namespace Tarzan.Nfx.Model.Cassandra
             global.Define(Flow.Mapping);
             global.Define(Host.Mapping);
             global.Define(Service.Mapping);
+            global.Define(Dns.Mapping);
         }
     }
 }

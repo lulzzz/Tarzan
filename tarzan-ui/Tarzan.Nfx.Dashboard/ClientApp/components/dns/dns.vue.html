@@ -9,11 +9,25 @@
             </el-header>
 
             <el-main>
-
+                <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <el-table-column prop="dnsId" label="Id" width="80"/>                        
+                    <el-table-column prop="timestamp" label="Time" width="80"/>
+                    <el-table-column prop="client" label="Client" width="200" />
+                    <el-table-column prop="server" label="Server" width="200" />
+                    <el-table-column prop="dnsTtl" label="TTL" width="100" />
+                    <el-table-column prop="dnsType" label="Type" width="80" />
+                    <el-table-column prop="dnsQuery" label="Query"  />
+                    <el-table-column prop="dnsAnswer" label="Answer" />
+                </el-table>
             </el-main>
 
             <el-footer>
-
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalItems"
+                               curent-page="currentPage"
+                               @current-change="reload" />
 
 
             </el-footer>

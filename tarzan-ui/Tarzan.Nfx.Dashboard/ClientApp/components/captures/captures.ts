@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 
-import { Capture } from '../../api/capture';
+import { Capture } from '../../api/models';
 
 @Component
 export default class CapturesComponent extends Vue {

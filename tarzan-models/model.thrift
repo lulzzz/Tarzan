@@ -39,3 +39,15 @@ struct Service {
 10: i64 MaxDuration;
 11: i64 AvgDuration;
 }
+
+struct Dns {
+1: string FlowId;
+2: string DnsId;
+5: i64 Timestamp;
+6: string Client;
+7: string Server;
+8: i32 DnsTtl;
+9: string DnsType;
+10: string DnsQuery;
+11: string DnsAnswer;
+}

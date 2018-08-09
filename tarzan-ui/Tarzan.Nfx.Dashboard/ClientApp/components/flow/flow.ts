@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Flow } from '../../api/flow';
+import { Flow } from '../../api/models';
 
 
 const emptyFlow = {

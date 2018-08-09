@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Host } from '../../api/host';
+import { Host } from '../../api/models';
 
 @Component
 export default class HostsComponent extends Vue {

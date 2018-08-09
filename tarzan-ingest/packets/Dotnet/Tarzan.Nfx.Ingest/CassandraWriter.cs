@@ -9,6 +9,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Tarzan.Nfx;
+using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest
@@ -22,11 +23,21 @@ namespace Tarzan.Nfx.Ingest
         private Table<Model.Flow> m_flowTable;
         private Table<Model.Host> m_hostTable;
         private Table<Model.Service> m_serviceTable;
+        private Table<Model.Dns> m_dnsTable;
 
         public CassandraWriter(IPEndPoint endpoint, string keyspace)
         {
             this.m_endpoint = endpoint;
             this.m_keyspace = keyspace;
+        }
+
+        internal void DeleteKeyspace()
+        {
+            var cluster = Cluster.Builder().AddContactPoint(m_endpoint).Build();
+            using (var session = cluster.Connect())
+            {
+                session.Execute($"DROP KEYSPACE IF EXISTS {m_keyspace}");
+            }
         }
 
         internal void Setup()
@@ -43,6 +54,8 @@ namespace Tarzan.Nfx.Ingest
             m_hostTable.CreateIfNotExists();
             m_serviceTable = new Table<Model.Service>(m_session);
             m_serviceTable.CreateIfNotExists();
+            m_dnsTable = new Table<Model.Dns>(m_session);
+            m_dnsTable.CreateIfNotExists();
         }
 
         internal void Write(FlowTable table)
@@ -50,6 +63,7 @@ namespace Tarzan.Nfx.Ingest
             WriteFlows(table);
             WriteHosts(table);
             WriteServices(table);
+            WriteDns(table);
         }
 
         internal void Shutdown()
@@ -60,11 +74,11 @@ namespace Tarzan.Nfx.Ingest
 
         void WriteFlows(FlowTable table)
         {
-            foreach (var (flow, index) in table.Entries.Select(x => (x, Guid.NewGuid())))
+            foreach (var flow in table.Entries)
             {
                 var flowPoco = new Flow
                 {
-                    FlowId = index.ToString(),
+                    FlowId = flow.Value.FlowId.ToString(),
                     Protocol = flow.Key.Protocol.ToString(),
                     SourceAddress = flow.Key.SourceEndpoint.Address.ToString(),
                     SourcePort = flow.Key.SourceEndpoint.Port,
@@ -175,6 +189,16 @@ namespace Tarzan.Nfx.Ingest
             foreach(var service in services)
             {
                 var insert = m_serviceTable.Insert(service);
+                insert.Execute();
+            }
+        }
+
+        private void WriteDns(FlowTable flowTable)
+        {
+            var dnsModels = flowTable.Entries.SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
+            foreach(var dnsModel in dnsModels)
+            {
+                var insert = m_dnsTable.Insert(dnsModel);
                 insert.Execute();
             }
         }

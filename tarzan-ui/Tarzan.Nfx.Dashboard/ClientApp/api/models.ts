@@ -8,8 +8,105 @@
 
 
 
-export class Host {
+export class Dns {
     __isset!: Isset;
+    flowId?: string | null;
+    dnsId?: string | null;
+    timestamp!: number;
+    client?: string | null;
+    server?: string | null;
+    dnsTtl!: number;
+    dnsType?: string | null;
+    dnsQuery?: string | null;
+    dnsAnswer?: string | null;
+
+    init(data?: any) {
+        if (data) {
+            this.__isset = data["__isset"] ? Isset.fromJS(data["__isset"]) : new Isset();
+            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
+            this.dnsId = data["dnsId"] !== undefined ? data["dnsId"] : <any>null;
+            this.timestamp = data["timestamp"] !== undefined ? data["timestamp"] : <any>null;
+            this.client = data["client"] !== undefined ? data["client"] : <any>null;
+            this.server = data["server"] !== undefined ? data["server"] : <any>null;
+            this.dnsTtl = data["dnsTtl"] !== undefined ? data["dnsTtl"] : <any>null;
+            this.dnsType = data["dnsType"] !== undefined ? data["dnsType"] : <any>null;
+            this.dnsQuery = data["dnsQuery"] !== undefined ? data["dnsQuery"] : <any>null;
+            this.dnsAnswer = data["dnsAnswer"] !== undefined ? data["dnsAnswer"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): Dns {
+        data = typeof data === 'object' ? data : {};
+        let result = new Dns();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>null;
+        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
+        data["dnsId"] = this.dnsId !== undefined ? this.dnsId : <any>null;
+        data["timestamp"] = this.timestamp !== undefined ? this.timestamp : <any>null;
+        data["client"] = this.client !== undefined ? this.client : <any>null;
+        data["server"] = this.server !== undefined ? this.server : <any>null;
+        data["dnsTtl"] = this.dnsTtl !== undefined ? this.dnsTtl : <any>null;
+        data["dnsType"] = this.dnsType !== undefined ? this.dnsType : <any>null;
+        data["dnsQuery"] = this.dnsQuery !== undefined ? this.dnsQuery : <any>null;
+        data["dnsAnswer"] = this.dnsAnswer !== undefined ? this.dnsAnswer : <any>null;
+        return data;
+    }
+}
+
+export class Isset {
+    flowId!: boolean;
+    dnsId!: boolean;
+    timestamp!: boolean;
+    client!: boolean;
+    server!: boolean;
+    dnsTtl!: boolean;
+    dnsType!: boolean;
+    dnsQuery!: boolean;
+    dnsAnswer!: boolean;
+
+    init(data?: any) {
+        if (data) {
+            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
+            this.dnsId = data["dnsId"] !== undefined ? data["dnsId"] : <any>null;
+            this.timestamp = data["timestamp"] !== undefined ? data["timestamp"] : <any>null;
+            this.client = data["client"] !== undefined ? data["client"] : <any>null;
+            this.server = data["server"] !== undefined ? data["server"] : <any>null;
+            this.dnsTtl = data["dnsTtl"] !== undefined ? data["dnsTtl"] : <any>null;
+            this.dnsType = data["dnsType"] !== undefined ? data["dnsType"] : <any>null;
+            this.dnsQuery = data["dnsQuery"] !== undefined ? data["dnsQuery"] : <any>null;
+            this.dnsAnswer = data["dnsAnswer"] !== undefined ? data["dnsAnswer"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): Isset {
+        data = typeof data === 'object' ? data : {};
+        let result = new Isset();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
+        data["dnsId"] = this.dnsId !== undefined ? this.dnsId : <any>null;
+        data["timestamp"] = this.timestamp !== undefined ? this.timestamp : <any>null;
+        data["client"] = this.client !== undefined ? this.client : <any>null;
+        data["server"] = this.server !== undefined ? this.server : <any>null;
+        data["dnsTtl"] = this.dnsTtl !== undefined ? this.dnsTtl : <any>null;
+        data["dnsType"] = this.dnsType !== undefined ? this.dnsType : <any>null;
+        data["dnsQuery"] = this.dnsQuery !== undefined ? this.dnsQuery : <any>null;
+        data["dnsAnswer"] = this.dnsAnswer !== undefined ? this.dnsAnswer : <any>null;
+        return data;
+    }
+}
+
+export class Host {
+    __isset!: Isset2;
     address?: string | null;
     hostname?: string | null;
     upFlows!: number;
@@ -21,7 +118,7 @@ export class Host {
 
     init(data?: any) {
         if (data) {
-            this.__isset = data["__isset"] ? Isset.fromJS(data["__isset"]) : new Isset();
+            this.__isset = data["__isset"] ? Isset2.fromJS(data["__isset"]) : new Isset2();
             this.address = data["address"] !== undefined ? data["address"] : <any>null;
             this.hostname = data["hostname"] !== undefined ? data["hostname"] : <any>null;
             this.upFlows = data["upFlows"] !== undefined ? data["upFlows"] : <any>null;
@@ -55,7 +152,7 @@ export class Host {
     }
 }
 
-export class Isset {
+export class Isset2 {
     address!: boolean;
     hostname!: boolean;
     upFlows!: boolean;
@@ -78,9 +175,9 @@ export class Isset {
         }
     }
 
-    static fromJS(data: any): Isset {
+    static fromJS(data: any): Isset2 {
         data = typeof data === 'object' ? data : {};
-        let result = new Isset();
+        let result = new Isset2();
         result.init(data);
         return result;
     }
@@ -100,7 +197,7 @@ export class Isset {
 }
 
 export class Service {
-    __isset!: Isset2;
+    __isset!: Isset3;
     name?: string | null;
     flows!: number;
     packets!: number;
@@ -115,7 +212,7 @@ export class Service {
 
     init(data?: any) {
         if (data) {
-            this.__isset = data["__isset"] ? Isset2.fromJS(data["__isset"]) : new Isset2();
+            this.__isset = data["__isset"] ? Isset3.fromJS(data["__isset"]) : new Isset3();
             this.name = data["name"] !== undefined ? data["name"] : <any>null;
             this.flows = data["flows"] !== undefined ? data["flows"] : <any>null;
             this.packets = data["packets"] !== undefined ? data["packets"] : <any>null;
@@ -155,7 +252,7 @@ export class Service {
     }
 }
 
-export class Isset2 {
+export class Isset3 {
     name!: boolean;
     flows!: boolean;
     packets!: boolean;
@@ -184,9 +281,9 @@ export class Isset2 {
         }
     }
 
-    static fromJS(data: any): Isset2 {
+    static fromJS(data: any): Isset3 {
         data = typeof data === 'object' ? data : {};
-        let result = new Isset2();
+        let result = new Isset3();
         result.init(data);
         return result;
     }
@@ -267,7 +364,7 @@ export class Capture {
 }
 
 export class Flow {
-    __isset!: Isset3;
+    __isset!: Isset4;
     protocol?: string | null;
     sourceAddress?: string | null;
     sourcePort!: number;
@@ -281,7 +378,7 @@ export class Flow {
 
     init(data?: any) {
         if (data) {
-            this.__isset = data["__isset"] ? Isset3.fromJS(data["__isset"]) : new Isset3();
+            this.__isset = data["__isset"] ? Isset4.fromJS(data["__isset"]) : new Isset4();
             this.protocol = data["protocol"] !== undefined ? data["protocol"] : <any>null;
             this.sourceAddress = data["sourceAddress"] !== undefined ? data["sourceAddress"] : <any>null;
             this.sourcePort = data["sourcePort"] !== undefined ? data["sourcePort"] : <any>null;
@@ -319,7 +416,7 @@ export class Flow {
     }
 }
 
-export class Isset3 {
+export class Isset4 {
     protocol!: boolean;
     sourceAddress!: boolean;
     sourcePort!: boolean;
@@ -346,9 +443,9 @@ export class Isset3 {
         }
     }
 
-    static fromJS(data: any): Isset3 {
+    static fromJS(data: any): Isset4 {
         data = typeof data === 'object' ? data : {};
-        let result = new Isset3();
+        let result = new Isset4();
         result.init(data);
         return result;
     }
