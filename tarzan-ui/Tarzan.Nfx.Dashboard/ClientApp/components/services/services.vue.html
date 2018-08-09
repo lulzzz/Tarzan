@@ -8,20 +8,28 @@
             </el-header>
 
             <el-main>
-                <el-table :data="dataSource" border style="width: 100%" v-loading="loading" @row-dblclick="selectFlow">
-                    <el-table-column prop="protocol" label="Proto" width="80" />
+                <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <el-table-column prop="name" label="Service" width="120" />
                     <el-table-column prop="flows" label="Flows" width="100" />
                     <el-table-column label="Packets">
                         <el-table-column prop="packets" label="Total" width="100" />
                         <el-table-column prop="minPackets" label="Min" width="100" />
                         <el-table-column prop="maxPackets" label="Max" width="100" />
-                        <el-table-column prop="avgPackets" label="Avg" width="100" />
+                        <el-table-column label="Avg" width="100">
+                            <template slot-scope="scope">
+                                {{ dataSource[scope.$index].packets / dataSource[scope.$index].flows }}
+                            </template>
+                        </el-table-column>
                     </el-table-column>
                     <el-table-column label="Octets">
                         <el-table-column prop="octets" label="Total" width="100" />
                         <el-table-column prop="minOctets" label="Min" width="100" />
                         <el-table-column prop="maxOctets" label="Max" width="100" />
-                        <el-table-column prop="avgOctets" label="Avg" width="100" />
+                        <el-table-column label="Avg" width="100">
+                            <template slot-scope="scope">
+                                {{ dataSource[scope.$index].octets / dataSource[scope.$index].flows }}
+                            </template>
+                        </el-table-column>
                     </el-table-column>
                     <el-table-column label="Duration">
                         <el-table-column prop="minDuration" label="Min" width="100" />
@@ -32,7 +40,12 @@
             </el-main>
 
             <el-footer>
-
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalItems"
+                               curent-page="currentPage"
+                               @current-change="reload" />
             </el-footer>
         </el-container>
     </div>

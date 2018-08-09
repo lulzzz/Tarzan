@@ -1,40 +1,32 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
+import { Service } from '../../api/models';
 
 @Component
 export default class ServicesComponent extends Vue {
     loading: boolean = false;
-    dataSource = [{
-        protocol: 'HTTP',
-        flows: 13256,
-        packets: 1242323,
-        octets: 242353456,
-        minPackets: 2, 
-        minOctets: 132,
-        maxPackets: 3424,
-        maxOctets: 122456,
-        avgPackets: 24,
-        avgOctets: 35346,
-        minDuration: 400,
-        maxDuration: 123425,
-        avgDuration: 3453
-    },
-    {
-        protocol: 'DNS',
-        flows: 13256,
-        packets: 1242323,
-        octets: 242353456,
-        minPackets: 2,
-        minOctets: 132,
-        maxPackets: 3424,
-        maxOctets: 122456,
-        avgPackets: 24,
-        avgOctets: 35346,
-        minDuration: 400,
-        maxDuration: 123425,
-        avgDuration: 3453
+    dataSource: Service[] = [];
+    currentPage: number = 1;
+    totalItems: number = 0;
+    serviceFilter: string = "*";
+    perPage = 10;
+    mounted() {
+        fetch('api/services/count').then(response => response.text().then(value => this.totalItems = parseInt(value)));
+        this.reload(1);
     }
-    ];
+
+    reload(page: number) {
+        this.loading = true;
+        let offset = (page - 1) * this.perPage;
+        let fetchString = `api/services/range/${offset}/count/${this.perPage}`;
+        console.log(fetchString);
+        fetch(fetchString)
+            .then(response => response.json() as Promise<Service[]>)
+            .then(data => {
+                this.dataSource = data;
+                this.loading = false;
+            });
+    }
 }
 
 
