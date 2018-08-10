@@ -52,6 +52,8 @@ namespace Tarzan.Nfx.Ingest
         public IList<(Packet packet, PosixTimeval time)> PacketList => m_packetList;
 
         public Guid FlowId => m_flowId;
+
+        public string ServiceName { get; internal set; }
     }
 
     class FlowTable : IFlowTable<FlowKey, FlowRecordWithPackets>, IKeyProvider<FlowKey, (Packet, PosixTimeval)>, IRecordProvider<(Packet, PosixTimeval), FlowRecordWithPackets>

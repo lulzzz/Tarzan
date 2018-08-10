@@ -53,7 +53,6 @@ namespace Tarzan.Nfx.Model
         /// List of tags that label the capture.
         /// </summary>
         public string[] Tags { get; set; }
-        public static ITypeDefinition[] Mapping { get; internal set; }
 
         /// <summary>
         /// Creates an empty flow record.

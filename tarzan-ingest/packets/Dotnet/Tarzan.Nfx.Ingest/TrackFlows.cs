@@ -43,7 +43,7 @@ namespace Tarzan.Nfx.Ingest
                     if (inputFile.HasValue())
                     {
                         inputDevice = new SharpPcap.LibPcap.CaptureFileReaderDevice(inputFile.Value());
-                        linkLayers = inputDevice.LinkType;
+                        LinkLayers = inputDevice.LinkType;
                     }
                     if (captureInterface.HasValue())
                     {
@@ -52,7 +52,7 @@ namespace Tarzan.Nfx.Ingest
                             if (interfaceIndex < CaptureDeviceList.Instance.Count)
                             {
                                 inputDevice = CaptureDeviceList.Instance[interfaceIndex];
-                                linkLayers = inputDevice.LinkType;
+                                LinkLayers = inputDevice.LinkType;
                             }
                             else
                             {
@@ -71,10 +71,15 @@ namespace Tarzan.Nfx.Ingest
                 {                    
                     var device = GetInputDevice();
 
-
-
                     var flowTracker = new FlowTracker(device);
                     flowTracker.Track();
+
+
+                    var serviceDetector = new ServiceDetector();
+                    foreach(var flow in flowTracker.Table.Entries)
+                    {
+                        flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
+                    }
 
                     var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(cassandraNode.Value() ?? "localhost:9042", 9042), cassandraKeyspace.Value() ?? $"ingest_{DateTime.Now.ToString()}");
 
@@ -89,7 +94,7 @@ namespace Tarzan.Nfx.Ingest
                 });
             };
 
-        public static LinkLayers linkLayers { get; private set; }
+        public static LinkLayers LinkLayers { get; private set; }
     }
 }
 

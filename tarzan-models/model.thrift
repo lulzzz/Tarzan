@@ -1,5 +1,6 @@
-﻿// TO COMPILE:          
-// thrift --gen csharp model.thrift 
+﻿// Compile with:          
+// thrift --gen csharp -o Tarzan.Nfx.Model model.thrift 
+
 namespace csharp Tarzan.Nfx.Model
 
 struct Flow {
@@ -52,22 +53,27 @@ struct DnsInfo {
 11: string DnsAnswer;
 }
 
+// Holds information and a single HTTP Request/response.
 struct HttpInfo {
-1: string FlowId;
-2: string Rid;
-3: string Method;
-4: string Host;
-5: string Uri;
-6: string Referrer;
-7: string Version;
-8: string UserAgent;
-9: i32 RequestBodyLenght;
-10: i32 ResponseBodyLength;
-11: string StatusCode;
-12: string StatusMessage;
-13: string InfoCode;
-14: string InfoMessage;
-15: string Username;
-16: string Password;
-17: list<string> Headers;
+1: string RequestFlowId;
+2: string ResponseFlowId;
+3: string TransactionId;
+4: i64 Timestamp;
+5: string Client;
+6: string Server;
+11: string Method;
+12: string Host;
+13: string Uri;
+14: string Referrer;
+15: string Version;
+16: string UserAgent;
+17: string Username;
+18: string Password;
+21: string StatusCode;
+22: string StatusMessage;
+31: list<string> RequestHeaders;
+32: list<string> ResponseHeaders;
+33: i32 RequestBodyLenght;
+34: i32 ResponseBodyLength;
+
 }

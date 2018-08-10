@@ -23,47 +23,102 @@ namespace Tarzan.Nfx.Model
   #endif
   public partial class HttpInfo : TBase
   {
-    private string _FlowId;
-    private string _Rid;
+    private string _RequestFlowId;
+    private string _ResponseFlowId;
+    private string _TransactionId;
+    private long _Timestamp;
+    private string _Client;
+    private string _Server;
     private string _Method;
     private string _Host;
     private string _Uri;
     private string _Referrer;
     private string _Version;
     private string _UserAgent;
-    private int _RequestBodyLenght;
-    private int _ResponseBodyLength;
-    private string _StatusCode;
-    private string _StatusMessage;
-    private string _InfoCode;
-    private string _InfoMessage;
     private string _Username;
     private string _Password;
-    private List<string> _Headers;
+    private string _StatusCode;
+    private string _StatusMessage;
+    private List<string> _RequestHeaders;
+    private List<string> _ResponseHeaders;
+    private int _RequestBodyLenght;
+    private int _ResponseBodyLength;
 
-    public string FlowId
+    public string RequestFlowId
     {
       get
       {
-        return _FlowId;
+        return _RequestFlowId;
       }
       set
       {
-        __isset.FlowId = true;
-        this._FlowId = value;
+        __isset.RequestFlowId = true;
+        this._RequestFlowId = value;
       }
     }
 
-    public string Rid
+    public string ResponseFlowId
     {
       get
       {
-        return _Rid;
+        return _ResponseFlowId;
       }
       set
       {
-        __isset.Rid = true;
-        this._Rid = value;
+        __isset.ResponseFlowId = true;
+        this._ResponseFlowId = value;
+      }
+    }
+
+    public string TransactionId
+    {
+      get
+      {
+        return _TransactionId;
+      }
+      set
+      {
+        __isset.TransactionId = true;
+        this._TransactionId = value;
+      }
+    }
+
+    public long Timestamp
+    {
+      get
+      {
+        return _Timestamp;
+      }
+      set
+      {
+        __isset.Timestamp = true;
+        this._Timestamp = value;
+      }
+    }
+
+    public string Client
+    {
+      get
+      {
+        return _Client;
+      }
+      set
+      {
+        __isset.Client = true;
+        this._Client = value;
+      }
+    }
+
+    public string Server
+    {
+      get
+      {
+        return _Server;
+      }
+      set
+      {
+        __isset.Server = true;
+        this._Server = value;
       }
     }
 
@@ -145,29 +200,29 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public int RequestBodyLenght
+    public string Username
     {
       get
       {
-        return _RequestBodyLenght;
+        return _Username;
       }
       set
       {
-        __isset.RequestBodyLenght = true;
-        this._RequestBodyLenght = value;
+        __isset.Username = true;
+        this._Username = value;
       }
     }
 
-    public int ResponseBodyLength
+    public string Password
     {
       get
       {
-        return _ResponseBodyLength;
+        return _Password;
       }
       set
       {
-        __isset.ResponseBodyLength = true;
-        this._ResponseBodyLength = value;
+        __isset.Password = true;
+        this._Password = value;
       }
     }
 
@@ -197,68 +252,55 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public string InfoCode
+    public List<string> RequestHeaders
     {
       get
       {
-        return _InfoCode;
+        return _RequestHeaders;
       }
       set
       {
-        __isset.InfoCode = true;
-        this._InfoCode = value;
+        __isset.RequestHeaders = true;
+        this._RequestHeaders = value;
       }
     }
 
-    public string InfoMessage
+    public List<string> ResponseHeaders
     {
       get
       {
-        return _InfoMessage;
+        return _ResponseHeaders;
       }
       set
       {
-        __isset.InfoMessage = true;
-        this._InfoMessage = value;
+        __isset.ResponseHeaders = true;
+        this._ResponseHeaders = value;
       }
     }
 
-    public string Username
+    public int RequestBodyLenght
     {
       get
       {
-        return _Username;
+        return _RequestBodyLenght;
       }
       set
       {
-        __isset.Username = true;
-        this._Username = value;
+        __isset.RequestBodyLenght = true;
+        this._RequestBodyLenght = value;
       }
     }
 
-    public string Password
+    public int ResponseBodyLength
     {
       get
       {
-        return _Password;
+        return _ResponseBodyLength;
       }
       set
       {
-        __isset.Password = true;
-        this._Password = value;
-      }
-    }
-
-    public List<string> Headers
-    {
-      get
-      {
-        return _Headers;
-      }
-      set
-      {
-        __isset.Headers = true;
-        this._Headers = value;
+        __isset.ResponseBodyLength = true;
+        this._ResponseBodyLength = value;
       }
     }
 
@@ -268,23 +310,26 @@ namespace Tarzan.Nfx.Model
     [Serializable]
     #endif
     public struct Isset {
-      public bool FlowId;
-      public bool Rid;
+      public bool RequestFlowId;
+      public bool ResponseFlowId;
+      public bool TransactionId;
+      public bool Timestamp;
+      public bool Client;
+      public bool Server;
       public bool Method;
       public bool Host;
       public bool Uri;
       public bool Referrer;
       public bool Version;
       public bool UserAgent;
-      public bool RequestBodyLenght;
-      public bool ResponseBodyLength;
-      public bool StatusCode;
-      public bool StatusMessage;
-      public bool InfoCode;
-      public bool InfoMessage;
       public bool Username;
       public bool Password;
-      public bool Headers;
+      public bool StatusCode;
+      public bool StatusMessage;
+      public bool RequestHeaders;
+      public bool ResponseHeaders;
+      public bool RequestBodyLenght;
+      public bool ResponseBodyLength;
     }
 
     public HttpInfo() {
@@ -307,129 +352,160 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                FlowId = iprot.ReadString();
+                RequestFlowId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 2:
               if (field.Type == TType.String) {
-                Rid = iprot.ReadString();
+                ResponseFlowId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 3:
               if (field.Type == TType.String) {
-                Method = iprot.ReadString();
+                TransactionId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 4:
-              if (field.Type == TType.String) {
-                Host = iprot.ReadString();
+              if (field.Type == TType.I64) {
+                Timestamp = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 5:
               if (field.Type == TType.String) {
-                Uri = iprot.ReadString();
+                Client = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 6:
               if (field.Type == TType.String) {
-                Referrer = iprot.ReadString();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 7:
-              if (field.Type == TType.String) {
-                Version = iprot.ReadString();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 8:
-              if (field.Type == TType.String) {
-                UserAgent = iprot.ReadString();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 9:
-              if (field.Type == TType.I32) {
-                RequestBodyLenght = iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 10:
-              if (field.Type == TType.I32) {
-                ResponseBodyLength = iprot.ReadI32();
+                Server = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 11:
               if (field.Type == TType.String) {
-                StatusCode = iprot.ReadString();
+                Method = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 12:
               if (field.Type == TType.String) {
-                StatusMessage = iprot.ReadString();
+                Host = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 13:
               if (field.Type == TType.String) {
-                InfoCode = iprot.ReadString();
+                Uri = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 14:
               if (field.Type == TType.String) {
-                InfoMessage = iprot.ReadString();
+                Referrer = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 15:
               if (field.Type == TType.String) {
-                Username = iprot.ReadString();
+                Version = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 16:
               if (field.Type == TType.String) {
-                Password = iprot.ReadString();
+                UserAgent = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 17:
+              if (field.Type == TType.String) {
+                Username = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 18:
+              if (field.Type == TType.String) {
+                Password = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 21:
+              if (field.Type == TType.String) {
+                StatusCode = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 22:
+              if (field.Type == TType.String) {
+                StatusMessage = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 31:
               if (field.Type == TType.List) {
                 {
-                  Headers = new List<string>();
+                  RequestHeaders = new List<string>();
                   TList _list0 = iprot.ReadListBegin();
                   for( int _i1 = 0; _i1 < _list0.Count; ++_i1)
                   {
                     string _elem2;
                     _elem2 = iprot.ReadString();
-                    Headers.Add(_elem2);
+                    RequestHeaders.Add(_elem2);
                   }
                   iprot.ReadListEnd();
                 }
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 32:
+              if (field.Type == TType.List) {
+                {
+                  ResponseHeaders = new List<string>();
+                  TList _list3 = iprot.ReadListBegin();
+                  for( int _i4 = 0; _i4 < _list3.Count; ++_i4)
+                  {
+                    string _elem5;
+                    _elem5 = iprot.ReadString();
+                    ResponseHeaders.Add(_elem5);
+                  }
+                  iprot.ReadListEnd();
+                }
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 33:
+              if (field.Type == TType.I32) {
+                RequestBodyLenght = iprot.ReadI32();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 34:
+              if (field.Type == TType.I32) {
+                ResponseBodyLength = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -455,26 +531,58 @@ namespace Tarzan.Nfx.Model
         TStruct struc = new TStruct("HttpInfo");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (FlowId != null && __isset.FlowId) {
-          field.Name = "FlowId";
+        if (RequestFlowId != null && __isset.RequestFlowId) {
+          field.Name = "RequestFlowId";
           field.Type = TType.String;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(FlowId);
+          oprot.WriteString(RequestFlowId);
           oprot.WriteFieldEnd();
         }
-        if (Rid != null && __isset.Rid) {
-          field.Name = "Rid";
+        if (ResponseFlowId != null && __isset.ResponseFlowId) {
+          field.Name = "ResponseFlowId";
           field.Type = TType.String;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(Rid);
+          oprot.WriteString(ResponseFlowId);
+          oprot.WriteFieldEnd();
+        }
+        if (TransactionId != null && __isset.TransactionId) {
+          field.Name = "TransactionId";
+          field.Type = TType.String;
+          field.ID = 3;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(TransactionId);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.Timestamp) {
+          field.Name = "Timestamp";
+          field.Type = TType.I64;
+          field.ID = 4;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI64(Timestamp);
+          oprot.WriteFieldEnd();
+        }
+        if (Client != null && __isset.Client) {
+          field.Name = "Client";
+          field.Type = TType.String;
+          field.ID = 5;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(Client);
+          oprot.WriteFieldEnd();
+        }
+        if (Server != null && __isset.Server) {
+          field.Name = "Server";
+          field.Type = TType.String;
+          field.ID = 6;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(Server);
           oprot.WriteFieldEnd();
         }
         if (Method != null && __isset.Method) {
           field.Name = "Method";
           field.Type = TType.String;
-          field.ID = 3;
+          field.ID = 11;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Method);
           oprot.WriteFieldEnd();
@@ -482,7 +590,7 @@ namespace Tarzan.Nfx.Model
         if (Host != null && __isset.Host) {
           field.Name = "Host";
           field.Type = TType.String;
-          field.ID = 4;
+          field.ID = 12;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Host);
           oprot.WriteFieldEnd();
@@ -490,7 +598,7 @@ namespace Tarzan.Nfx.Model
         if (Uri != null && __isset.Uri) {
           field.Name = "Uri";
           field.Type = TType.String;
-          field.ID = 5;
+          field.ID = 13;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Uri);
           oprot.WriteFieldEnd();
@@ -498,7 +606,7 @@ namespace Tarzan.Nfx.Model
         if (Referrer != null && __isset.Referrer) {
           field.Name = "Referrer";
           field.Type = TType.String;
-          field.ID = 6;
+          field.ID = 14;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Referrer);
           oprot.WriteFieldEnd();
@@ -506,7 +614,7 @@ namespace Tarzan.Nfx.Model
         if (Version != null && __isset.Version) {
           field.Name = "Version";
           field.Type = TType.String;
-          field.ID = 7;
+          field.ID = 15;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Version);
           oprot.WriteFieldEnd();
@@ -514,63 +622,15 @@ namespace Tarzan.Nfx.Model
         if (UserAgent != null && __isset.UserAgent) {
           field.Name = "UserAgent";
           field.Type = TType.String;
-          field.ID = 8;
+          field.ID = 16;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(UserAgent);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.RequestBodyLenght) {
-          field.Name = "RequestBodyLenght";
-          field.Type = TType.I32;
-          field.ID = 9;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(RequestBodyLenght);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.ResponseBodyLength) {
-          field.Name = "ResponseBodyLength";
-          field.Type = TType.I32;
-          field.ID = 10;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(ResponseBodyLength);
-          oprot.WriteFieldEnd();
-        }
-        if (StatusCode != null && __isset.StatusCode) {
-          field.Name = "StatusCode";
-          field.Type = TType.String;
-          field.ID = 11;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(StatusCode);
-          oprot.WriteFieldEnd();
-        }
-        if (StatusMessage != null && __isset.StatusMessage) {
-          field.Name = "StatusMessage";
-          field.Type = TType.String;
-          field.ID = 12;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(StatusMessage);
-          oprot.WriteFieldEnd();
-        }
-        if (InfoCode != null && __isset.InfoCode) {
-          field.Name = "InfoCode";
-          field.Type = TType.String;
-          field.ID = 13;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(InfoCode);
-          oprot.WriteFieldEnd();
-        }
-        if (InfoMessage != null && __isset.InfoMessage) {
-          field.Name = "InfoMessage";
-          field.Type = TType.String;
-          field.ID = 14;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(InfoMessage);
           oprot.WriteFieldEnd();
         }
         if (Username != null && __isset.Username) {
           field.Name = "Username";
           field.Type = TType.String;
-          field.ID = 15;
+          field.ID = 17;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Username);
           oprot.WriteFieldEnd();
@@ -578,24 +638,71 @@ namespace Tarzan.Nfx.Model
         if (Password != null && __isset.Password) {
           field.Name = "Password";
           field.Type = TType.String;
-          field.ID = 16;
+          field.ID = 18;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Password);
           oprot.WriteFieldEnd();
         }
-        if (Headers != null && __isset.Headers) {
-          field.Name = "Headers";
+        if (StatusCode != null && __isset.StatusCode) {
+          field.Name = "StatusCode";
+          field.Type = TType.String;
+          field.ID = 21;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(StatusCode);
+          oprot.WriteFieldEnd();
+        }
+        if (StatusMessage != null && __isset.StatusMessage) {
+          field.Name = "StatusMessage";
+          field.Type = TType.String;
+          field.ID = 22;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(StatusMessage);
+          oprot.WriteFieldEnd();
+        }
+        if (RequestHeaders != null && __isset.RequestHeaders) {
+          field.Name = "RequestHeaders";
           field.Type = TType.List;
-          field.ID = 17;
+          field.ID = 31;
           oprot.WriteFieldBegin(field);
           {
-            oprot.WriteListBegin(new TList(TType.String, Headers.Count));
-            foreach (string _iter3 in Headers)
+            oprot.WriteListBegin(new TList(TType.String, RequestHeaders.Count));
+            foreach (string _iter6 in RequestHeaders)
             {
-              oprot.WriteString(_iter3);
+              oprot.WriteString(_iter6);
             }
             oprot.WriteListEnd();
           }
+          oprot.WriteFieldEnd();
+        }
+        if (ResponseHeaders != null && __isset.ResponseHeaders) {
+          field.Name = "ResponseHeaders";
+          field.Type = TType.List;
+          field.ID = 32;
+          oprot.WriteFieldBegin(field);
+          {
+            oprot.WriteListBegin(new TList(TType.String, ResponseHeaders.Count));
+            foreach (string _iter7 in ResponseHeaders)
+            {
+              oprot.WriteString(_iter7);
+            }
+            oprot.WriteListEnd();
+          }
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.RequestBodyLenght) {
+          field.Name = "RequestBodyLenght";
+          field.Type = TType.I32;
+          field.ID = 33;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI32(RequestBodyLenght);
+          oprot.WriteFieldEnd();
+        }
+        if (__isset.ResponseBodyLength) {
+          field.Name = "ResponseBodyLength";
+          field.Type = TType.I32;
+          field.ID = 34;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteI32(ResponseBodyLength);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -610,17 +717,41 @@ namespace Tarzan.Nfx.Model
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("HttpInfo(");
       bool __first = true;
-      if (FlowId != null && __isset.FlowId) {
+      if (RequestFlowId != null && __isset.RequestFlowId) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("FlowId: ");
-        __sb.Append(FlowId);
+        __sb.Append("RequestFlowId: ");
+        __sb.Append(RequestFlowId);
       }
-      if (Rid != null && __isset.Rid) {
+      if (ResponseFlowId != null && __isset.ResponseFlowId) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Rid: ");
-        __sb.Append(Rid);
+        __sb.Append("ResponseFlowId: ");
+        __sb.Append(ResponseFlowId);
+      }
+      if (TransactionId != null && __isset.TransactionId) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("TransactionId: ");
+        __sb.Append(TransactionId);
+      }
+      if (__isset.Timestamp) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("Timestamp: ");
+        __sb.Append(Timestamp);
+      }
+      if (Client != null && __isset.Client) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("Client: ");
+        __sb.Append(Client);
+      }
+      if (Server != null && __isset.Server) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("Server: ");
+        __sb.Append(Server);
       }
       if (Method != null && __isset.Method) {
         if(!__first) { __sb.Append(", "); }
@@ -658,17 +789,17 @@ namespace Tarzan.Nfx.Model
         __sb.Append("UserAgent: ");
         __sb.Append(UserAgent);
       }
-      if (__isset.RequestBodyLenght) {
+      if (Username != null && __isset.Username) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("RequestBodyLenght: ");
-        __sb.Append(RequestBodyLenght);
+        __sb.Append("Username: ");
+        __sb.Append(Username);
       }
-      if (__isset.ResponseBodyLength) {
+      if (Password != null && __isset.Password) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("ResponseBodyLength: ");
-        __sb.Append(ResponseBodyLength);
+        __sb.Append("Password: ");
+        __sb.Append(Password);
       }
       if (StatusCode != null && __isset.StatusCode) {
         if(!__first) { __sb.Append(", "); }
@@ -682,35 +813,29 @@ namespace Tarzan.Nfx.Model
         __sb.Append("StatusMessage: ");
         __sb.Append(StatusMessage);
       }
-      if (InfoCode != null && __isset.InfoCode) {
+      if (RequestHeaders != null && __isset.RequestHeaders) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("InfoCode: ");
-        __sb.Append(InfoCode);
+        __sb.Append("RequestHeaders: ");
+        __sb.Append(RequestHeaders);
       }
-      if (InfoMessage != null && __isset.InfoMessage) {
+      if (ResponseHeaders != null && __isset.ResponseHeaders) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("InfoMessage: ");
-        __sb.Append(InfoMessage);
+        __sb.Append("ResponseHeaders: ");
+        __sb.Append(ResponseHeaders);
       }
-      if (Username != null && __isset.Username) {
+      if (__isset.RequestBodyLenght) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Username: ");
-        __sb.Append(Username);
+        __sb.Append("RequestBodyLenght: ");
+        __sb.Append(RequestBodyLenght);
       }
-      if (Password != null && __isset.Password) {
+      if (__isset.ResponseBodyLength) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Password: ");
-        __sb.Append(Password);
-      }
-      if (Headers != null && __isset.Headers) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("Headers: ");
-        __sb.Append(Headers);
+        __sb.Append("ResponseBodyLength: ");
+        __sb.Append(ResponseBodyLength);
       }
       __sb.Append(")");
       return __sb.ToString();

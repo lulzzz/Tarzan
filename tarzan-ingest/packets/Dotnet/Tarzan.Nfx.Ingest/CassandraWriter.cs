@@ -1,14 +1,10 @@
 ﻿using Cassandra;
 using Cassandra.Data.Linq;
 using Cassandra.Mapping;
+using Netdx.ConversationTracker;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using Tarzan.Nfx;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Model;
 
@@ -24,6 +20,7 @@ namespace Tarzan.Nfx.Ingest
         private Table<Model.Host> m_hostTable;
         private Table<Model.Service> m_serviceTable;
         private Table<Model.DnsInfo> m_dnsTable;
+        private Table<Model.HttpInfo> m_httpTable;
 
         public CassandraWriter(IPEndPoint endpoint, string keyspace)
         {
@@ -42,7 +39,7 @@ namespace Tarzan.Nfx.Ingest
 
         internal void Setup()
         {
-            Tarzan.Nfx.Model.Cassandra.ModelMapping.Register(MappingConfiguration.Global);
+            Tarzan.Nfx.Model.Cassandra.ModelMapping.AutoRegister(MappingConfiguration.Global);
 
             var cluster = Cluster.Builder().AddContactPoint(m_endpoint).WithDefaultKeyspace(m_keyspace).Build();     
             m_session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
@@ -56,6 +53,8 @@ namespace Tarzan.Nfx.Ingest
             m_serviceTable.CreateIfNotExists();
             m_dnsTable = new Table<Model.DnsInfo>(m_session);
             m_dnsTable.CreateIfNotExists();
+            m_httpTable = new Table<Model.HttpInfo>(m_session);
+            m_httpTable.CreateIfNotExists();
         }
 
         internal void Write(FlowTable table)
@@ -64,6 +63,7 @@ namespace Tarzan.Nfx.Ingest
             WriteHosts(table);
             WriteServices(table);
             WriteDns(table);
+            WriteHttp(table);
         }
 
         internal void Shutdown()
@@ -113,78 +113,25 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        class ServiceName
-        {
-            public int Port { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Protocol { get; set; }
-        }
-
-        private Dictionary<string, ServiceName> LoadServiceNames()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resource = assembly.GetManifestResourceStream("Tarzan.Nfx.Ingest.service-names-port-numbers.csv");
-            var dictionary = new Dictionary<string, ServiceName>();
-            using (var tr = new StreamReader(resource))
-            {
-                for(var line = tr.ReadLine(); line != null; line = tr.ReadLine())
-                {
-                    var components = line.Split(',');
-                    if (components.Length < 4) continue;
-                    var name = components[0];
-                    var port = components[1];
-                    var protocol = components[2];
-                    var description = components[3];
-                    if (!String.IsNullOrWhiteSpace(port) && Int32.TryParse(port, out int protocolNumber))
-                    {
-                        var key = $"{protocol.ToLowerInvariant()}/{port}";
-                        dictionary[key] = new ServiceName
-                        {
-                            Name = String.IsNullOrWhiteSpace(name) ? key : name,
-                            Port = protocolNumber,
-                            Protocol = protocol,
-                            Description = description
-                        };
-                    }
-                }
-                return dictionary;
-            }
-            // load CSV file:
-
-        }
-
+       
         private void WriteServices(FlowTable table)
         {
-            var serviceDict = LoadServiceNames();
-            string getServiceName(string protocol, int port)
-            {
-                if (serviceDict.TryGetValue($"{protocol.ToLowerInvariant()}/{port}", out var service))
-                {
-                    return service.Name;
-                }
-                else
-                {
-                    return $"{protocol.ToLowerInvariant()}/{port}";
-                }
-            }
-
             var services = table.Entries
-                .GroupBy(f => ( f.Key.Protocol, Port: Math.Min(f.Key.SourceEndpoint.Port, f.Key.DestinationEndpoint.Port)))
+                .GroupBy(f => f.Value.ServiceName)
                 .Select(f =>
                     new Model.Service
                     {
-                        Name = getServiceName(f.Key.Protocol.ToString(), f.Key.Port),
+                        Name = f.Key,
                         Flows = f.Count(),
-                        Packets = f.Sum(x=>x.Value.Packets),
+                        Packets = f.Sum(x => x.Value.Packets),
                         MaxPackets = f.Max(x => x.Value.Packets),
                         MinPackets = f.Min(x => x.Value.Packets),
-                        Octets = f.Sum(x=>x.Value.Octets),
+                        Octets = f.Sum(x => x.Value.Octets),
                         MaxOctets = f.Max(x => x.Value.Octets),
                         MinOctets = f.Min(x => x.Value.Octets),
-                        AvgDuration = (long)f.Average(x=>x.Value.LastSeen-x.Value.FirstSeen),
+                        AvgDuration = (long)f.Average(x => x.Value.LastSeen - x.Value.FirstSeen),
                         MaxDuration = f.Max(x => x.Value.LastSeen - x.Value.FirstSeen),
-                        MinDuration = f.Min(x => x.Value.LastSeen - x.Value.FirstSeen),                        
+                        MinDuration = f.Min(x => x.Value.LastSeen - x.Value.FirstSeen),
                     }); 
             foreach(var service in services)
             {
@@ -195,11 +142,64 @@ namespace Tarzan.Nfx.Ingest
 
         private void WriteDns(FlowTable flowTable)
         {
-            var dnsModels = flowTable.Entries.SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
-            foreach(var dnsModel in dnsModels)
+            var dnsInfos = flowTable.Entries.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
+            foreach(var dnsInfo in dnsInfos)
             {
-                var insert = m_dnsTable.Insert(dnsModel);
+                var insert = m_dnsTable.Insert(dnsInfo);
                 insert.Execute();
+            }
+        }
+        private void WriteHttp(FlowTable flowTable)
+        {
+            var httpFlows = flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
+            var httpInfos = PairFlows(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
+            foreach (var httpInfo in httpInfos)
+            {
+                var insert = m_httpTable.Insert(httpInfo);
+                insert.Execute();
+            }
+        }
+
+        class Conversation
+        {
+            public KeyValuePair<FlowKey, FlowRecordWithPackets> RequestFlow { get; set; }
+            public KeyValuePair<FlowKey, FlowRecordWithPackets> ResponseFlow { get; set; }
+
+            internal class Comparer : IEqualityComparer<FlowKey>
+            {
+                public bool Equals(FlowKey x, FlowKey y)
+                {
+                    return FlowKey.Equals(x, y) || 
+                        (x.Protocol == y.Protocol
+                         && x.SourceEndpoint.Equals(y.DestinationEndpoint)
+                         && y.SourceEndpoint.Equals(x.DestinationEndpoint)
+                        );
+                }
+
+                public int GetHashCode(FlowKey obj)
+                {
+                    return obj.Protocol.GetHashCode() ^ obj.DestinationEndpoint.GetHashCode() ^ obj.SourceEndpoint.GetHashCode();
+                }
+            }
+        }
+
+        private IEnumerable<Conversation> PairFlows(IEnumerable<KeyValuePair<FlowKey, FlowRecordWithPackets>> flows)
+        {
+            var downFlows = flows.Where(f => f.Key.DestinationEndpoint.Port < f.Key.SourceEndpoint.Port);
+            var upFlows = flows.Where(f => f.Key.DestinationEndpoint.Port > f.Key.SourceEndpoint.Port);
+            var conversationCandidates = downFlows.Join(upFlows, f => f.Key, f => f.Key, (f1, f2) => new Conversation { RequestFlow = f1, ResponseFlow = f2 }, new Conversation.Comparer());
+            return conversationCandidates.Where(c => DoIntersect(c.RequestFlow.Value, c.ResponseFlow.Value));
+        }
+
+        private bool DoIntersect(FlowRecordWithPackets value1, FlowRecordWithPackets value2)
+        {
+            if (value1.FirstSeen <= value2.FirstSeen)
+            {
+                return value2.FirstSeen <= value1.LastSeen;
+            }
+            else
+            {
+                return value1.FirstSeen <= value2.LastSeen;
             }
         }
     }
