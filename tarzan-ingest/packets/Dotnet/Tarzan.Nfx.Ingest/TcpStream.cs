@@ -17,7 +17,7 @@ namespace Tarzan.Nfx.Ingest
        
         public static TcpStream From((TcpPacket tcp, PosixTimeval timeval) capture)
         {
-            return new TcpStream(Guid.NewGuid(), (long)capture.Item2.MicroSeconds, (long)capture.Item2.MicroSeconds, capture.Item1.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture })
+            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.tcp.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture })
             {
                 TcpInitialSequenceNumber = capture.tcp.SequenceNumber
             };
@@ -50,8 +50,13 @@ namespace Tarzan.Nfx.Ingest
 
         /// <summary>
         /// Analyze a sequence of flows and returns a new sequence of Tcp flows. This method splits Packet Flow into Tcp Streams.
+        /// Usually there is 1-to-1 mapping, but in general the flow can be reused by a number of TCP streams.
         /// </summary>
         /// <param name="flows"></param>
+        /// <remarks>
+        /// The current implementation uses a simple rule to split a flow into streams. It searches for SYN flag that identifies 
+        /// the new TCP stream. 
+        /// </remarks>
         /// <returns></returns>
         public static IEnumerable<KeyValuePair<FlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<FlowKey, FlowPackets>> flows)
         {
