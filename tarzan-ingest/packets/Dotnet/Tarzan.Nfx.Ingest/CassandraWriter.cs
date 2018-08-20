@@ -1,22 +1,20 @@
 ﻿using Cassandra;
 using Cassandra.Data.Linq;
 using Cassandra.Mapping;
-using Netdx.ConversationTracker;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest
 {
-    class CassandraWriter
+    partial class CassandraWriter
     {
         private IPEndPoint m_endpoint;
         private string m_keyspace;
         private ISession m_session;
         private IMapper m_mapper;
-        private Table<Model.Flow> m_flowTable;
+        private Table<Model.PacketFlow> m_flowTable;
         private Table<Model.Host> m_hostTable;
         private Table<Model.Service> m_serviceTable;
         private Table<Model.DnsInfo> m_dnsTable;
@@ -45,7 +43,7 @@ namespace Tarzan.Nfx.Ingest
             m_session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
             m_mapper = new Mapper(m_session);
 
-            m_flowTable = new Table<Model.Flow>(m_session);
+            m_flowTable = new Table<Model.PacketFlow>(m_session);
             m_flowTable.CreateIfNotExists();
             m_hostTable = new Table<Model.Host>(m_session);
             m_hostTable.CreateIfNotExists();
@@ -76,7 +74,7 @@ namespace Tarzan.Nfx.Ingest
         {
             foreach (var flow in table.Entries)
             {
-                var flowPoco = new Flow
+                var flowPoco = new PacketFlow
                 {
                     FlowId = flow.Value.FlowId.ToString(),
                     Protocol = flow.Key.Protocol.ToString(),
@@ -151,55 +149,12 @@ namespace Tarzan.Nfx.Ingest
         }
         private void WriteHttp(FlowTable flowTable)
         {
-            var httpFlows = flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
-            var httpInfos = PairFlows(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
+            var httpFlows = TcpFlows.Isolate(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
+            var httpInfos = TcpFlows.Pair(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
             foreach (var httpInfo in httpInfos)
             {
                 var insert = m_httpTable.Insert(httpInfo);
                 insert.Execute();
-            }
-        }
-
-        class Conversation
-        {
-            public KeyValuePair<FlowKey, FlowRecordWithPackets> RequestFlow { get; set; }
-            public KeyValuePair<FlowKey, FlowRecordWithPackets> ResponseFlow { get; set; }
-
-            internal class Comparer : IEqualityComparer<FlowKey>
-            {
-                public bool Equals(FlowKey x, FlowKey y)
-                {
-                    return FlowKey.Equals(x, y) || 
-                        (x.Protocol == y.Protocol
-                         && x.SourceEndpoint.Equals(y.DestinationEndpoint)
-                         && y.SourceEndpoint.Equals(x.DestinationEndpoint)
-                        );
-                }
-
-                public int GetHashCode(FlowKey obj)
-                {
-                    return obj.Protocol.GetHashCode() ^ obj.DestinationEndpoint.GetHashCode() ^ obj.SourceEndpoint.GetHashCode();
-                }
-            }
-        }
-
-        private IEnumerable<Conversation> PairFlows(IEnumerable<KeyValuePair<FlowKey, FlowRecordWithPackets>> flows)
-        {
-            var downFlows = flows.Where(f => f.Key.DestinationEndpoint.Port < f.Key.SourceEndpoint.Port);
-            var upFlows = flows.Where(f => f.Key.DestinationEndpoint.Port > f.Key.SourceEndpoint.Port);
-            var conversationCandidates = downFlows.Join(upFlows, f => f.Key, f => f.Key, (f1, f2) => new Conversation { RequestFlow = f1, ResponseFlow = f2 }, new Conversation.Comparer());
-            return conversationCandidates.Where(c => DoIntersect(c.RequestFlow.Value, c.ResponseFlow.Value));
-        }
-
-        private bool DoIntersect(FlowRecordWithPackets value1, FlowRecordWithPackets value2)
-        {
-            if (value1.FirstSeen <= value2.FirstSeen)
-            {
-                return value2.FirstSeen <= value1.LastSeen;
-            }
-            else
-            {
-                return value1.FirstSeen <= value2.LastSeen;
             }
         }
     }

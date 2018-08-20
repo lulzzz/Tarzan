@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Dns } from '../../api/models';
+import { DnsInfo } from '../../api/models';
 @Component
 export default class DnsComponent extends Vue {
     loading: boolean = true;
-    dataSource: Dns[] = [];
+    dataSource: DnsInfo[] = [];
     currentPage: number = 1;
     totalItems: number = 0;
     serviceFilter: string = "*";
@@ -20,7 +20,7 @@ export default class DnsComponent extends Vue {
         let fetchString = `api/dns/range/${offset}/count/${this.perPage}`;
         console.log(fetchString);
         fetch(fetchString)
-            .then(response => response.json() as Promise<Dns[]>)
+            .then(response => response.json() as Promise<DnsInfo[]>)
             .then(data => {
                 this.dataSource = data;
                 this.loading = false;

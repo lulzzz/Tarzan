@@ -13,32 +13,55 @@
                     <el-table-column type="expand" width="50">
                         <template slot-scope="props">
                             <el-col :span="12">
-                                <h3>Request</h3>
-                                <p>{{ props.row.requestLine }}</p>
-                                <p>{{ props.row.requestHeader }}</p>
-                                <p>{{ props.row.requestBody }}</p>
+                                <p><b>Request</b></p>
+                                <p>
+                                    <code>
+                                        {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
+                                        <div v-for="item in props.row.requestHeaders">{{ item }}</div>
+                                        </br>
+                                        ... {{ props.row.requestBodyLength}} bytes ...
+                                    </code>
+                                </p>
+                                <el-button icon="el-icon-view" circle />
+                                <el-button icon="el-icon-download" circle />
                             </el-col>
                             <el-col :span="12">
-                                <h3>Response</h3>
-                                <p>{{ props.row.responseLine }}</p>
-                                <p>{{ props.row.requestHeader }}</p>
-                                <p>{{ props.row.requestBody }}</p>
+                                <p><b>Response</b></p>
+                                <p>
+                                    <code>
+                                        {{ props.row.version }} {{ props.row.statusCode }} {{ props.row.statusMessage }}
+                                        <div v-for="item in props.row.responseHeaders">
+                                            {{ item }}
+                                        </div>
+                                        </br>
+                                        ... {{ props.row.responseBodyLength}} bytes ...
+                                    </code>
+                                </p>
+                                <el-button icon="el-icon-view" circle />
+                                <el-button icon="el-icon-download" circle />
                             </el-col>
                         </template>
                     </el-table-column>
                     <el-table-column prop="timestamp" label="Time" width="80" />
-                    <el-table-column prop="client" label="Client" width="200" />
-                    <el-table-column prop="server" label="Server" width="200" />
-                    <el-table-column prop="requestMethod" label="Method" width="100" />
-                    <el-table-column prop="requestUri" label="URI"  />
+                    <el-table-column prop="client" label="Client" width="150" />
+                    <el-table-column prop="server" label="Server" width="150" />
+                    <el-table-column prop="method" label="Method" width="80" />
+                    <el-table-column label="URI">
+                        <template slot-scope="props">
+                            http://{{ props.row.host }}{{ props.row.uri }}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="userAgent" label="User Agent" width="150" />
                 </el-table>
             </el-main>
 
             <el-footer>
-
-
-
+                <el-pagination background
+                               layout="prev, pager, next"
+                               :page-size="perPage"
+                               :total="totalItems"
+                               curent-page="currentPage"
+                               @current-change="reload" />
             </el-footer>
         </el-container>
     </div>

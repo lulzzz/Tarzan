@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using Netdx.ConversationTracker;
 using PacketDotNet;
@@ -7,55 +6,9 @@ using IPEndPoint = System.Net.IPEndPoint;
 using SharpPcap;
 using System.Threading;
 using System.IO;
-using System.Linq;
 
 namespace Tarzan.Nfx.Ingest
 {
-
-    public class FlowRecordWithPackets : FlowRecord
-    {
-        IList<(Packet packet, PosixTimeval time)> m_packetList;
-        Guid m_flowId;
-        FlowRecordWithPackets()
-        { }
-        public static FlowRecordWithPackets From((Packet, PosixTimeval) capture)
-        {
-            return new FlowRecordWithPackets
-            {
-                m_flowId = Guid.NewGuid(),
-                FirstSeen = (long)capture.Item2.MicroSeconds,
-                LastSeen = (long)capture.Item2.MicroSeconds,
-                Octets = capture.Item1.BytesHighPerformance.BytesLength,
-                Packets = 1,
-                m_packetList = new List<(Packet, PosixTimeval)> { capture }
-            };
-        }
-        /// <summary>
-        /// Merges two existing flow records. It generates a new uuid for the newly created flow record.
-        /// </summary>
-        /// <param name="f1"></param>
-        /// <param name="f2"></param>
-        /// <returns></returns>
-        public static FlowRecordWithPackets Merge(FlowRecordWithPackets f1, FlowRecordWithPackets f2)
-        {
-            return new FlowRecordWithPackets
-            {
-                m_packetList = f1.PacketList.Concat(f2.PacketList).ToList(),
-                m_flowId = Guid.NewGuid(),
-                FirstSeen = Math.Min(f1.FirstSeen, f2.FirstSeen),
-                LastSeen = Math.Max(f1.FirstSeen, f2.FirstSeen),
-                Octets = f1.Octets + f2.Octets,
-                Packets = f1.Packets + f2.Packets,
-            };
-        }
-
-        public IList<(Packet packet, PosixTimeval time)> PacketList => m_packetList;
-
-        public Guid FlowId => m_flowId;
-
-        public string ServiceName { get; internal set; }
-    }
-
     class FlowTable : IFlowTable<FlowKey, FlowRecordWithPackets>, IKeyProvider<FlowKey, (Packet, PosixTimeval)>, IRecordProvider<(Packet, PosixTimeval), FlowRecordWithPackets>
     {
         Dictionary<FlowKey, FlowRecordWithPackets> m_table = new Dictionary<FlowKey, FlowRecordWithPackets>();

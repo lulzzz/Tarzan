@@ -10,7 +10,7 @@ namespace Tarzan.Nfx.Model
         public static Map<HttpInfo> Mapping =>
             new Map<HttpInfo>()
                 .TableName(nameof(HttpInfo))
-                .PartitionKey(x => x.RequestFlowId)
+                .PartitionKey(x => x.FlowId)
                 .ClusteringKey(x => x.TransactionId)
                 .Column(f => f.__isset, cc => cc.Ignore());
     }

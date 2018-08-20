@@ -23,8 +23,7 @@ namespace Tarzan.Nfx.Model
   #endif
   public partial class HttpInfo : TBase
   {
-    private string _RequestFlowId;
-    private string _ResponseFlowId;
+    private string _FlowId;
     private string _TransactionId;
     private long _Timestamp;
     private string _Client;
@@ -41,32 +40,21 @@ namespace Tarzan.Nfx.Model
     private string _StatusMessage;
     private List<string> _RequestHeaders;
     private List<string> _ResponseHeaders;
-    private int _RequestBodyLenght;
+    private int _RequestBodyLength;
     private int _ResponseBodyLength;
+    private List<byte[]> _RequestBodyChunks;
+    private List<byte[]> _ResponseBodyChunks;
 
-    public string RequestFlowId
+    public string FlowId
     {
       get
       {
-        return _RequestFlowId;
+        return _FlowId;
       }
       set
       {
-        __isset.RequestFlowId = true;
-        this._RequestFlowId = value;
-      }
-    }
-
-    public string ResponseFlowId
-    {
-      get
-      {
-        return _ResponseFlowId;
-      }
-      set
-      {
-        __isset.ResponseFlowId = true;
-        this._ResponseFlowId = value;
+        __isset.FlowId = true;
+        this._FlowId = value;
       }
     }
 
@@ -278,16 +266,16 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public int RequestBodyLenght
+    public int RequestBodyLength
     {
       get
       {
-        return _RequestBodyLenght;
+        return _RequestBodyLength;
       }
       set
       {
-        __isset.RequestBodyLenght = true;
-        this._RequestBodyLenght = value;
+        __isset.RequestBodyLength = true;
+        this._RequestBodyLength = value;
       }
     }
 
@@ -304,14 +292,39 @@ namespace Tarzan.Nfx.Model
       }
     }
 
+    public List<byte[]> RequestBodyChunks
+    {
+      get
+      {
+        return _RequestBodyChunks;
+      }
+      set
+      {
+        __isset.RequestBodyChunks = true;
+        this._RequestBodyChunks = value;
+      }
+    }
+
+    public List<byte[]> ResponseBodyChunks
+    {
+      get
+      {
+        return _ResponseBodyChunks;
+      }
+      set
+      {
+        __isset.ResponseBodyChunks = true;
+        this._ResponseBodyChunks = value;
+      }
+    }
+
 
     public Isset __isset;
     #if !SILVERLIGHT
     [Serializable]
     #endif
     public struct Isset {
-      public bool RequestFlowId;
-      public bool ResponseFlowId;
+      public bool FlowId;
       public bool TransactionId;
       public bool Timestamp;
       public bool Client;
@@ -328,8 +341,10 @@ namespace Tarzan.Nfx.Model
       public bool StatusMessage;
       public bool RequestHeaders;
       public bool ResponseHeaders;
-      public bool RequestBodyLenght;
+      public bool RequestBodyLength;
       public bool ResponseBodyLength;
+      public bool RequestBodyChunks;
+      public bool ResponseBodyChunks;
     }
 
     public HttpInfo() {
@@ -352,19 +367,12 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                RequestFlowId = iprot.ReadString();
+                FlowId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 2:
-              if (field.Type == TType.String) {
-                ResponseFlowId = iprot.ReadString();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 3:
               if (field.Type == TType.String) {
                 TransactionId = iprot.ReadString();
               } else { 
@@ -498,7 +506,7 @@ namespace Tarzan.Nfx.Model
               break;
             case 33:
               if (field.Type == TType.I32) {
-                RequestBodyLenght = iprot.ReadI32();
+                RequestBodyLength = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -506,6 +514,40 @@ namespace Tarzan.Nfx.Model
             case 34:
               if (field.Type == TType.I32) {
                 ResponseBodyLength = iprot.ReadI32();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 35:
+              if (field.Type == TType.List) {
+                {
+                  RequestBodyChunks = new List<byte[]>();
+                  TList _list6 = iprot.ReadListBegin();
+                  for( int _i7 = 0; _i7 < _list6.Count; ++_i7)
+                  {
+                    byte[] _elem8;
+                    _elem8 = iprot.ReadBinary();
+                    RequestBodyChunks.Add(_elem8);
+                  }
+                  iprot.ReadListEnd();
+                }
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 36:
+              if (field.Type == TType.List) {
+                {
+                  ResponseBodyChunks = new List<byte[]>();
+                  TList _list9 = iprot.ReadListBegin();
+                  for( int _i10 = 0; _i10 < _list9.Count; ++_i10)
+                  {
+                    byte[] _elem11;
+                    _elem11 = iprot.ReadBinary();
+                    ResponseBodyChunks.Add(_elem11);
+                  }
+                  iprot.ReadListEnd();
+                }
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -531,26 +573,18 @@ namespace Tarzan.Nfx.Model
         TStruct struc = new TStruct("HttpInfo");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (RequestFlowId != null && __isset.RequestFlowId) {
-          field.Name = "RequestFlowId";
+        if (FlowId != null && __isset.FlowId) {
+          field.Name = "FlowId";
           field.Type = TType.String;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(RequestFlowId);
-          oprot.WriteFieldEnd();
-        }
-        if (ResponseFlowId != null && __isset.ResponseFlowId) {
-          field.Name = "ResponseFlowId";
-          field.Type = TType.String;
-          field.ID = 2;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(ResponseFlowId);
+          oprot.WriteString(FlowId);
           oprot.WriteFieldEnd();
         }
         if (TransactionId != null && __isset.TransactionId) {
           field.Name = "TransactionId";
           field.Type = TType.String;
-          field.ID = 3;
+          field.ID = 2;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(TransactionId);
           oprot.WriteFieldEnd();
@@ -666,9 +700,9 @@ namespace Tarzan.Nfx.Model
           oprot.WriteFieldBegin(field);
           {
             oprot.WriteListBegin(new TList(TType.String, RequestHeaders.Count));
-            foreach (string _iter6 in RequestHeaders)
+            foreach (string _iter12 in RequestHeaders)
             {
-              oprot.WriteString(_iter6);
+              oprot.WriteString(_iter12);
             }
             oprot.WriteListEnd();
           }
@@ -681,20 +715,20 @@ namespace Tarzan.Nfx.Model
           oprot.WriteFieldBegin(field);
           {
             oprot.WriteListBegin(new TList(TType.String, ResponseHeaders.Count));
-            foreach (string _iter7 in ResponseHeaders)
+            foreach (string _iter13 in ResponseHeaders)
             {
-              oprot.WriteString(_iter7);
+              oprot.WriteString(_iter13);
             }
             oprot.WriteListEnd();
           }
           oprot.WriteFieldEnd();
         }
-        if (__isset.RequestBodyLenght) {
-          field.Name = "RequestBodyLenght";
+        if (__isset.RequestBodyLength) {
+          field.Name = "RequestBodyLength";
           field.Type = TType.I32;
           field.ID = 33;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(RequestBodyLenght);
+          oprot.WriteI32(RequestBodyLength);
           oprot.WriteFieldEnd();
         }
         if (__isset.ResponseBodyLength) {
@@ -703,6 +737,36 @@ namespace Tarzan.Nfx.Model
           field.ID = 34;
           oprot.WriteFieldBegin(field);
           oprot.WriteI32(ResponseBodyLength);
+          oprot.WriteFieldEnd();
+        }
+        if (RequestBodyChunks != null && __isset.RequestBodyChunks) {
+          field.Name = "RequestBodyChunks";
+          field.Type = TType.List;
+          field.ID = 35;
+          oprot.WriteFieldBegin(field);
+          {
+            oprot.WriteListBegin(new TList(TType.String, RequestBodyChunks.Count));
+            foreach (byte[] _iter14 in RequestBodyChunks)
+            {
+              oprot.WriteBinary(_iter14);
+            }
+            oprot.WriteListEnd();
+          }
+          oprot.WriteFieldEnd();
+        }
+        if (ResponseBodyChunks != null && __isset.ResponseBodyChunks) {
+          field.Name = "ResponseBodyChunks";
+          field.Type = TType.List;
+          field.ID = 36;
+          oprot.WriteFieldBegin(field);
+          {
+            oprot.WriteListBegin(new TList(TType.String, ResponseBodyChunks.Count));
+            foreach (byte[] _iter15 in ResponseBodyChunks)
+            {
+              oprot.WriteBinary(_iter15);
+            }
+            oprot.WriteListEnd();
+          }
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -717,17 +781,11 @@ namespace Tarzan.Nfx.Model
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("HttpInfo(");
       bool __first = true;
-      if (RequestFlowId != null && __isset.RequestFlowId) {
+      if (FlowId != null && __isset.FlowId) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("RequestFlowId: ");
-        __sb.Append(RequestFlowId);
-      }
-      if (ResponseFlowId != null && __isset.ResponseFlowId) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("ResponseFlowId: ");
-        __sb.Append(ResponseFlowId);
+        __sb.Append("FlowId: ");
+        __sb.Append(FlowId);
       }
       if (TransactionId != null && __isset.TransactionId) {
         if(!__first) { __sb.Append(", "); }
@@ -825,17 +883,29 @@ namespace Tarzan.Nfx.Model
         __sb.Append("ResponseHeaders: ");
         __sb.Append(ResponseHeaders);
       }
-      if (__isset.RequestBodyLenght) {
+      if (__isset.RequestBodyLength) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("RequestBodyLenght: ");
-        __sb.Append(RequestBodyLenght);
+        __sb.Append("RequestBodyLength: ");
+        __sb.Append(RequestBodyLength);
       }
       if (__isset.ResponseBodyLength) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
         __sb.Append("ResponseBodyLength: ");
         __sb.Append(ResponseBodyLength);
+      }
+      if (RequestBodyChunks != null && __isset.RequestBodyChunks) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("RequestBodyChunks: ");
+        __sb.Append(RequestBodyChunks);
+      }
+      if (ResponseBodyChunks != null && __isset.ResponseBodyChunks) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("ResponseBodyChunks: ");
+        __sb.Append(ResponseBodyChunks);
       }
       __sb.Append(")");
       return __sb.ToString();

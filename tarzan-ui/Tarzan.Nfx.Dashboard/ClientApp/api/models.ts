@@ -8,57 +8,82 @@
 
 
 
-export class Dns {
+export class DnsInfo implements IDnsInfo {
     __isset!: Isset;
-    flowId?: string | null;
-    dnsId?: string | null;
+    flowId?: string | undefined;
+    dnsId?: string | undefined;
     timestamp!: number;
-    client?: string | null;
-    server?: string | null;
+    client?: string | undefined;
+    server?: string | undefined;
     dnsTtl!: number;
-    dnsType?: string | null;
-    dnsQuery?: string | null;
-    dnsAnswer?: string | null;
+    dnsType?: string | undefined;
+    dnsQuery?: string | undefined;
+    dnsAnswer?: string | undefined;
+
+    constructor(data?: IDnsInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset();
+        }
+    }
 
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset.fromJS(data["__isset"]) : new Isset();
-            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
-            this.dnsId = data["dnsId"] !== undefined ? data["dnsId"] : <any>null;
-            this.timestamp = data["timestamp"] !== undefined ? data["timestamp"] : <any>null;
-            this.client = data["client"] !== undefined ? data["client"] : <any>null;
-            this.server = data["server"] !== undefined ? data["server"] : <any>null;
-            this.dnsTtl = data["dnsTtl"] !== undefined ? data["dnsTtl"] : <any>null;
-            this.dnsType = data["dnsType"] !== undefined ? data["dnsType"] : <any>null;
-            this.dnsQuery = data["dnsQuery"] !== undefined ? data["dnsQuery"] : <any>null;
-            this.dnsAnswer = data["dnsAnswer"] !== undefined ? data["dnsAnswer"] : <any>null;
+            this.flowId = data["flowId"];
+            this.dnsId = data["dnsId"];
+            this.timestamp = data["timestamp"];
+            this.client = data["client"];
+            this.server = data["server"];
+            this.dnsTtl = data["dnsTtl"];
+            this.dnsType = data["dnsType"];
+            this.dnsQuery = data["dnsQuery"];
+            this.dnsAnswer = data["dnsAnswer"];
         }
     }
 
-    static fromJS(data: any): Dns {
+    static fromJS(data: any): DnsInfo {
         data = typeof data === 'object' ? data : {};
-        let result = new Dns();
+        let result = new DnsInfo();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>null;
-        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
-        data["dnsId"] = this.dnsId !== undefined ? this.dnsId : <any>null;
-        data["timestamp"] = this.timestamp !== undefined ? this.timestamp : <any>null;
-        data["client"] = this.client !== undefined ? this.client : <any>null;
-        data["server"] = this.server !== undefined ? this.server : <any>null;
-        data["dnsTtl"] = this.dnsTtl !== undefined ? this.dnsTtl : <any>null;
-        data["dnsType"] = this.dnsType !== undefined ? this.dnsType : <any>null;
-        data["dnsQuery"] = this.dnsQuery !== undefined ? this.dnsQuery : <any>null;
-        data["dnsAnswer"] = this.dnsAnswer !== undefined ? this.dnsAnswer : <any>null;
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["flowId"] = this.flowId;
+        data["dnsId"] = this.dnsId;
+        data["timestamp"] = this.timestamp;
+        data["client"] = this.client;
+        data["server"] = this.server;
+        data["dnsTtl"] = this.dnsTtl;
+        data["dnsType"] = this.dnsType;
+        data["dnsQuery"] = this.dnsQuery;
+        data["dnsAnswer"] = this.dnsAnswer;
         return data;
     }
 }
 
-export class Isset {
+export interface IDnsInfo {
+    __isset: Isset;
+    flowId?: string | undefined;
+    dnsId?: string | undefined;
+    timestamp: number;
+    client?: string | undefined;
+    server?: string | undefined;
+    dnsTtl: number;
+    dnsType?: string | undefined;
+    dnsQuery?: string | undefined;
+    dnsAnswer?: string | undefined;
+}
+
+export class Isset implements IIsset {
     flowId!: boolean;
     dnsId!: boolean;
     timestamp!: boolean;
@@ -69,17 +94,26 @@ export class Isset {
     dnsQuery!: boolean;
     dnsAnswer!: boolean;
 
+    constructor(data?: IIsset) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
     init(data?: any) {
         if (data) {
-            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
-            this.dnsId = data["dnsId"] !== undefined ? data["dnsId"] : <any>null;
-            this.timestamp = data["timestamp"] !== undefined ? data["timestamp"] : <any>null;
-            this.client = data["client"] !== undefined ? data["client"] : <any>null;
-            this.server = data["server"] !== undefined ? data["server"] : <any>null;
-            this.dnsTtl = data["dnsTtl"] !== undefined ? data["dnsTtl"] : <any>null;
-            this.dnsType = data["dnsType"] !== undefined ? data["dnsType"] : <any>null;
-            this.dnsQuery = data["dnsQuery"] !== undefined ? data["dnsQuery"] : <any>null;
-            this.dnsAnswer = data["dnsAnswer"] !== undefined ? data["dnsAnswer"] : <any>null;
+            this.flowId = data["flowId"];
+            this.dnsId = data["dnsId"];
+            this.timestamp = data["timestamp"];
+            this.client = data["client"];
+            this.server = data["server"];
+            this.dnsTtl = data["dnsTtl"];
+            this.dnsType = data["dnsType"];
+            this.dnsQuery = data["dnsQuery"];
+            this.dnsAnswer = data["dnsAnswer"];
         }
     }
 
@@ -92,23 +126,35 @@ export class Isset {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
-        data["dnsId"] = this.dnsId !== undefined ? this.dnsId : <any>null;
-        data["timestamp"] = this.timestamp !== undefined ? this.timestamp : <any>null;
-        data["client"] = this.client !== undefined ? this.client : <any>null;
-        data["server"] = this.server !== undefined ? this.server : <any>null;
-        data["dnsTtl"] = this.dnsTtl !== undefined ? this.dnsTtl : <any>null;
-        data["dnsType"] = this.dnsType !== undefined ? this.dnsType : <any>null;
-        data["dnsQuery"] = this.dnsQuery !== undefined ? this.dnsQuery : <any>null;
-        data["dnsAnswer"] = this.dnsAnswer !== undefined ? this.dnsAnswer : <any>null;
+        data["flowId"] = this.flowId;
+        data["dnsId"] = this.dnsId;
+        data["timestamp"] = this.timestamp;
+        data["client"] = this.client;
+        data["server"] = this.server;
+        data["dnsTtl"] = this.dnsTtl;
+        data["dnsType"] = this.dnsType;
+        data["dnsQuery"] = this.dnsQuery;
+        data["dnsAnswer"] = this.dnsAnswer;
         return data;
     }
 }
 
-export class Host {
+export interface IIsset {
+    flowId: boolean;
+    dnsId: boolean;
+    timestamp: boolean;
+    client: boolean;
+    server: boolean;
+    dnsTtl: boolean;
+    dnsType: boolean;
+    dnsQuery: boolean;
+    dnsAnswer: boolean;
+}
+
+export class Host implements IHost {
     __isset!: Isset2;
-    address?: string | null;
-    hostname?: string | null;
+    address?: string | undefined;
+    hostname?: string | undefined;
     upFlows!: number;
     downFlows!: number;
     octetsSent!: number;
@@ -116,17 +162,29 @@ export class Host {
     packetsSent!: number;
     packetsRecv!: number;
 
+    constructor(data?: IHost) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset2();
+        }
+    }
+
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset2.fromJS(data["__isset"]) : new Isset2();
-            this.address = data["address"] !== undefined ? data["address"] : <any>null;
-            this.hostname = data["hostname"] !== undefined ? data["hostname"] : <any>null;
-            this.upFlows = data["upFlows"] !== undefined ? data["upFlows"] : <any>null;
-            this.downFlows = data["downFlows"] !== undefined ? data["downFlows"] : <any>null;
-            this.octetsSent = data["octetsSent"] !== undefined ? data["octetsSent"] : <any>null;
-            this.octetsRecv = data["octetsRecv"] !== undefined ? data["octetsRecv"] : <any>null;
-            this.packetsSent = data["packetsSent"] !== undefined ? data["packetsSent"] : <any>null;
-            this.packetsRecv = data["packetsRecv"] !== undefined ? data["packetsRecv"] : <any>null;
+            this.address = data["address"];
+            this.hostname = data["hostname"];
+            this.upFlows = data["upFlows"];
+            this.downFlows = data["downFlows"];
+            this.octetsSent = data["octetsSent"];
+            this.octetsRecv = data["octetsRecv"];
+            this.packetsSent = data["packetsSent"];
+            this.packetsRecv = data["packetsRecv"];
         }
     }
 
@@ -139,20 +197,32 @@ export class Host {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>null;
-        data["address"] = this.address !== undefined ? this.address : <any>null;
-        data["hostname"] = this.hostname !== undefined ? this.hostname : <any>null;
-        data["upFlows"] = this.upFlows !== undefined ? this.upFlows : <any>null;
-        data["downFlows"] = this.downFlows !== undefined ? this.downFlows : <any>null;
-        data["octetsSent"] = this.octetsSent !== undefined ? this.octetsSent : <any>null;
-        data["octetsRecv"] = this.octetsRecv !== undefined ? this.octetsRecv : <any>null;
-        data["packetsSent"] = this.packetsSent !== undefined ? this.packetsSent : <any>null;
-        data["packetsRecv"] = this.packetsRecv !== undefined ? this.packetsRecv : <any>null;
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["address"] = this.address;
+        data["hostname"] = this.hostname;
+        data["upFlows"] = this.upFlows;
+        data["downFlows"] = this.downFlows;
+        data["octetsSent"] = this.octetsSent;
+        data["octetsRecv"] = this.octetsRecv;
+        data["packetsSent"] = this.packetsSent;
+        data["packetsRecv"] = this.packetsRecv;
         return data;
     }
 }
 
-export class Isset2 {
+export interface IHost {
+    __isset: Isset2;
+    address?: string | undefined;
+    hostname?: string | undefined;
+    upFlows: number;
+    downFlows: number;
+    octetsSent: number;
+    octetsRecv: number;
+    packetsSent: number;
+    packetsRecv: number;
+}
+
+export class Isset2 implements IIsset2 {
     address!: boolean;
     hostname!: boolean;
     upFlows!: boolean;
@@ -162,16 +232,25 @@ export class Isset2 {
     packetsSent!: boolean;
     packetsRecv!: boolean;
 
+    constructor(data?: IIsset2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
     init(data?: any) {
         if (data) {
-            this.address = data["address"] !== undefined ? data["address"] : <any>null;
-            this.hostname = data["hostname"] !== undefined ? data["hostname"] : <any>null;
-            this.upFlows = data["upFlows"] !== undefined ? data["upFlows"] : <any>null;
-            this.downFlows = data["downFlows"] !== undefined ? data["downFlows"] : <any>null;
-            this.octetsSent = data["octetsSent"] !== undefined ? data["octetsSent"] : <any>null;
-            this.octetsRecv = data["octetsRecv"] !== undefined ? data["octetsRecv"] : <any>null;
-            this.packetsSent = data["packetsSent"] !== undefined ? data["packetsSent"] : <any>null;
-            this.packetsRecv = data["packetsRecv"] !== undefined ? data["packetsRecv"] : <any>null;
+            this.address = data["address"];
+            this.hostname = data["hostname"];
+            this.upFlows = data["upFlows"];
+            this.downFlows = data["downFlows"];
+            this.octetsSent = data["octetsSent"];
+            this.octetsRecv = data["octetsRecv"];
+            this.packetsSent = data["packetsSent"];
+            this.packetsRecv = data["packetsRecv"];
         }
     }
 
@@ -184,100 +263,217 @@ export class Isset2 {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["address"] = this.address !== undefined ? this.address : <any>null;
-        data["hostname"] = this.hostname !== undefined ? this.hostname : <any>null;
-        data["upFlows"] = this.upFlows !== undefined ? this.upFlows : <any>null;
-        data["downFlows"] = this.downFlows !== undefined ? this.downFlows : <any>null;
-        data["octetsSent"] = this.octetsSent !== undefined ? this.octetsSent : <any>null;
-        data["octetsRecv"] = this.octetsRecv !== undefined ? this.octetsRecv : <any>null;
-        data["packetsSent"] = this.packetsSent !== undefined ? this.packetsSent : <any>null;
-        data["packetsRecv"] = this.packetsRecv !== undefined ? this.packetsRecv : <any>null;
+        data["address"] = this.address;
+        data["hostname"] = this.hostname;
+        data["upFlows"] = this.upFlows;
+        data["downFlows"] = this.downFlows;
+        data["octetsSent"] = this.octetsSent;
+        data["octetsRecv"] = this.octetsRecv;
+        data["packetsSent"] = this.packetsSent;
+        data["packetsRecv"] = this.packetsRecv;
         return data;
     }
 }
 
-export class Service {
+export interface IIsset2 {
+    address: boolean;
+    hostname: boolean;
+    upFlows: boolean;
+    downFlows: boolean;
+    octetsSent: boolean;
+    octetsRecv: boolean;
+    packetsSent: boolean;
+    packetsRecv: boolean;
+}
+
+export class HttpInfo implements IHttpInfo {
     __isset!: Isset3;
-    name?: string | null;
-    flows!: number;
-    packets!: number;
-    minPackets!: number;
-    maxPackets!: number;
-    octets!: number;
-    minOctets!: number;
-    maxOctets!: number;
-    minDuration!: number;
-    maxDuration!: number;
-    avgDuration!: number;
+    requestFlowId?: string | undefined;
+    responseFlowId?: string | undefined;
+    transactionId?: string | undefined;
+    timestamp!: number;
+    client?: string | undefined;
+    server?: string | undefined;
+    method?: string | undefined;
+    host?: string | undefined;
+    uri?: string | undefined;
+    referrer?: string | undefined;
+    version?: string | undefined;
+    userAgent?: string | undefined;
+    username?: string | undefined;
+    password?: string | undefined;
+    statusCode?: string | undefined;
+    statusMessage?: string | undefined;
+    requestHeaders?: string[] | undefined;
+    responseHeaders?: string[] | undefined;
+    requestBodyLenght!: number;
+    responseBodyLength!: number;
+
+    constructor(data?: IHttpInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset3();
+        }
+    }
 
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset3.fromJS(data["__isset"]) : new Isset3();
-            this.name = data["name"] !== undefined ? data["name"] : <any>null;
-            this.flows = data["flows"] !== undefined ? data["flows"] : <any>null;
-            this.packets = data["packets"] !== undefined ? data["packets"] : <any>null;
-            this.minPackets = data["minPackets"] !== undefined ? data["minPackets"] : <any>null;
-            this.maxPackets = data["maxPackets"] !== undefined ? data["maxPackets"] : <any>null;
-            this.octets = data["octets"] !== undefined ? data["octets"] : <any>null;
-            this.minOctets = data["minOctets"] !== undefined ? data["minOctets"] : <any>null;
-            this.maxOctets = data["maxOctets"] !== undefined ? data["maxOctets"] : <any>null;
-            this.minDuration = data["minDuration"] !== undefined ? data["minDuration"] : <any>null;
-            this.maxDuration = data["maxDuration"] !== undefined ? data["maxDuration"] : <any>null;
-            this.avgDuration = data["avgDuration"] !== undefined ? data["avgDuration"] : <any>null;
+            this.requestFlowId = data["requestFlowId"];
+            this.responseFlowId = data["responseFlowId"];
+            this.transactionId = data["transactionId"];
+            this.timestamp = data["timestamp"];
+            this.client = data["client"];
+            this.server = data["server"];
+            this.method = data["method"];
+            this.host = data["host"];
+            this.uri = data["uri"];
+            this.referrer = data["referrer"];
+            this.version = data["version"];
+            this.userAgent = data["userAgent"];
+            this.username = data["username"];
+            this.password = data["password"];
+            this.statusCode = data["statusCode"];
+            this.statusMessage = data["statusMessage"];
+            if (data["requestHeaders"] && data["requestHeaders"].constructor === Array) {
+                this.requestHeaders = [];
+                for (let item of data["requestHeaders"])
+                    this.requestHeaders.push(item);
+            }
+            if (data["responseHeaders"] && data["responseHeaders"].constructor === Array) {
+                this.responseHeaders = [];
+                for (let item of data["responseHeaders"])
+                    this.responseHeaders.push(item);
+            }
+            this.requestBodyLenght = data["requestBodyLenght"];
+            this.responseBodyLength = data["responseBodyLength"];
         }
     }
 
-    static fromJS(data: any): Service {
+    static fromJS(data: any): HttpInfo {
         data = typeof data === 'object' ? data : {};
-        let result = new Service();
+        let result = new HttpInfo();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>null;
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        data["flows"] = this.flows !== undefined ? this.flows : <any>null;
-        data["packets"] = this.packets !== undefined ? this.packets : <any>null;
-        data["minPackets"] = this.minPackets !== undefined ? this.minPackets : <any>null;
-        data["maxPackets"] = this.maxPackets !== undefined ? this.maxPackets : <any>null;
-        data["octets"] = this.octets !== undefined ? this.octets : <any>null;
-        data["minOctets"] = this.minOctets !== undefined ? this.minOctets : <any>null;
-        data["maxOctets"] = this.maxOctets !== undefined ? this.maxOctets : <any>null;
-        data["minDuration"] = this.minDuration !== undefined ? this.minDuration : <any>null;
-        data["maxDuration"] = this.maxDuration !== undefined ? this.maxDuration : <any>null;
-        data["avgDuration"] = this.avgDuration !== undefined ? this.avgDuration : <any>null;
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["requestFlowId"] = this.requestFlowId;
+        data["responseFlowId"] = this.responseFlowId;
+        data["transactionId"] = this.transactionId;
+        data["timestamp"] = this.timestamp;
+        data["client"] = this.client;
+        data["server"] = this.server;
+        data["method"] = this.method;
+        data["host"] = this.host;
+        data["uri"] = this.uri;
+        data["referrer"] = this.referrer;
+        data["version"] = this.version;
+        data["userAgent"] = this.userAgent;
+        data["username"] = this.username;
+        data["password"] = this.password;
+        data["statusCode"] = this.statusCode;
+        data["statusMessage"] = this.statusMessage;
+        if (this.requestHeaders && this.requestHeaders.constructor === Array) {
+            data["requestHeaders"] = [];
+            for (let item of this.requestHeaders)
+                data["requestHeaders"].push(item);
+        }
+        if (this.responseHeaders && this.responseHeaders.constructor === Array) {
+            data["responseHeaders"] = [];
+            for (let item of this.responseHeaders)
+                data["responseHeaders"].push(item);
+        }
+        data["requestBodyLenght"] = this.requestBodyLenght;
+        data["responseBodyLength"] = this.responseBodyLength;
         return data;
     }
 }
 
-export class Isset3 {
-    name!: boolean;
-    flows!: boolean;
-    packets!: boolean;
-    minPackets!: boolean;
-    maxPackets!: boolean;
-    octets!: boolean;
-    minOctets!: boolean;
-    maxOctets!: boolean;
-    minDuration!: boolean;
-    maxDuration!: boolean;
-    avgDuration!: boolean;
+export interface IHttpInfo {
+    __isset: Isset3;
+    requestFlowId?: string | undefined;
+    responseFlowId?: string | undefined;
+    transactionId?: string | undefined;
+    timestamp: number;
+    client?: string | undefined;
+    server?: string | undefined;
+    method?: string | undefined;
+    host?: string | undefined;
+    uri?: string | undefined;
+    referrer?: string | undefined;
+    version?: string | undefined;
+    userAgent?: string | undefined;
+    username?: string | undefined;
+    password?: string | undefined;
+    statusCode?: string | undefined;
+    statusMessage?: string | undefined;
+    requestHeaders?: string[] | undefined;
+    responseHeaders?: string[] | undefined;
+    requestBodyLenght: number;
+    responseBodyLength: number;
+}
+
+export class Isset3 implements IIsset3 {
+    requestFlowId!: boolean;
+    responseFlowId!: boolean;
+    transactionId!: boolean;
+    timestamp!: boolean;
+    client!: boolean;
+    server!: boolean;
+    method!: boolean;
+    host!: boolean;
+    uri!: boolean;
+    referrer!: boolean;
+    version!: boolean;
+    userAgent!: boolean;
+    username!: boolean;
+    password!: boolean;
+    statusCode!: boolean;
+    statusMessage!: boolean;
+    requestHeaders!: boolean;
+    responseHeaders!: boolean;
+    requestBodyLenght!: boolean;
+    responseBodyLength!: boolean;
+
+    constructor(data?: IIsset3) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(data?: any) {
         if (data) {
-            this.name = data["name"] !== undefined ? data["name"] : <any>null;
-            this.flows = data["flows"] !== undefined ? data["flows"] : <any>null;
-            this.packets = data["packets"] !== undefined ? data["packets"] : <any>null;
-            this.minPackets = data["minPackets"] !== undefined ? data["minPackets"] : <any>null;
-            this.maxPackets = data["maxPackets"] !== undefined ? data["maxPackets"] : <any>null;
-            this.octets = data["octets"] !== undefined ? data["octets"] : <any>null;
-            this.minOctets = data["minOctets"] !== undefined ? data["minOctets"] : <any>null;
-            this.maxOctets = data["maxOctets"] !== undefined ? data["maxOctets"] : <any>null;
-            this.minDuration = data["minDuration"] !== undefined ? data["minDuration"] : <any>null;
-            this.maxDuration = data["maxDuration"] !== undefined ? data["maxDuration"] : <any>null;
-            this.avgDuration = data["avgDuration"] !== undefined ? data["avgDuration"] : <any>null;
+            this.requestFlowId = data["requestFlowId"];
+            this.responseFlowId = data["responseFlowId"];
+            this.transactionId = data["transactionId"];
+            this.timestamp = data["timestamp"];
+            this.client = data["client"];
+            this.server = data["server"];
+            this.method = data["method"];
+            this.host = data["host"];
+            this.uri = data["uri"];
+            this.referrer = data["referrer"];
+            this.version = data["version"];
+            this.userAgent = data["userAgent"];
+            this.username = data["username"];
+            this.password = data["password"];
+            this.statusCode = data["statusCode"];
+            this.statusMessage = data["statusMessage"];
+            this.requestHeaders = data["requestHeaders"];
+            this.responseHeaders = data["responseHeaders"];
+            this.requestBodyLenght = data["requestBodyLenght"];
+            this.responseBodyLength = data["responseBodyLength"];
         }
     }
 
@@ -290,44 +486,244 @@ export class Isset3 {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        data["flows"] = this.flows !== undefined ? this.flows : <any>null;
-        data["packets"] = this.packets !== undefined ? this.packets : <any>null;
-        data["minPackets"] = this.minPackets !== undefined ? this.minPackets : <any>null;
-        data["maxPackets"] = this.maxPackets !== undefined ? this.maxPackets : <any>null;
-        data["octets"] = this.octets !== undefined ? this.octets : <any>null;
-        data["minOctets"] = this.minOctets !== undefined ? this.minOctets : <any>null;
-        data["maxOctets"] = this.maxOctets !== undefined ? this.maxOctets : <any>null;
-        data["minDuration"] = this.minDuration !== undefined ? this.minDuration : <any>null;
-        data["maxDuration"] = this.maxDuration !== undefined ? this.maxDuration : <any>null;
-        data["avgDuration"] = this.avgDuration !== undefined ? this.avgDuration : <any>null;
+        data["requestFlowId"] = this.requestFlowId;
+        data["responseFlowId"] = this.responseFlowId;
+        data["transactionId"] = this.transactionId;
+        data["timestamp"] = this.timestamp;
+        data["client"] = this.client;
+        data["server"] = this.server;
+        data["method"] = this.method;
+        data["host"] = this.host;
+        data["uri"] = this.uri;
+        data["referrer"] = this.referrer;
+        data["version"] = this.version;
+        data["userAgent"] = this.userAgent;
+        data["username"] = this.username;
+        data["password"] = this.password;
+        data["statusCode"] = this.statusCode;
+        data["statusMessage"] = this.statusMessage;
+        data["requestHeaders"] = this.requestHeaders;
+        data["responseHeaders"] = this.responseHeaders;
+        data["requestBodyLenght"] = this.requestBodyLenght;
+        data["responseBodyLength"] = this.responseBodyLength;
         return data;
     }
 }
 
-export class Capture {
-    id!: string;
-    name?: string | null;
-    type?: string | null;
-    size!: number;
-    createdOn!: Date;
-    uploadedOn!: Date;
-    hash?: string | null;
-    author?: string | null;
-    notes?: string | null;
-    tags?: string[] | null;
+export interface IIsset3 {
+    requestFlowId: boolean;
+    responseFlowId: boolean;
+    transactionId: boolean;
+    timestamp: boolean;
+    client: boolean;
+    server: boolean;
+    method: boolean;
+    host: boolean;
+    uri: boolean;
+    referrer: boolean;
+    version: boolean;
+    userAgent: boolean;
+    username: boolean;
+    password: boolean;
+    statusCode: boolean;
+    statusMessage: boolean;
+    requestHeaders: boolean;
+    responseHeaders: boolean;
+    requestBodyLenght: boolean;
+    responseBodyLength: boolean;
+}
+
+export class Service implements IService {
+    __isset!: Isset4;
+    name?: string | undefined;
+    flows!: number;
+    packets!: number;
+    minPackets!: number;
+    maxPackets!: number;
+    octets!: number;
+    minOctets!: number;
+    maxOctets!: number;
+    minDuration!: number;
+    maxDuration!: number;
+    avgDuration!: number;
+
+    constructor(data?: IService) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset4();
+        }
+    }
 
     init(data?: any) {
         if (data) {
-            this.id = data["id"] !== undefined ? data["id"] : <any>null;
-            this.name = data["name"] !== undefined ? data["name"] : <any>null;
-            this.type = data["type"] !== undefined ? data["type"] : <any>null;
-            this.size = data["size"] !== undefined ? data["size"] : <any>null;
-            this.createdOn = data["createdOn"] ? new Date(data["createdOn"].toString()) : <any>null;
-            this.uploadedOn = data["uploadedOn"] ? new Date(data["uploadedOn"].toString()) : <any>null;
-            this.hash = data["hash"] !== undefined ? data["hash"] : <any>null;
-            this.author = data["author"] !== undefined ? data["author"] : <any>null;
-            this.notes = data["notes"] !== undefined ? data["notes"] : <any>null;
+            this.__isset = data["__isset"] ? Isset4.fromJS(data["__isset"]) : new Isset4();
+            this.name = data["name"];
+            this.flows = data["flows"];
+            this.packets = data["packets"];
+            this.minPackets = data["minPackets"];
+            this.maxPackets = data["maxPackets"];
+            this.octets = data["octets"];
+            this.minOctets = data["minOctets"];
+            this.maxOctets = data["maxOctets"];
+            this.minDuration = data["minDuration"];
+            this.maxDuration = data["maxDuration"];
+            this.avgDuration = data["avgDuration"];
+        }
+    }
+
+    static fromJS(data: any): Service {
+        data = typeof data === 'object' ? data : {};
+        let result = new Service();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        data["flows"] = this.flows;
+        data["packets"] = this.packets;
+        data["minPackets"] = this.minPackets;
+        data["maxPackets"] = this.maxPackets;
+        data["octets"] = this.octets;
+        data["minOctets"] = this.minOctets;
+        data["maxOctets"] = this.maxOctets;
+        data["minDuration"] = this.minDuration;
+        data["maxDuration"] = this.maxDuration;
+        data["avgDuration"] = this.avgDuration;
+        return data;
+    }
+}
+
+export interface IService {
+    __isset: Isset4;
+    name?: string | undefined;
+    flows: number;
+    packets: number;
+    minPackets: number;
+    maxPackets: number;
+    octets: number;
+    minOctets: number;
+    maxOctets: number;
+    minDuration: number;
+    maxDuration: number;
+    avgDuration: number;
+}
+
+export class Isset4 implements IIsset4 {
+    name!: boolean;
+    flows!: boolean;
+    packets!: boolean;
+    minPackets!: boolean;
+    maxPackets!: boolean;
+    octets!: boolean;
+    minOctets!: boolean;
+    maxOctets!: boolean;
+    minDuration!: boolean;
+    maxDuration!: boolean;
+    avgDuration!: boolean;
+
+    constructor(data?: IIsset4) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["name"];
+            this.flows = data["flows"];
+            this.packets = data["packets"];
+            this.minPackets = data["minPackets"];
+            this.maxPackets = data["maxPackets"];
+            this.octets = data["octets"];
+            this.minOctets = data["minOctets"];
+            this.maxOctets = data["maxOctets"];
+            this.minDuration = data["minDuration"];
+            this.maxDuration = data["maxDuration"];
+            this.avgDuration = data["avgDuration"];
+        }
+    }
+
+    static fromJS(data: any): Isset4 {
+        data = typeof data === 'object' ? data : {};
+        let result = new Isset4();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["flows"] = this.flows;
+        data["packets"] = this.packets;
+        data["minPackets"] = this.minPackets;
+        data["maxPackets"] = this.maxPackets;
+        data["octets"] = this.octets;
+        data["minOctets"] = this.minOctets;
+        data["maxOctets"] = this.maxOctets;
+        data["minDuration"] = this.minDuration;
+        data["maxDuration"] = this.maxDuration;
+        data["avgDuration"] = this.avgDuration;
+        return data;
+    }
+}
+
+export interface IIsset4 {
+    name: boolean;
+    flows: boolean;
+    packets: boolean;
+    minPackets: boolean;
+    maxPackets: boolean;
+    octets: boolean;
+    minOctets: boolean;
+    maxOctets: boolean;
+    minDuration: boolean;
+    maxDuration: boolean;
+    avgDuration: boolean;
+}
+
+export class Capture implements ICapture {
+    id!: string;
+    name?: string | undefined;
+    type?: string | undefined;
+    size!: number;
+    createdOn!: Date;
+    uploadedOn!: Date;
+    hash?: string | undefined;
+    author?: string | undefined;
+    notes?: string | undefined;
+    tags?: string[] | undefined;
+
+    constructor(data?: ICapture) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.name = data["name"];
+            this.type = data["type"];
+            this.size = data["size"];
+            this.createdOn = data["createdOn"] ? new Date(data["createdOn"].toString()) : <any>undefined;
+            this.uploadedOn = data["uploadedOn"] ? new Date(data["uploadedOn"].toString()) : <any>undefined;
+            this.hash = data["hash"];
+            this.author = data["author"];
+            this.notes = data["notes"];
             if (data["tags"] && data["tags"].constructor === Array) {
                 this.tags = [];
                 for (let item of data["tags"])
@@ -345,15 +741,15 @@ export class Capture {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        data["type"] = this.type !== undefined ? this.type : <any>null;
-        data["size"] = this.size !== undefined ? this.size : <any>null;
-        data["createdOn"] = this.createdOn ? this.createdOn.toISOString() : <any>null;
-        data["uploadedOn"] = this.uploadedOn ? this.uploadedOn.toISOString() : <any>null;
-        data["hash"] = this.hash !== undefined ? this.hash : <any>null;
-        data["author"] = this.author !== undefined ? this.author : <any>null;
-        data["notes"] = this.notes !== undefined ? this.notes : <any>null;
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["type"] = this.type;
+        data["size"] = this.size;
+        data["createdOn"] = this.createdOn ? this.createdOn.toISOString() : <any>undefined;
+        data["uploadedOn"] = this.uploadedOn ? this.uploadedOn.toISOString() : <any>undefined;
+        data["hash"] = this.hash;
+        data["author"] = this.author;
+        data["notes"] = this.notes;
         if (this.tags && this.tags.constructor === Array) {
             data["tags"] = [];
             for (let item of this.tags)
@@ -363,32 +759,57 @@ export class Capture {
     }
 }
 
-export class Flow {
-    __isset!: Isset4;
-    protocol?: string | null;
-    sourceAddress?: string | null;
+export interface ICapture {
+    id: string;
+    name?: string | undefined;
+    type?: string | undefined;
+    size: number;
+    createdOn: Date;
+    uploadedOn: Date;
+    hash?: string | undefined;
+    author?: string | undefined;
+    notes?: string | undefined;
+    tags?: string[] | undefined;
+}
+
+export class Flow implements IFlow {
+    __isset!: Isset5;
+    protocol?: string | undefined;
+    sourceAddress?: string | undefined;
     sourcePort!: number;
-    destinationAddress?: string | null;
+    destinationAddress?: string | undefined;
     destinationPort!: number;
-    flowId?: string | null;
+    flowId?: string | undefined;
     firstSeen!: number;
     lastSeen!: number;
     packets!: number;
     octets!: number;
 
+    constructor(data?: IFlow) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset5();
+        }
+    }
+
     init(data?: any) {
         if (data) {
-            this.__isset = data["__isset"] ? Isset4.fromJS(data["__isset"]) : new Isset4();
-            this.protocol = data["protocol"] !== undefined ? data["protocol"] : <any>null;
-            this.sourceAddress = data["sourceAddress"] !== undefined ? data["sourceAddress"] : <any>null;
-            this.sourcePort = data["sourcePort"] !== undefined ? data["sourcePort"] : <any>null;
-            this.destinationAddress = data["destinationAddress"] !== undefined ? data["destinationAddress"] : <any>null;
-            this.destinationPort = data["destinationPort"] !== undefined ? data["destinationPort"] : <any>null;
-            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
-            this.firstSeen = data["firstSeen"] !== undefined ? data["firstSeen"] : <any>null;
-            this.lastSeen = data["lastSeen"] !== undefined ? data["lastSeen"] : <any>null;
-            this.packets = data["packets"] !== undefined ? data["packets"] : <any>null;
-            this.octets = data["octets"] !== undefined ? data["octets"] : <any>null;
+            this.__isset = data["__isset"] ? Isset5.fromJS(data["__isset"]) : new Isset5();
+            this.protocol = data["protocol"];
+            this.sourceAddress = data["sourceAddress"];
+            this.sourcePort = data["sourcePort"];
+            this.destinationAddress = data["destinationAddress"];
+            this.destinationPort = data["destinationPort"];
+            this.flowId = data["flowId"];
+            this.firstSeen = data["firstSeen"];
+            this.lastSeen = data["lastSeen"];
+            this.packets = data["packets"];
+            this.octets = data["octets"];
         }
     }
 
@@ -401,22 +822,36 @@ export class Flow {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>null;
-        data["protocol"] = this.protocol !== undefined ? this.protocol : <any>null;
-        data["sourceAddress"] = this.sourceAddress !== undefined ? this.sourceAddress : <any>null;
-        data["sourcePort"] = this.sourcePort !== undefined ? this.sourcePort : <any>null;
-        data["destinationAddress"] = this.destinationAddress !== undefined ? this.destinationAddress : <any>null;
-        data["destinationPort"] = this.destinationPort !== undefined ? this.destinationPort : <any>null;
-        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
-        data["firstSeen"] = this.firstSeen !== undefined ? this.firstSeen : <any>null;
-        data["lastSeen"] = this.lastSeen !== undefined ? this.lastSeen : <any>null;
-        data["packets"] = this.packets !== undefined ? this.packets : <any>null;
-        data["octets"] = this.octets !== undefined ? this.octets : <any>null;
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["protocol"] = this.protocol;
+        data["sourceAddress"] = this.sourceAddress;
+        data["sourcePort"] = this.sourcePort;
+        data["destinationAddress"] = this.destinationAddress;
+        data["destinationPort"] = this.destinationPort;
+        data["flowId"] = this.flowId;
+        data["firstSeen"] = this.firstSeen;
+        data["lastSeen"] = this.lastSeen;
+        data["packets"] = this.packets;
+        data["octets"] = this.octets;
         return data;
     }
 }
 
-export class Isset4 {
+export interface IFlow {
+    __isset: Isset5;
+    protocol?: string | undefined;
+    sourceAddress?: string | undefined;
+    sourcePort: number;
+    destinationAddress?: string | undefined;
+    destinationPort: number;
+    flowId?: string | undefined;
+    firstSeen: number;
+    lastSeen: number;
+    packets: number;
+    octets: number;
+}
+
+export class Isset5 implements IIsset5 {
     protocol!: boolean;
     sourceAddress!: boolean;
     sourcePort!: boolean;
@@ -428,42 +863,64 @@ export class Isset4 {
     packets!: boolean;
     octets!: boolean;
 
-    init(data?: any) {
+    constructor(data?: IIsset5) {
         if (data) {
-            this.protocol = data["protocol"] !== undefined ? data["protocol"] : <any>null;
-            this.sourceAddress = data["sourceAddress"] !== undefined ? data["sourceAddress"] : <any>null;
-            this.sourcePort = data["sourcePort"] !== undefined ? data["sourcePort"] : <any>null;
-            this.destinationAddress = data["destinationAddress"] !== undefined ? data["destinationAddress"] : <any>null;
-            this.destinationPort = data["destinationPort"] !== undefined ? data["destinationPort"] : <any>null;
-            this.flowId = data["flowId"] !== undefined ? data["flowId"] : <any>null;
-            this.firstSeen = data["firstSeen"] !== undefined ? data["firstSeen"] : <any>null;
-            this.lastSeen = data["lastSeen"] !== undefined ? data["lastSeen"] : <any>null;
-            this.packets = data["packets"] !== undefined ? data["packets"] : <any>null;
-            this.octets = data["octets"] !== undefined ? data["octets"] : <any>null;
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
         }
     }
 
-    static fromJS(data: any): Isset4 {
+    init(data?: any) {
+        if (data) {
+            this.protocol = data["protocol"];
+            this.sourceAddress = data["sourceAddress"];
+            this.sourcePort = data["sourcePort"];
+            this.destinationAddress = data["destinationAddress"];
+            this.destinationPort = data["destinationPort"];
+            this.flowId = data["flowId"];
+            this.firstSeen = data["firstSeen"];
+            this.lastSeen = data["lastSeen"];
+            this.packets = data["packets"];
+            this.octets = data["octets"];
+        }
+    }
+
+    static fromJS(data: any): Isset5 {
         data = typeof data === 'object' ? data : {};
-        let result = new Isset4();
+        let result = new Isset5();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["protocol"] = this.protocol !== undefined ? this.protocol : <any>null;
-        data["sourceAddress"] = this.sourceAddress !== undefined ? this.sourceAddress : <any>null;
-        data["sourcePort"] = this.sourcePort !== undefined ? this.sourcePort : <any>null;
-        data["destinationAddress"] = this.destinationAddress !== undefined ? this.destinationAddress : <any>null;
-        data["destinationPort"] = this.destinationPort !== undefined ? this.destinationPort : <any>null;
-        data["flowId"] = this.flowId !== undefined ? this.flowId : <any>null;
-        data["firstSeen"] = this.firstSeen !== undefined ? this.firstSeen : <any>null;
-        data["lastSeen"] = this.lastSeen !== undefined ? this.lastSeen : <any>null;
-        data["packets"] = this.packets !== undefined ? this.packets : <any>null;
-        data["octets"] = this.octets !== undefined ? this.octets : <any>null;
+        data["protocol"] = this.protocol;
+        data["sourceAddress"] = this.sourceAddress;
+        data["sourcePort"] = this.sourcePort;
+        data["destinationAddress"] = this.destinationAddress;
+        data["destinationPort"] = this.destinationPort;
+        data["flowId"] = this.flowId;
+        data["firstSeen"] = this.firstSeen;
+        data["lastSeen"] = this.lastSeen;
+        data["packets"] = this.packets;
+        data["octets"] = this.octets;
         return data;
     }
+}
+
+export interface IIsset5 {
+    protocol: boolean;
+    sourceAddress: boolean;
+    sourcePort: boolean;
+    destinationAddress: boolean;
+    destinationPort: boolean;
+    flowId: boolean;
+    firstSeen: boolean;
+    lastSeen: boolean;
+    packets: boolean;
+    octets: boolean;
 }
 
 export interface FileResponse {

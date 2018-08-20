@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using Tarzan.Nfx.Model;
-using IFlowsDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.Flow, System.Guid>;
+using IFlowsDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.PacketFlow, System.Guid>;
 namespace Tarzan.Nfx.Dashboard.Controllers
 {
     [Produces("application/json")]
@@ -27,7 +27,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<Flow> FetchRange(int start, int length)
+        public IEnumerable<PacketFlow> FetchRange(int start, int length)
         {
             return m_dataAccess.FetchRange(start, length);
         }
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
         [HttpGet("item/{id}")]
-        public Flow FetchRecordById(string id)
+        public PacketFlow FetchRecordById(string id)
         {
             var uuid = Guid.Parse(id);
             return m_dataAccess.FetchItem(uuid);

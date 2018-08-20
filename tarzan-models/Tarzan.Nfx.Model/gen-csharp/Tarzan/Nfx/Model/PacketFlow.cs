@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.Model
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class Flow : TBase
+  public partial class PacketFlow : TBase
   {
     private string _Protocol;
     private string _SourceAddress;
@@ -182,7 +182,7 @@ namespace Tarzan.Nfx.Model
       public bool Octets;
     }
 
-    public Flow() {
+    public PacketFlow() {
     }
 
     public void Read (TProtocol iprot)
@@ -288,7 +288,7 @@ namespace Tarzan.Nfx.Model
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("Flow");
+        TStruct struc = new TStruct("PacketFlow");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
         if (Protocol != null && __isset.Protocol) {
@@ -381,7 +381,7 @@ namespace Tarzan.Nfx.Model
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("Flow(");
+      StringBuilder __sb = new StringBuilder("PacketFlow(");
       bool __first = true;
       if (Protocol != null && __isset.Protocol) {
         if(!__first) { __sb.Append(", "); }

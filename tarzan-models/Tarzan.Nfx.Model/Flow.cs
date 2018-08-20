@@ -8,15 +8,15 @@ namespace Tarzan.Nfx.Model
     /// <summary>
     /// Represents a single flow record.
     /// </summary>
-    public partial class Flow
+    public partial class PacketFlow
     {
         [JsonIgnore]
         public IPAddress SourceIpAddress => IPAddress.Parse(this.SourceAddress);
         [JsonIgnore]
         public IPAddress DestinationIpAddress => IPAddress.Parse(this.DestinationAddress);
 
-        public static Map<Flow> Mapping =>
-            new Map<Flow>()
+        public static Map<PacketFlow> Mapping =>
+            new Map<PacketFlow>()
                 .TableName("flows")
                 .PartitionKey("protocol", "sourceAddress", "sourcePort", "destinationAddress", "destinationPort")
                 .ClusteringKey(x => x.FlowId)
