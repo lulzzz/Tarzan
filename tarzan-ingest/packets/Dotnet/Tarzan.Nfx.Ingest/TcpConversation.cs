@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace Tarzan.Nfx.Ingest
 {
 
-        public class Conversation
+        public class TcpConversation
         {
-            public KeyValuePair<FlowKey, TcpFlowRecordWithPackets> RequestFlow { get; set; }
-            public KeyValuePair<FlowKey, TcpFlowRecordWithPackets> ResponseFlow { get; set; }
+            public KeyValuePair<FlowKey, TcpStream> RequestFlow { get; set; }
+            public KeyValuePair<FlowKey, TcpStream> ResponseFlow { get; set; }
 
             internal class Comparer : IEqualityComparer<FlowKey>
             {

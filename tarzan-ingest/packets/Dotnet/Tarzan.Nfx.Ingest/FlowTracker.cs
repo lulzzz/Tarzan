@@ -26,7 +26,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Track()
         {
-            var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, FlowRecordWithPackets>(m_table, m_table, m_table);
+            var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, FlowPackets>(m_table, m_table, m_table);
             var captureTsc = new TaskCompletionSource<CaptureStoppedEventStatus>();
             var captureTask = captureTsc.Task;
             var packetOffset = 6 * sizeof(uint);

@@ -46,7 +46,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             return acc;
         }
 
-        public static IEnumerable<Model.HttpInfo> Inspect(KeyValuePair<FlowKey, TcpFlowRecordWithPackets> requestFlow, KeyValuePair<FlowKey, TcpFlowRecordWithPackets> responseFlow)
+        public static IEnumerable<Model.HttpInfo> Inspect(KeyValuePair<FlowKey, TcpStream> requestFlow, KeyValuePair<FlowKey, TcpStream> responseFlow)
         {
             var requests = requestFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.time)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
 

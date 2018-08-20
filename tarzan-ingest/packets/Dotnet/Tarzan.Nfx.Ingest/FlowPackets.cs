@@ -7,25 +7,27 @@ using System.Linq;
 
 namespace Tarzan.Nfx.Ingest
 {
-    public class FlowRecordWithPackets : FlowRecord
+    public class FlowPackets : FlowRecord
     {
-        IList<(Packet packet, PosixTimeval time)> m_packetList;
+        public IList<(Packet packet, PosixTimeval time)> PacketList { get; private set; }
 
-        protected FlowRecordWithPackets(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list)
+        public Guid FlowId { get; private set; }
+
+        public string ServiceName { get; set; }
+
+        protected FlowPackets(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list)
         {
             FlowId = flowId;
             FirstSeen = firstSeen;
             LastSeen = lastSeen;
             Octets = octets;
             Packets = packets;
-            m_packetList = list;
+            PacketList = list;
         }
 
-      
-
-        public static FlowRecordWithPackets From((Packet, PosixTimeval) capture)
+        public static FlowPackets From((Packet, PosixTimeval) capture)
         {
-            return new FlowRecordWithPackets(Guid.NewGuid(), (long)capture.Item2.MicroSeconds, (long)capture.Item2.MicroSeconds, capture.Item1.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture });
+            return new FlowPackets(Guid.NewGuid(), (long)capture.Item2.MicroSeconds, (long)capture.Item2.MicroSeconds, capture.Item1.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture });
         }                     
         /// <summary>
         /// Merges two existing flow records. It takes uuid from the first record.
@@ -33,9 +35,9 @@ namespace Tarzan.Nfx.Ingest
         /// <param name="f1"></param>
         /// <param name="f2"></param>
         /// <returns></returns>
-        public static FlowRecordWithPackets Merge(FlowRecordWithPackets f1, FlowRecordWithPackets f2)
+        public static FlowPackets Merge(FlowPackets f1, FlowPackets f2)
         {
-            return new FlowRecordWithPackets(
+            return new FlowPackets(
                 f1.FlowId,
                 Math.Min(f1.FirstSeen, f2.FirstSeen),
                 Math.Max(f1.FirstSeen, f2.FirstSeen),
@@ -44,13 +46,7 @@ namespace Tarzan.Nfx.Ingest
                 f1.PacketList.Concat(f2.PacketList).ToList());
         }
 
-        public IList<(Packet packet, PosixTimeval time)> PacketList => m_packetList;
-
-        public Guid FlowId { get; private set; }
-
-        public string ServiceName { get; internal set; }
-
-        public bool IntersectsWith(FlowRecordWithPackets that)
+        public bool IntersectsWith(FlowPackets that)
         {            
             if (this.FirstSeen <= that.FirstSeen)
             {

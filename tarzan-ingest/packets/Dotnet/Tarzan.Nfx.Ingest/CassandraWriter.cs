@@ -149,8 +149,8 @@ namespace Tarzan.Nfx.Ingest
         }
         private void WriteHttp(FlowTable flowTable)
         {
-            var httpFlows = TcpFlows.Isolate(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
-            var httpInfos = TcpFlows.Pair(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
+            var httpFlows = TcpStream.Split(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
+            var httpInfos = TcpStream.Pair(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
             foreach (var httpInfo in httpInfos)
             {
                 var insert = m_httpTable.Insert(httpInfo);

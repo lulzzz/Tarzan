@@ -9,15 +9,15 @@ using System.IO;
 
 namespace Tarzan.Nfx.Ingest
 {
-    class FlowTable : IFlowTable<FlowKey, FlowRecordWithPackets>, IKeyProvider<FlowKey, (Packet, PosixTimeval)>, IRecordProvider<(Packet, PosixTimeval), FlowRecordWithPackets>
+    class FlowTable : IFlowTable<FlowKey, FlowPackets>, IKeyProvider<FlowKey, (Packet, PosixTimeval)>, IRecordProvider<(Packet, PosixTimeval), FlowPackets>
     {
-        Dictionary<FlowKey, FlowRecordWithPackets> m_table = new Dictionary<FlowKey, FlowRecordWithPackets>();
+        Dictionary<FlowKey, FlowPackets> m_table = new Dictionary<FlowKey, FlowPackets>();
 
         public object Count => m_table.Count;
 
-        public IEnumerable<KeyValuePair<FlowKey, FlowRecordWithPackets>> Entries => m_table;
+        public IEnumerable<KeyValuePair<FlowKey, FlowPackets>> Entries => m_table;
 
-        public FlowRecordWithPackets Delete(FlowKey key)
+        public FlowPackets Delete(FlowKey key)
         {
             lock (LockObject)
             {
@@ -40,7 +40,7 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        public FlowRecordWithPackets Get(FlowKey key)
+        public FlowPackets Get(FlowKey key)
         {
             return m_table.GetValueOrDefault(key);
         }
@@ -111,19 +111,19 @@ namespace Tarzan.Nfx.Ingest
             Monitor.Enter(LockObject);
         }
 
-        public FlowRecordWithPackets GetRecord((Packet, PosixTimeval) capture)
+        public FlowPackets GetRecord((Packet, PosixTimeval) capture)
         {
-            return FlowRecordWithPackets.From(capture);
+            return FlowPackets.From(capture);
         }
 
-        public FlowRecordWithPackets Merge(FlowKey key, FlowRecordWithPackets value)
+        public FlowPackets Merge(FlowKey key, FlowPackets value)
         {
 
             var stored = m_table.GetValueOrDefault(key);
-            FlowRecordWithPackets newValue;
+            FlowPackets newValue;
             if (stored != null)
             {
-                newValue = FlowRecordWithPackets.Merge(stored, value);
+                newValue = FlowPackets.Merge(stored, value);
             }
             else
             {
@@ -135,7 +135,7 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        public void Put(FlowKey key, FlowRecordWithPackets value)
+        public void Put(FlowKey key, FlowPackets value)
         {
             lock (LockObject)
             {
