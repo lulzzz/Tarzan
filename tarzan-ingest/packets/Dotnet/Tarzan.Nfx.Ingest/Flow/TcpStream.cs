@@ -10,17 +10,29 @@ namespace Tarzan.Nfx.Ingest
     /// <summary>
     /// Represents TCP stream of packets. 
     /// </summary>
-    public class TcpStream : PacketStream
+    public class TcpStream : FlowRecord
     {
         public long TcpInitialSequenceNumber { get; set; }
 
-        public TcpStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list) : base(flowId, firstSeen, lastSeen, octets, packets, list)
+        public IList<(TcpPacket Packet, PosixTimeval Timeval)> SegmentList { get; private set; }
+
+        public Guid FlowId { get; private set; }
+
+        public string ServiceName { get; set; }
+
+        public TcpStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTimeval)> list)
         {
+            FlowId = flowId;
+            FirstSeen = firstSeen;
+            LastSeen = lastSeen;
+            Octets = octets;
+            Packets = packets;
+            SegmentList = list;
         }
        
         public static TcpStream From((TcpPacket packet, PosixTimeval timeval) capture)
         {
-            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture })
+            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(TcpPacket, PosixTimeval)> { capture })
             {
                 TcpInitialSequenceNumber = capture.packet.SequenceNumber
             };
@@ -31,7 +43,7 @@ namespace Tarzan.Nfx.Ingest
         /// <param name="f1"></param>
         /// <param name="f2"></param>
         /// <returns></returns>
-        public static TcpStream Merge(TcpStream f1, PacketStream f2)
+        public static TcpStream Merge(TcpStream f1, TcpStream f2)
         {
             return new TcpStream(
                 f1.FlowId,
@@ -39,7 +51,7 @@ namespace Tarzan.Nfx.Ingest
                 Math.Max(f1.FirstSeen, f2.FirstSeen),
                 f1.Octets + f2.Octets,
                 f1.Packets + f2.Packets,
-                f1.PacketList.Concat(f2.PacketList).ToList())
+                f1.SegmentList.Concat(f2.SegmentList).ToList())
             { TcpInitialSequenceNumber = f1.TcpInitialSequenceNumber };
         }
 
@@ -85,10 +97,18 @@ namespace Tarzan.Nfx.Ingest
                     }
                     else
                     {
-                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((packet, timeval)));
+                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((tcp, timeval)));
                     }
                 }
                 if (currentFlowRecord != null) yield return KeyValuePair.Create(flowKey, currentFlowRecord);
+            }
+        }
+
+        public static IEnumerable<(PosixTimeval Timeval, bool Syn, bool Fin, bool Rst, bool Ack, bool Psh, long SequenceNumber, long AcknowledgmentNumber, int Length)> SegmentMap(TcpStream stream)
+        {
+            foreach (var (packet, timeval) in stream.SegmentList)
+            {
+                yield return (timeval, packet.Syn, packet.Fin, packet.Rst, packet.Ack, packet.Psh, packet.SequenceNumber, packet.AcknowledgmentNumber, packet.PayloadData?.Length ?? 0);
             }
         }
 

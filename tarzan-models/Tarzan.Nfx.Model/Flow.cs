@@ -24,5 +24,8 @@ namespace Tarzan.Nfx.Model
                 .Column(f => f.SourceIpAddress, cc => cc.Ignore())
                 .Column(f => f.DestinationIpAddress, cc => cc.Ignore())
                 .Column(f => f.__isset, cc => cc.Ignore());
+
+
+
     }
 }

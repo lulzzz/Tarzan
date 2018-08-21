@@ -15,14 +15,9 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         private static HttpPacket ParseHttpPacket(Packet packet)
         {
             var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
-            if (tcpPacket.PayloadData?.Length > 0)
-            {
-                var stream = new KaitaiStream(tcpPacket.PayloadData);
-
-                var httpPacket = new Netdx.Packets.Core.HttpPacket(stream);
-                return httpPacket;
-            }
-            return null;
+            var stream = new KaitaiStream(tcpPacket.PayloadData ?? new byte[0]);
+            var httpPacket = new HttpPacket(stream);
+            return httpPacket;
         }
 
         private static List<List<(HttpPacket Packet, PosixTimeval Timeval)>> EmptyAccumulator()
@@ -46,9 +41,9 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
         public static IEnumerable<Model.HttpInfo> Inspect(TcpConversation conversation)
         {
-            var requests = conversation.RequestFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.timeval)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
+            var requests = conversation.RequestFlow.Value.SegmentList.Select(p => (Packet: ParseHttpPacket(p.Packet), Time: p.Timeval)).Aggregate(EmptyAccumulator(), Accumulate);
 
-            var responses = conversation.ResponseFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.timeval)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
+            var responses = conversation.ResponseFlow.Value.SegmentList.Select(p => (Packet: ParseHttpPacket(p.Packet), Time: p.Timeval)).Aggregate(EmptyAccumulator(), Accumulate);
 
             var transactions = requests.Zip(responses, (request, response) => (Request:request, Response:response)).Select((item,index) => (Transaction: item, TransactionId: index+1));
                      

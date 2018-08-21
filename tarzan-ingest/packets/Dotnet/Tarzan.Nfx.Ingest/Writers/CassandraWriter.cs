@@ -2,6 +2,7 @@
 using Cassandra.Data.Linq;
 using Cassandra.Mapping;
 using System;
+using System.IO;
 using System.Linq;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Model;
@@ -147,10 +148,26 @@ namespace Tarzan.Nfx.Ingest
                 insert.Execute();
             }
         }
+
+        private void DebugSeqnum(TcpStream stream)
+        {
+            var contents = "timeval, SYN, FIN, RST, ACK, PSH, Seq, Ack, Len, Exp"+Environment.NewLine;
+            foreach(var packet in TcpStream.SegmentMap(stream))
+            {
+                var nextSeqNum = packet.SequenceNumber + packet.Length + (packet.Syn || packet.Fin || packet.Rst ? 1 : 0);
+                contents += $"{packet.Timeval.Date}, {packet.Syn}, {packet.Fin}, {packet.Rst}, {packet.Ack}, {packet.Psh}, {packet.SequenceNumber}, {packet.AcknowledgmentNumber}, {packet.Length}, {nextSeqNum}"+Environment.NewLine;
+            }
+            File.WriteAllText(stream.FlowId.ToString() + ".csv", contents);
+        }
+
+        
+
         private void WriteHttp(FlowTable flowTable)
         {
-            var tcpFlows = TcpStream.Split(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
-            var httpInfos = TcpStream.Pair(tcpFlows).SelectMany(c => HttpAnalyzer.Inspect(c));
+            var httpFlows = flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
+            var httpStreams = TcpStream.Split(httpFlows).ToList();
+            httpStreams.ForEach(x=> DebugSeqnum(x.Value));
+            var httpInfos = TcpStream.Pair(httpStreams).SelectMany(c => HttpAnalyzer.Inspect(c));
             foreach (var httpInfo in httpInfos)
             {
                 var insert = m_httpTable.Insert(httpInfo);

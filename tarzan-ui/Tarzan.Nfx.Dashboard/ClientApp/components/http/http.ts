@@ -31,16 +31,12 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         return this.cachedItems[key];
     }
 
-    getBody(contentType: string | undefined, chunks: string[] | undefined): string {
+    getBody(contentType: string | undefined, chunks: string[] | undefined): Buffer[] {
         if (chunks == undefined) {
-            return "";
+            return [];
         }
         else {
-            // content has base64 encoding
-            var content = "";
-            chunks.forEach(s => content = content.concat(s));
-            // format to fit the content on the screen
-            return content;
+            return chunks.map(content => new Buffer(content, 'base64'));
         }
     }
 
@@ -56,7 +52,7 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         this.getItem(flowId, transactionId).then(item => this.getBody(item.responseContentType, item.responseBodyChunks));
     }
 
-    downloadContent(content: Buffer, filename: string, mimeType: string) {
+    downloadContent(content: Buffer[], filename: string, mimeType: string) {
         let fileSaver = new FileSaver();
         fileSaver.responseData = content;
         fileSaver.strFileName = filename;
@@ -67,14 +63,14 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
     downloadResponseContent(flowId: string, transactionId: string) {
         this.getItem(flowId, transactionId).then(item => {
             if (item) {
+                let chunks = item.responseBodyChunks ? item.responseBodyChunks : []; 
                 let content = this.getBody(item.responseContentType, item.responseBodyChunks);
                 let filename = item.uri ? item.uri : "file.raw";
-                try {
-                    let buffer = new Buffer(content, 'base64');                    
-                    this.downloadContent(buffer, filename, "application/octet-stream");
+                try {   
+                    this.downloadContent(content, filename, "application/octet-stream");
                 }
                 catch (err) { console.log("ERROR: downloadResponseContent:" + err); }
-                this.downloadContent(new Buffer(content), filename + ".base64", "application/octet-stream");
+                this.downloadContent(chunks.map(x=> new Buffer(x)), filename + ".base64", "application/octet-stream");
             }
         });
     }

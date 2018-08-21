@@ -48,18 +48,6 @@ namespace Tarzan.Nfx.Ingest
                 f1.Octets + f2.Octets,
                 f1.Packets + f2.Packets,
                 f1.PacketList.Concat(f2.PacketList).ToList());
-        }
-
-        public bool IntersectsWith(PacketStream that)
-        {            
-            if (this.FirstSeen <= that.FirstSeen)
-            {
-                return that.FirstSeen <= this.LastSeen;
-            }
-            else
-            {
-                return this.FirstSeen <= that.LastSeen;
-            }
-        }
+        }        
     }
 }
