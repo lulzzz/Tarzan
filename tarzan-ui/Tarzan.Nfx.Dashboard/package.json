@@ -3,13 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@types/buffers": "^0.1.31",
+    "@types/js-base64": "^2.3.1",
+    "buffer": "^5.2.0",
     "element-ui": "^2.4.4",
+    "js-base64": "^2.4.8",
     "object-assign": "^4.1.1"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.0.0-beta.49",
     "@mdi/font": "^2.5.94",
-    "@types/node": "^10.5.2",
+    "@types/node": "^10.7.1",
     "@types/webpack-env": "^1.13.0",
     "aspnet-webpack": "^2.0.1",
     "awesome-typescript-loader": "^3.0.0",

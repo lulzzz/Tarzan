@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Flow } from '../../api/models';
+import { PacketFlow } from '../../api/models';
 
 
 const emptyFlow = {
@@ -14,12 +14,12 @@ const emptyFlow = {
     "lastSeen": 0,
     "packets": 0,
     "octets": 0
-} as Flow;
+} as PacketFlow;
 
 @Component
 export default class FlowComponent extends Vue {
     loading: boolean = true;
-    flowRecord: Flow = emptyFlow;
+    flowRecord: PacketFlow = emptyFlow;
     newTagInputValue = '';
     newTagInputVisible = false;
 
@@ -32,7 +32,7 @@ export default class FlowComponent extends Vue {
         let fetchString = `api/flows/item/${flowId}`;   
         console.log(fetchString);
         fetch(fetchString)
-            .then(response => response.json() as Promise<Flow>)
+            .then(response => response.json() as Promise<PacketFlow>)
             .then(data => {
                 this.flowRecord = data;
                 this.loading = false;

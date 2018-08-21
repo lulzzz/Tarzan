@@ -7,19 +7,22 @@ using System.Linq;
 
 namespace Tarzan.Nfx.Ingest
 {
-    public class TcpStream : FlowPackets
+    /// <summary>
+    /// Represents TCP stream of packets. 
+    /// </summary>
+    public class TcpStream : PacketStream
     {
         public long TcpInitialSequenceNumber { get; set; }
 
-        public TcpStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, System.Collections.Generic.List<(Packet, PosixTimeval)> list) : base(flowId, firstSeen, lastSeen, octets, packets, list)
+        public TcpStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list) : base(flowId, firstSeen, lastSeen, octets, packets, list)
         {
         }
        
-        public static TcpStream From((TcpPacket tcp, PosixTimeval timeval) capture)
+        public static TcpStream From((TcpPacket packet, PosixTimeval timeval) capture)
         {
-            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.tcp.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture })
+            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture })
             {
-                TcpInitialSequenceNumber = capture.tcp.SequenceNumber
+                TcpInitialSequenceNumber = capture.packet.SequenceNumber
             };
         }
         /// <summary>
@@ -28,7 +31,7 @@ namespace Tarzan.Nfx.Ingest
         /// <param name="f1"></param>
         /// <param name="f2"></param>
         /// <returns></returns>
-        public static TcpStream Merge(TcpStream f1, FlowPackets f2)
+        public static TcpStream Merge(TcpStream f1, PacketStream f2)
         {
             return new TcpStream(
                 f1.FlowId,
@@ -40,6 +43,11 @@ namespace Tarzan.Nfx.Ingest
             { TcpInitialSequenceNumber = f1.TcpInitialSequenceNumber };
         }
 
+        /// <summary>
+        /// Pairs tcp streams in the provided collection of flows.
+        /// </summary>
+        /// <param name="flows">Enumerable collection of source flows to find matching TCP streams.</param>
+        /// <returns>A collection of TCP conversations.</returns>
         public static IEnumerable<TcpConversation> Pair(IEnumerable<KeyValuePair<FlowKey, TcpStream>> flows)
         {
             var downFlows = flows.Where(f => f.Key.DestinationEndpoint.Port < f.Key.SourceEndpoint.Port);
@@ -58,7 +66,7 @@ namespace Tarzan.Nfx.Ingest
         /// the new TCP stream. 
         /// </remarks>
         /// <returns></returns>
-        public static IEnumerable<KeyValuePair<FlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<FlowKey, FlowPackets>> flows)
+        public static IEnumerable<KeyValuePair<FlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<FlowKey, PacketStream>> flows)
         {
             foreach (var (flowKey, flowRecord) in flows.Where(f => f.Key.Protocol == ProtocolType.TCP))
             {

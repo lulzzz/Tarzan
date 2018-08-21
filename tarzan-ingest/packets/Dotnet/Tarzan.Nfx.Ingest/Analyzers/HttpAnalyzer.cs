@@ -1,5 +1,4 @@
 ﻿using Kaitai;
-using Netdx.ConversationTracker;
 using Netdx.Packets.Core;
 using PacketDotNet;
 using SharpPcap;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Tarzan.Nfx.Functional;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
@@ -46,11 +44,11 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             return acc;
         }
 
-        public static IEnumerable<Model.HttpInfo> Inspect(KeyValuePair<FlowKey, TcpStream> requestFlow, KeyValuePair<FlowKey, TcpStream> responseFlow)
+        public static IEnumerable<Model.HttpInfo> Inspect(TcpConversation conversation)
         {
-            var requests = requestFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.time)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
+            var requests = conversation.RequestFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.timeval)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
 
-            var responses = responseFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.time)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
+            var responses = conversation.ResponseFlow.Value.PacketList.Select(p => (Packet: ParseHttpPacket(p.packet), Time: p.timeval)).Where(p => p.Packet != null).Aggregate(EmptyAccumulator(), Accumulate);
 
             var transactions = requests.Zip(responses, (request, response) => (Request:request, Response:response)).Select((item,index) => (Transaction: item, TransactionId: index+1));
                      
@@ -69,7 +67,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
                 var httpInfo = new HttpInfo
                 {
-                    FlowId = requestFlow.Value.FlowId.ToString(),
+                    FlowId = conversation.RequestFlow.Value.FlowId.ToString(),
                     TransactionId = TransactionId.ToString(),
                     Timestamp = new DateTimeOffset(Transaction.Request.FirstOrDefault().Timeval.Date).ToUnixTimeMilliseconds(),
                     Method = transactionRequest.Request.Command,
@@ -81,15 +79,17 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                     Username = username,
                     Password = password,
                     RequestHeaders = transactionRequest.Header.Lines.Select(line => $"{line.Name}:{line.Value}").ToList(),
-                    ResponseHeaders = transactionResponse.Header.Lines.Select(line => $"{line.Name}:{line.Value}").ToList(),                    
+                    ResponseHeaders = transactionResponse.Header.Lines.Select(line => $"{line.Name}:{line.Value}").ToList(),
                     StatusCode = transactionResponse.Response.StatusCode,
                     StatusMessage = transactionResponse.Response.Reason,
-                    Client = requestFlow.Key.SourceEndpoint.ToString(),
-                    Server = responseFlow.Key.SourceEndpoint.ToString(),
+                    Client = conversation.RequestFlow.Key.SourceEndpoint.ToString(),
+                    Server = conversation.ResponseFlow.Key.SourceEndpoint.ToString(),
                     RequestBodyChunks = requestBytes,
                     ResponseBodyChunks = responseBytes,
-                    RequestBodyLength = requestBytes.Sum(p=>p.Length),
+                    RequestBodyLength = requestBytes.Sum(p => p.Length),
                     ResponseBodyLength = responseBytes.Sum(p => p.Length),
+                    RequestContentType = transactionRequest.Header.GetLine("Content-Type", "ContentType") ?? "application/octet-stream",
+                    ResponseContentType = transactionResponse.Header.GetLine("Content-Type", "ContentType") ?? "application/octet-stream",
                 };
                 yield return httpInfo;
             }

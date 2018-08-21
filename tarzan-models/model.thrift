@@ -79,4 +79,6 @@ struct HttpInfo {
     34: i32 ResponseBodyLength;
     35: list<binary> RequestBodyChunks;
     36: list<binary> ResponseBodyChunks;
+    37: string RequestContentType;
+    38: string ResponseContentType;
 }

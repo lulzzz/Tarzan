@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Flow } from '../../api/models';
+import { PacketFlow } from '../../api/models';
 
 @Component
 export default class FlowTableComponent extends Vue {
-    dataSource: Flow[] = [];
+    dataSource: PacketFlow[] = [];
     currentPage: number = 1;
     totalFlows: number = 0;
     flowFilter: string = "*";
@@ -22,14 +22,14 @@ export default class FlowTableComponent extends Vue {
         let fetchString = `api/flows/range/${offset}/count/${this.perPage}`;
         console.log(fetchString);
         fetch(fetchString)
-            .then(response => response.json() as Promise<Flow[]>)
+            .then(response => response.json() as Promise<PacketFlow[]>)
         .then(data => {
             this.dataSource = data;
             this.loading = false;
         });        
     }
 
-    selectFlow(row: Flow) {
+    selectFlow(row: PacketFlow) {
         console.log('Double Click, row.flowid=' + row.flowId);
         this.$router.push({ path: `/flows/details/${row.flowId}` })
     }

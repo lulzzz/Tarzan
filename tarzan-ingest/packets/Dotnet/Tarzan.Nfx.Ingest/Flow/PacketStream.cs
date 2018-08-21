@@ -7,15 +7,19 @@ using System.Linq;
 
 namespace Tarzan.Nfx.Ingest
 {
-    public class FlowPackets : FlowRecord
+    /// <summary>
+    /// Extends <see cref="FlowRecord"/> with other properties, such as, <see cref="FlowId"/>, <see cref="ServiceName"/>, and mainly
+    /// <see cref="PacketList"/>.
+    /// </summary>
+    public class PacketStream : FlowRecord
     {
-        public IList<(Packet packet, PosixTimeval time)> PacketList { get; private set; }
+        public IList<(Packet packet, PosixTimeval timeval)> PacketList { get; private set; }
 
         public Guid FlowId { get; private set; }
 
         public string ServiceName { get; set; }
 
-        protected FlowPackets(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list)
+        protected PacketStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list)
         {
             FlowId = flowId;
             FirstSeen = firstSeen;
@@ -25,9 +29,9 @@ namespace Tarzan.Nfx.Ingest
             PacketList = list;
         }
 
-        public static FlowPackets From((Packet, PosixTimeval) capture)
+        public static PacketStream From((Packet packet, PosixTimeval timeval) capture)
         {
-            return new FlowPackets(Guid.NewGuid(), (long)capture.Item2.MicroSeconds, (long)capture.Item2.MicroSeconds, capture.Item1.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture });
+            return new PacketStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture });
         }                     
         /// <summary>
         /// Merges two existing flow records. It takes uuid from the first record.
@@ -35,9 +39,9 @@ namespace Tarzan.Nfx.Ingest
         /// <param name="f1"></param>
         /// <param name="f2"></param>
         /// <returns></returns>
-        public static FlowPackets Merge(FlowPackets f1, FlowPackets f2)
+        public static PacketStream Merge(PacketStream f1, PacketStream f2)
         {
-            return new FlowPackets(
+            return new PacketStream(
                 f1.FlowId,
                 Math.Min(f1.FirstSeen, f2.FirstSeen),
                 Math.Max(f1.FirstSeen, f2.FirstSeen),
@@ -46,7 +50,7 @@ namespace Tarzan.Nfx.Ingest
                 f1.PacketList.Concat(f2.PacketList).ToList());
         }
 
-        public bool IntersectsWith(FlowPackets that)
+        public bool IntersectsWith(PacketStream that)
         {            
             if (this.FirstSeen <= that.FirstSeen)
             {

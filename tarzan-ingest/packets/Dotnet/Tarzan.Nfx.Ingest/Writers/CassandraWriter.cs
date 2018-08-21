@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Ingest
 
         internal void Setup()
         {
-            Tarzan.Nfx.Model.Cassandra.ModelMapping.AutoRegister(MappingConfiguration.Global);
+            Model.Cassandra.ModelMapping.AutoRegister(MappingConfiguration.Global);
 
             var cluster = Cluster.Builder().AddContactPoint(m_endpoint).WithDefaultKeyspace(m_keyspace).Build();     
             m_session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
@@ -149,8 +149,8 @@ namespace Tarzan.Nfx.Ingest
         }
         private void WriteHttp(FlowTable flowTable)
         {
-            var httpFlows = TcpStream.Split(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
-            var httpInfos = TcpStream.Pair(httpFlows).SelectMany(c => HttpAnalyzer.Inspect(c.RequestFlow, c.ResponseFlow));
+            var tcpFlows = TcpStream.Split(flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase)));
+            var httpInfos = TcpStream.Pair(tcpFlows).SelectMany(c => HttpAnalyzer.Inspect(c));
             foreach (var httpInfo in httpInfos)
             {
                 var insert = m_httpTable.Insert(httpInfo);

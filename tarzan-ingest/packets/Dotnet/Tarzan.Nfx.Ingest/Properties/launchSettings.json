@@ -2,8 +2,8 @@
   "profiles": {
     "flowstat-cassandra": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -r  testbed-12jun-000.pcap -w \"localhost\" -n testbed",
-      "workingDirectory": "D:\\Captures\\ids\\testbed-12jun-32"
+      "commandLineArgs": "track-flows -r  testbed12jun-000.pcap -w \"localhost\" -n testbed",
+      "workingDirectory": "D:\\Captures\\ids\\testbed-12jun-128"
     }
   }
 }

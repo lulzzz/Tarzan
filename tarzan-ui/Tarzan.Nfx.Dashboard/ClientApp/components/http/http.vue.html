@@ -9,37 +9,56 @@
             </el-header>
 
             <el-main>
-                <el-table :data="dataSource" border style="width: 100%">
+                <el-table :data="dataSource" border style="width: 100%"  v-loading="loading">
                     <el-table-column type="expand" width="50">
                         <template slot-scope="props">
-                            <el-col :span="12">
-                                <p><b>Request</b></p>
-                                <p>
-                                    <code>
-                                        {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
-                                        <div v-for="item in props.row.requestHeaders">{{ item }}</div>
-                                        </br>
-                                        ... {{ props.row.requestBodyLength}} bytes ...
-                                    </code>
-                                </p>
-                                <el-button icon="el-icon-view" circle />
-                                <el-button icon="el-icon-download" circle />
+                            <el-col :span="11">
+                                <el-card shadow="never">
+                                    <div slot="header" class="clearfix">
+                                        <span>Request ({{ props.row.requestBodyLength}} Bytes)</span>
+                                        <el-popover width="800"
+                                                    trigger="click">
+                                            <code>
+                                                {{ getRequestContent(props.row.flowId,props.row.transactionId) }}
+                                            </code>
+                                            <el-button slot="reference" icon="el-icon-view" style="float: right;" circle size="mini" />
+                                        </el-popover>
+                                        <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
+                                                   @click="downloadRequestContent(props.row.flowId,props.row.transactionId)" />
+                                    </div>
+                                    <div class="fixed-font">
+                                            {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
+                                            <div v-for="item in props.row.requestHeaders">{{ item }}</div>
+                                    </div>     
+                                </el-card>
                             </el-col>
-                            <el-col :span="12">
-                                <p><b>Response</b></p>
-                                <p>
-                                    <code>
-                                        {{ props.row.version }} {{ props.row.statusCode }} {{ props.row.statusMessage }}
-                                        <div v-for="item in props.row.responseHeaders">
-                                            {{ item }}
-                                        </div>
-                                        </br>
-                                        ... {{ props.row.responseBodyLength}} bytes ...
-                                    </code>
-                                </p>
-                                <el-button icon="el-icon-view" circle />
-                                <el-button icon="el-icon-download" circle />
+                            <el-col :span="1">
+                                <br />
                             </el-col>
+                            <el-col :span="11">
+                                <el-card shadow="never">
+                                    <div slot="header" class="clearfix">
+                                        <span>Response ({{ props.row.responseBodyLength}} Bytes)</span>
+                                        <el-popover width="800"                                                    
+                                                    trigger="click">
+                                            <el-tabs>
+                                                <el-tab-pane label="Preview">Cannot preview this type of object.</el-tab-pane>
+                                                <el-tab-pane label="Plain">Plain text</el-tab-pane>
+                                                <el-tab-pane label="Hex">Hex View</el-tab-pane>                                                
+                                            </el-tabs>                                                   
+                                            <el-button style="float: right;" slot="reference" icon="el-icon-view" circle size="mini"/>
+                                        </el-popover>
+                                        <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
+                                                   @click="downloadResponseContent(props.row.flowId,props.row.transactionId)" />
+                                    </div>
+                                    <div class="fixed-font">
+                                            {{ props.row.version }} {{ props.row.statusCode }} {{ props.row.statusMessage }}
+                                            <div v-for="item in props.row.responseHeaders">
+                                                {{ item }}
+                                            </div>                                        
+                                    </div>
+                                </el-card>
+                        </el-col>
                         </template>
                     </el-table-column>
                     <el-table-column prop="timestamp" label="Time" width="80" />

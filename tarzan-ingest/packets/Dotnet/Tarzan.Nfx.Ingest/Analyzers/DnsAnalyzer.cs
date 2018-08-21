@@ -12,7 +12,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class DnsAnalyzer
     {    
-        public static IEnumerable<Model.DnsInfo> Inspect(FlowKey flowKey, FlowPackets flowRecord)
+        public static IEnumerable<Model.DnsInfo> Inspect(FlowKey flowKey, PacketStream flowRecord)
         {
             // DNS response?
             if (flowKey.Protocol == ProtocolType.UDP && flowKey.SourceEndpoint.Port == 53)

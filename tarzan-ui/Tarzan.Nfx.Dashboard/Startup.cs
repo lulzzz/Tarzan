@@ -41,7 +41,8 @@ namespace Tarzan.Nfx.Dashboard
             var hostsDataAccess = new HostsDataAccesss(session);
             var servicesDataAccess = new ServicesDataAccesss(session);
             var dnsDataAccess = new DnsDataAccesss(session);
-            var httpDataAccess = new HttpDataAccesss(session);
+            var httpDataAccess = new HttpDataAccesssNoContent(session);
+            var httpContentDataAccess = new HttpDataAccesssWithContent(session);
 
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.PacketFlow, Guid>>(flowsDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Host, string>>(hostsDataAccess);
@@ -49,6 +50,7 @@ namespace Tarzan.Nfx.Dashboard
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(capturesDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.DnsInfo, Guid, string>>(dnsDataAccess);
             services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.HttpInfo, Guid, string>>(httpDataAccess);
+            services.AddSingleton<ITableDataAccess<HttpInfoWithContent, Guid, string>>(httpContentDataAccess);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

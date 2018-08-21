@@ -58,7 +58,7 @@ namespace Tarzan.Nfx.Ingest
 
         }
 
-        public string DetectService(FlowKey flowKey, FlowPackets FlowValue)
+        public string DetectService(FlowKey flowKey, PacketStream FlowValue)
         {
             string getServiceName(string protocol, int port)
             {

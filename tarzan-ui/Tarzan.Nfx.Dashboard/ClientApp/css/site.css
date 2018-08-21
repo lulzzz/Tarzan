@@ -1,5 +1,10 @@
 body {
-    font-family: Roboto, Arial, sans-serif;    
+    font-family: Roboto, sans-serif;    
+}
+
+.fixed-font {
+    font-family: 'Roboto Mono', monospace;
+    font-size: small;
 }
 
 a {

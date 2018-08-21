@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Tarzan.Nfx.Dashboard.DataAccess;
+using Tarzan.Nfx.Dashboard.DataAccess.Cassandra;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Dashboard
@@ -11,9 +12,11 @@ namespace Tarzan.Nfx.Dashboard
     public class HttpController : Controller
     {
         ITableDataAccess<HttpInfo, Guid, string> m_dataAccess;
-        public HttpController(ITableDataAccess<HttpInfo, Guid,string> dataAccess)
+        ITableDataAccess<HttpInfoWithContent, Guid, string> m_fullDataAccess;
+        public HttpController(ITableDataAccess<HttpInfo, Guid,string> dataAccess, ITableDataAccess<HttpInfoWithContent, Guid, string> fullDataAccess)
         {
             m_dataAccess = dataAccess;
+            m_fullDataAccess = fullDataAccess;
         }
 
         [HttpGet("count")]
@@ -28,11 +31,11 @@ namespace Tarzan.Nfx.Dashboard
             return m_dataAccess.FetchRange(start, length); 
         }
 
-        [HttpGet("item/{flow-id}/{dns-id}")]
-        public HttpInfo Get(string flowId, string dnsId)
+        [HttpGet("item/{flowId}/{transactionId}")]
+        public HttpInfo Get(string flowId, string transactionId)
         {
             var uuid = Guid.Parse(flowId);
-            return m_dataAccess.FetchItem(uuid, dnsId);
+            return m_fullDataAccess.FetchItem(uuid, transactionId);
         }
                 
         // PUT: api/hosts/5
