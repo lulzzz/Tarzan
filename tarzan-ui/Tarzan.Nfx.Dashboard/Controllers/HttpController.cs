@@ -95,8 +95,7 @@ namespace Tarzan.Nfx.Dashboard
 
             }).Execute();
             var filteredSource = source.Where(CreateFilterPredicate(filter));
-
-            return filteredSource.Skip(start).Take(length);
+            return filteredSource.OrderBy(x=>x.Timestamp).Skip(start).Take(length);
         }
 
         [HttpGet("item/{flowId}/{transactionId}")]
