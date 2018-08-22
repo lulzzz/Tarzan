@@ -28,7 +28,7 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
             nameof(HttpInfo.Version)
             )
         {
-        }
+        }        
     }
     /// <summary>
     /// Helps to distinguish between <see cref="HttpDataAccesssNoContent" and <see cref="HttpDataAccesssWithContent"/>.

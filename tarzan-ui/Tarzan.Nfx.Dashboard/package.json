@@ -5,10 +5,12 @@
   "dependencies": {
     "@types/buffers": "^0.1.31",
     "@types/js-base64": "^2.3.1",
+    "@types/query-string": "^6.1.0",
     "buffer": "^5.2.0",
     "element-ui": "^2.4.4",
     "js-base64": "^2.4.8",
-    "object-assign": "^4.1.1"
+    "object-assign": "^4.1.1",
+    "query-string": "^6.1.0"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.0.0-beta.49",

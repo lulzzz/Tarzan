@@ -12,6 +12,7 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
     {
         private ISession m_session;
         private IMapper m_mapper;
+        private Table<TRowType> m_table;
         private string m_tableName;
         private string m_keyProperty;
 
@@ -21,10 +22,12 @@ namespace Tarzan.Nfx.Dashboard.DataAccess.Cassandra
         {
             m_session = session;
             m_mapper = new Mapper(m_session);
+            m_table = new Table<TRowType>(m_session);
             m_tableName = tableName;
             m_keyProperty = keyProperty;
             m_selectTerm = selectFields.Length > 0 ? String.Join(',',selectFields) : "*";
         }
+        
 
         public int Count()
         {

@@ -5,6 +5,8 @@ import { HttpInfo } from '../../api/models';
 import { FileSaver } from '../../utils/file-saver';
 import { Base64 } from 'js-base64';
 import { Buffer } from 'buffer';
+import { stringify } from 'query-string';
+
 @Component
 export default class HttpComponent extends TableViewComponent<HttpInfo> {
     cachedItems: { [id: string]: HttpInfo; } = {};
@@ -20,7 +22,7 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
     }
 
     async getItem(flowId: string, transactionId: string) {
-        let key = flowId + "-" + transactionId;
+        let key = flowId + "/" + transactionId;
         let item = this.cachedItems[key];
         if (item == undefined) {
             let fetchString = `api/http/item/${flowId}/${transactionId}`;
@@ -54,15 +56,18 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
 
     downloadContent(content: Buffer[], filename: string, mimeType: string) {
         let fileSaver = new FileSaver();
-        fileSaver.responseData = content;
+        let buffer = Buffer.concat(content)
+        fileSaver.responseData = buffer; 
         fileSaver.strFileName = filename;
         fileSaver.strMimeType = mimeType;
         fileSaver.initSaveFile();
     }
 
     downloadResponseContent(flowId: string, transactionId: string) {
+        console.log("Downloading " + flowId + "/" + transactionId);
         this.getItem(flowId, transactionId).then(item => {
             if (item) {
+                console.log("Getting " + item.flowId + "/" + item.transactionId);
                 let chunks = item.responseBodyChunks ? item.responseBodyChunks : []; 
                 let content = this.getBody(item.responseContentType, item.responseBodyChunks);
                 let filename = item.uri ? item.uri : "file.raw";
@@ -73,6 +78,90 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
                 this.downloadContent(chunks.map(x=> new Buffer(x)), filename + ".base64", "application/octet-stream");
             }
         });
+    }
+
+
+    // FILTERING
+    filterUri = "";
+    filterContentType: string[] = [];
+    contentTypeOptions = [{
+        value: 'text/html',
+        label: 'HTML'
+        }, {
+        value: 'text/css',
+        label: 'CSS'
+        }, {
+        value: 'text/javascript',
+        label: 'JavaScript'
+        }, {
+            value: 'image/jpeg',
+            label: 'JPEG'
+        }, {
+            value: 'image/gif',
+            label: 'GIF'
+        }, {
+            value: 'image/png',
+            label: 'PNG'
+        }, {
+            value: 'application/octet-stream',
+            label: 'OctetStream'
+        }, {
+            value: 'application/msword',
+            label: 'Microsoft Word'
+        }
+    ];
+    filterAtLeastValue = "";
+    filterAtLeastUnit = "";
+    filterAtMostValue = "";
+    filterAtMostUnit = "";
+    filterDateTimeRange = "";
+    filterText = "All HTTP objects.";
+    filterPopoverVisible = false;
+
+    setFilter() {           
+        this.queryParams = "?" + stringify({
+            uri: this.filterUri,
+            contentTypeList: this.filterContentType,
+            atLeastSize: this.filterAtLeastValue.toString() + this.filterAtLeastUnit,
+            atMostSize: this.filterAtMostValue.toString() + this.filterAtMostUnit,
+            timeRange: this.filterDateTimeRange
+        });
+
+        let filterTextArray = [];
+        if (this.filterUri.trim().length > 0) {
+            filterTextArray.push(`URI matches "${this.filterUri.trim()}"`);
+        }
+        if (this.filterContentType.length > 0) {
+            filterTextArray.push(`Content-Type is one of { ${this.filterContentType} }`);
+        }
+
+        if (this.filterAtLeastValue.length > 0) {
+            filterTextArray.push(`size is at least ${this.filterAtLeastValue} ${this.filterAtLeastUnit}`);
+        }
+
+        if (this.filterAtMostValue.length > 0) {
+            filterTextArray.push(`size is at most ${this.filterAtMostValue} ${this.filterAtMostUnit}`);
+        }
+
+        this.filterText = filterTextArray.join(" and ") + "."; 
+        this.filterPopoverVisible = false;
+        console.log("SET-FILTER:" + this.queryParams);        
+        this.fetch();
+    }
+
+    resetFilter() {
+        this.filterUri = "";
+        this.filterContentType = [];
+        this.filterAtLeastValue = "";
+        this.filterAtLeastUnit = "";
+        this.filterAtMostValue = "";
+        this.filterAtMostUnit = "";
+        this.filterDateTimeRange = "";
+        this.filterText = "All HTTP objects."
+        this.filterPopoverVisible = false;
+        this.queryParams = "";
+        console.log("RESET-FILTER");        
+        this.fetch();
     }
 }
 

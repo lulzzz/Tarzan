@@ -4,14 +4,115 @@
 
         <el-container>
             <el-header>
-
-
+                <!--URI Name -->
+                <el-popover trigger="click" width="800" ref="filterPopover" v-model="filterPopoverVisible">
+                    <div>
+                        <el-row style="padding:5px">
+                            <el-card shadow="never">
+                                <div slot="header" class="clearfix">
+                                    <span>Content</span>
+                                </div>
+                                <div>
+                                    <el-row style="padding:5px">
+                                        <el-col>
+                                            <span>URI Contains:</span>
+                                        </el-col>
+                                        <el-col>
+                                            <el-input v-model="filterUri" placeholder=""></el-input>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row style="padding:5px">
+                                        <span>Content-Type:</span>
+                                        <template>
+                                            <el-select v-model="filterContentType"
+                                                       multiple
+                                                       filterable
+                                                       allow-create
+                                                       default-first-option
+                                                       placeholder="Choose content type for your filter"
+                                                       style="width:100%">
+                                                <el-option v-for="item in contentTypeOptions"
+                                                           :key="item.value"
+                                                           :label="item.label"
+                                                           :value="item.value">
+                                                </el-option>
+                                            </el-select>
+                                        </template>
+                                    </el-row>
+                                    <el-row style="padding:5px">
+                                        <span>Content Size:</span>
+                                        <div style="width:100%">
+                                            <el-col :span="12" style="padding:5px">
+                                                <el-input v-model="filterAtLeastValue" style="width:100%">
+                                                    <template slot="prepend">
+                                                        At least:
+                                                    </template>
+                                                    <el-select v-model="filterAtLeastUnit" slot="append" placeholder="Select" style="min-width:120px">
+                                                        <el-option label="Bytes" value="B"></el-option>
+                                                        <el-option label="KiloBytes" value="KB"></el-option>
+                                                        <el-option label="MegaBytes" value="MB"></el-option>
+                                                    </el-select>
+                                                </el-input>
+                                            </el-col>
+                                            <el-col :span="12" style="padding:5px">
+                                                <el-input v-model="filterAtMostValue" style="width:100%">
+                                                    <template slot="prepend">
+                                                        At Most:
+                                                    </template>
+                                                    <el-select v-model="filterAtMostUnit" slot="append" placeholder="Select" style="min-width:120px">
+                                                        <el-option label="Bytes" value="B"></el-option>
+                                                        <el-option label="KiloBytes" value="KB"></el-option>
+                                                        <el-option label="MegaBytes" value="MB"></el-option>
+                                                    </el-select>
+                                                </el-input>
+                                            </el-col>
+                                        </div>
+                                    </el-row>
+                                </div>
+                            </el-card>
+                        </el-row>
+                        <el-row style="padding:5px">
+                            <el-card shadow="never">
+                                <div slot="header" class="clearfix">
+                                    <span>Headers</span>
+                                </div>
+                            </el-card>
+                        </el-row>
+                        <el-row :span="8" style="padding:5px">
+                            <el-card shadow="never">
+                                <div slot="header" class="clearfix">
+                                    <span>Date and Time</span>
+                                </div>
+                                <el-date-picker v-model="filterDateTimeRange" style="width:100%"
+                                                type="datetimerange"
+                                                range-separator="To"
+                                                start-placeholder="Start date"
+                                                end-placeholder="End date">
+                                </el-date-picker>
+                            </el-card>
+                        </el-row>
+                        <el-button icon="el-icon-circle-close-outline" @click="resetFilter" type="warning" plain style="float: right; margin-left:5px;">Reset</el-button>
+                        <el-button icon="el-icon-circle-check-outline" type="primary" plain style="float: right;" @click="setFilter">Ok</el-button>
+                    </div>
+                </el-popover>
+                    <el-input style="width: 100%; float: right;" v-model="filterText" readonly>
+                        <template slot="prepend">
+                            Filter:
+                        </template>
+                        <template slot="append">
+                            <el-button v-popover:filterPopover type="primary" plain icon="el-icon-setting">Set</el-button>
+                        </template>
+                    </el-input>
             </el-header>
+
 
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%"  v-loading="loading">
                     <el-table-column type="expand" width="50">
                         <template slot-scope="props">
+                            <el-row style="margin-bottom:10px">
+                                ObjectId: {{ props.row.flowId}}/{{props.row.transactionId}}
+                            </el-row>
                             <el-col :span="12">
                                 <el-card shadow="never">
                                     <div slot="header" class="clearfix">
@@ -27,38 +128,43 @@
                                                    @click="downloadRequestContent(props.row.flowId,props.row.transactionId)" />
                                     </div>
                                     <div class="fixed-font">
-                                            {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
-                                            <div v-for="item in props.row.requestHeaders">{{ item }}</div>
-                                    </div>     
+                                        {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
+                                        <div v-for="item in props.row.requestHeaders">{{ item }}</div>
+                                    </div>
                                 </el-card>
                             </el-col>
                             <el-col :span="12" style="padding-left:10px">
                                 <el-card shadow="never">
                                     <div slot="header" class="clearfix">
                                         <span>Response ({{ props.row.responseBodyLength}} Bytes)</span>
-                                        <el-popover width="800"                                                    
+                                        <el-popover width="800"
                                                     trigger="click">
                                             <el-tabs>
-                                                <el-tab-pane label="Preview">Cannot preview this type of object.</el-tab-pane>
+                                                <el-tab-pane label="Preview">Preview</el-tab-pane>
                                                 <el-tab-pane label="Plain">Plain text</el-tab-pane>
-                                                <el-tab-pane label="Hex">Hex View</el-tab-pane>                                                
-                                            </el-tabs>                                                   
-                                            <el-button style="float: right;" slot="reference" icon="el-icon-view" circle size="mini"/>
-                                        </el-popover>
+                                                <el-tab-pane label="Hex">Hex View</el-tab-pane>
+                                            </el-tabs>
+                                            <el-button style="float: right;" slot="reference" icon="el-icon-view" circle size="mini" />
+                                        </el-popover>                                        
                                         <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
                                                    @click="downloadResponseContent(props.row.flowId,props.row.transactionId)" />
+
                                     </div>
                                     <div class="fixed-font">
-                                            {{ props.row.version }} {{ props.row.statusCode }} {{ props.row.statusMessage }}
-                                            <div v-for="item in props.row.responseHeaders">
-                                                {{ item }}
-                                            </div>                                        
+                                        {{ props.row.version }} {{ props.row.statusCode }} {{ props.row.statusMessage }}
+                                        <div v-for="item in props.row.responseHeaders">
+                                            {{ item }}
+                                        </div>
                                     </div>
                                 </el-card>
-                        </el-col>
+                            </el-col>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="timestamp" label="Time" width="80" />
+                    <el-table-column label="Time" width="200" >
+                    <template slot-scope="props">
+                       {{ new Date(props.row.timestamp).toString() }}
+                    </template>
+                    </el-table-column>
                     <el-table-column prop="client" label="Client" width="150" />
                     <el-table-column prop="server" label="Server" width="150" />
                     <el-table-column prop="method" label="Method" width="80" />
@@ -66,8 +172,7 @@
                         <template slot-scope="props">
                             http://{{ props.row.host }}{{ props.row.uri }}
                         </template>
-                    </el-table-column>
-                    <el-table-column prop="userAgent" label="User Agent" width="150" />
+                    </el-table-column>                    
                 </el-table>
             </el-main>
 

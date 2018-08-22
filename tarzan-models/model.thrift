@@ -82,3 +82,10 @@ struct HttpInfo {
     37: string RequestContentType;
     38: string ResponseContentType;
 }
+struct HttpInfoFilter {
+    1: string Uri;
+    2: list<string> ContentTypeList;
+    3: string AtLeastSize;
+    4: string AtMostSize;
+    5: string TimeRange;    
+}
