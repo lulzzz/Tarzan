@@ -111,9 +111,9 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         }
     ];
     filterAtLeastValue = "";
-    filterAtLeastUnit = "";
+    filterAtLeastUnit = "KB";
     filterAtMostValue = "";
-    filterAtMostUnit = "";
+    filterAtMostUnit = "KB";
     filterDateTimeRange = "";
     filterText = "All HTTP objects.";
     filterPopoverVisible = false;
@@ -136,11 +136,11 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         }
 
         if (this.filterAtLeastValue.length > 0) {
-            filterTextArray.push(`size is at least ${this.filterAtLeastValue} ${this.filterAtLeastUnit}`);
+            filterTextArray.push(`Content-Length is at least ${this.filterAtLeastValue} ${this.filterAtLeastUnit}`);
         }
 
         if (this.filterAtMostValue.length > 0) {
-            filterTextArray.push(`size is at most ${this.filterAtMostValue} ${this.filterAtMostUnit}`);
+            filterTextArray.push(`Content-Length is at most ${this.filterAtMostValue} ${this.filterAtMostUnit}`);
         }
 
         this.filterText = filterTextArray.join(" and ") + "."; 
@@ -153,9 +153,9 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         this.filterUri = "";
         this.filterContentType = [];
         this.filterAtLeastValue = "";
-        this.filterAtLeastUnit = "";
+        this.filterAtLeastUnit = "KB";
         this.filterAtMostValue = "";
-        this.filterAtMostUnit = "";
+        this.filterAtMostUnit = "KB";
         this.filterDateTimeRange = "";
         this.filterText = "All HTTP objects."
         this.filterPopoverVisible = false;
