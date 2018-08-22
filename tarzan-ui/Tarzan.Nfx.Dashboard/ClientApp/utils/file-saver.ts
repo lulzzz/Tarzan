@@ -1,5 +1,7 @@
-export class FileSaver {
+// File saver by Eli Grey, modified for typescript
+// https://github.com/eligrey/FileSaver.js
 
+export class FileSaver {
     private self: any;
     private currentFileName: string = "download";
     private currentMimeType: string = "application/octet-stream";
