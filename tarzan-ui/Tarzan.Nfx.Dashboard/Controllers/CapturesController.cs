@@ -1,8 +1,9 @@
+using Cassandra.Data.Linq;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tarzan.Nfx.Model;
-using ICapturesDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.Capture, System.Guid>;
+using Tarzan.Nfx.Model.Cassandra;
 namespace Tarzan.Nfx.Dashboard.Controllers
 {
 
@@ -10,11 +11,11 @@ namespace Tarzan.Nfx.Dashboard.Controllers
     [Route("api/captures")]
     public class CapturesController : Controller
     {
-        ICapturesDataAccess m_dataAccess;
+        IAffDataset m_dataset;
 
-        public CapturesController(ICapturesDataAccess dataAccess)
+        public CapturesController(IAffDataset dataset)
         {
-            m_dataAccess = dataAccess;
+            m_dataset = dataset;
         }
         /// <summary>
         /// Gets some values.
@@ -23,13 +24,12 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         [HttpGet("range/{start}/count/{length}")]
         public IEnumerable<Capture> Get(int start, int length)
         {
-            return m_dataAccess.FetchRange(start, length);
+            return m_dataset.CaptureTable.Execute().Skip(start).Take(length);
         }
         [HttpGet("item/{id}")]
-        public Capture Get(string id)
+        public Capture Get(string uid)
         {
-            var uuid = Guid.Parse(id);
-            return m_dataAccess.FetchItem(uuid);
+            return m_dataset.CaptureTable.Where(x => x.Uid == uid).FirstOrDefault().Execute();
         }
         /// <summary>
         /// Gets all flow records.
@@ -38,7 +38,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         [HttpGet("count")]
         public int FetchCount()
         {
-            return m_dataAccess.Count();
+            return (int)m_dataset.CaptureTable.Count().Execute();
         }
     }
 }

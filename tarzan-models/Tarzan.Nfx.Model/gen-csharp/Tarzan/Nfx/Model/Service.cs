@@ -23,7 +23,7 @@ namespace Tarzan.Nfx.Model
   #endif
   public partial class Service : TBase
   {
-    private string _Name;
+    private string _ServiceName;
     private int _Flows;
     private int _Packets;
     private int _MinPackets;
@@ -35,16 +35,16 @@ namespace Tarzan.Nfx.Model
     private long _MaxDuration;
     private long _AvgDuration;
 
-    public string Name
+    public string ServiceName
     {
       get
       {
-        return _Name;
+        return _ServiceName;
       }
       set
       {
-        __isset.Name = true;
-        this._Name = value;
+        __isset.ServiceName = true;
+        this._ServiceName = value;
       }
     }
 
@@ -184,7 +184,7 @@ namespace Tarzan.Nfx.Model
     [Serializable]
     #endif
     public struct Isset {
-      public bool Name;
+      public bool ServiceName;
       public bool Flows;
       public bool Packets;
       public bool MinPackets;
@@ -217,7 +217,7 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                Name = iprot.ReadString();
+                ServiceName = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -313,12 +313,12 @@ namespace Tarzan.Nfx.Model
         TStruct struc = new TStruct("Service");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (Name != null && __isset.Name) {
-          field.Name = "Name";
+        if (ServiceName != null && __isset.ServiceName) {
+          field.Name = "ServiceName";
           field.Type = TType.String;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(Name);
+          oprot.WriteString(ServiceName);
           oprot.WriteFieldEnd();
         }
         if (__isset.Flows) {
@@ -413,11 +413,11 @@ namespace Tarzan.Nfx.Model
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("Service(");
       bool __first = true;
-      if (Name != null && __isset.Name) {
+      if (ServiceName != null && __isset.ServiceName) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Name: ");
-        __sb.Append(Name);
+        __sb.Append("ServiceName: ");
+        __sb.Append(ServiceName);
       }
       if (__isset.Flows) {
         if(!__first) { __sb.Append(", "); }

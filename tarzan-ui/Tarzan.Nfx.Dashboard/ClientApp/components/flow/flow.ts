@@ -3,23 +3,10 @@ import { Component } from 'vue-property-decorator';
 import { PacketFlow } from '../../api/models';
 
 
-const emptyFlow = {
-    "protocol": "",
-    "sourceAddress": "",
-    "sourcePort": 0,
-    "destinationAddress": "",
-    "destinationPort": 0,
-    "flowId": "",
-    "firstSeen": 0,
-    "lastSeen": 0,
-    "packets": 0,
-    "octets": 0
-} as PacketFlow;
-
 @Component
 export default class FlowComponent extends Vue {
     loading: boolean = true;
-    flowRecord: PacketFlow = emptyFlow;
+    flowRecord: PacketFlow = new PacketFlow();
     newTagInputValue = '';
     newTagInputVisible = false;
 

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using Cassandra.Data.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Tarzan.Nfx.Dashboard.DataAccess;
+using System.Linq;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.Model.Cassandra;
 
 namespace Tarzan.Nfx.Dashboard
 {
@@ -10,35 +11,28 @@ namespace Tarzan.Nfx.Dashboard
     [Route("api/dns")]
     public class DnsController : Controller
     {
-        ITableDataAccess<DnsInfo, Guid, string> m_dataAccess;
-        public DnsController(ITableDataAccess<DnsInfo, Guid,string> dataAccess)
+        IAffDataset m_dataset;
+        public DnsController(IAffDataset dataset)
         {
-            m_dataAccess = dataAccess;
+            m_dataset = dataset;
         }
 
         [HttpGet("count")]
         public int GetCount()
         {
-            return m_dataAccess.Count();
+            return (int)m_dataset.DnsTable.Count().Execute();
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<DnsInfo> Get(int start, int length)
+        public IEnumerable<DnsObject> Get(int start, int length)
         {
-            return m_dataAccess.FetchRange(start, length); 
+            return m_dataset.DnsTable.Execute().Skip(start).Take(length);
         }
 
-        [HttpGet("item/{flow-id}/{dns-id}")]
-        public DnsInfo Get(string flowId, string dnsId)
+        [HttpGet("item/{flowUid}/{transactionId}")]
+        public DnsObject Get(string flowUid, string transactionId)
         {
-            var uuid = Guid.Parse(flowId);
-            return m_dataAccess.FetchItem(uuid, dnsId);
+            return m_dataset.DnsTable.Where(x => x.FlowUid == flowUid && x.TransactionId == transactionId).FirstOrDefault().Execute();
         }
-                
-        // PUT: api/hosts/5
-        [HttpPut("item/{address}")]
-        public void Put(string address, [FromBody]DnsInfo value)
-        {
-        }        
     }
 }

@@ -14,13 +14,10 @@
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
                     <el-table-column prop="name" label="Name" />
-                    <el-table-column prop="size" label="Size" width="100"/>
-                    <el-table-column type="expand" prop="id" label="Details" width="80">
+                    <el-table-column prop="length" label="length" width="100" />
+                    <el-table-column label="Creation Time" width="200">
                         <template slot-scope="props">
-                            <p>Created On: {{ props.row.createdOn }}</p>
-                            <p>Uploaded On: {{ props.row.uploadOn }}</p>
-                            <p>Hash: {{ props.row.hash }}</p>
-                            <p>Author: {{ props.row.author }}</p>
+                            {{ new Date(props.row.creationTime).toString() }}
                         </template>
                     </el-table-column>
                 </el-table>

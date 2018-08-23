@@ -30,7 +30,7 @@ export default class FlowTableComponent extends Vue {
     }
 
     selectFlow(row: PacketFlow) {
-        console.log('Double Click, row.flowid=' + row.flowId);
-        this.$router.push({ path: `/flows/details/${row.flowId}` })
+        console.log('Double Click, row.flowid=' + row.uid);
+        this.$router.push({ path: `/flows/details/${row.uid}` })
     }
 }

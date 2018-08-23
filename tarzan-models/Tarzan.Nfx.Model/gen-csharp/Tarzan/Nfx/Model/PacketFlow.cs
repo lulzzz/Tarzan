@@ -23,16 +23,29 @@ namespace Tarzan.Nfx.Model
   #endif
   public partial class PacketFlow : TBase
   {
+    private string _Uid;
     private string _Protocol;
     private string _SourceAddress;
     private int _SourcePort;
     private string _DestinationAddress;
     private int _DestinationPort;
-    private string _FlowId;
     private long _FirstSeen;
     private long _LastSeen;
     private int _Packets;
     private long _Octets;
+
+    public string Uid
+    {
+      get
+      {
+        return _Uid;
+      }
+      set
+      {
+        __isset.Uid = true;
+        this._Uid = value;
+      }
+    }
 
     public string Protocol
     {
@@ -99,19 +112,6 @@ namespace Tarzan.Nfx.Model
       }
     }
 
-    public string FlowId
-    {
-      get
-      {
-        return _FlowId;
-      }
-      set
-      {
-        __isset.FlowId = true;
-        this._FlowId = value;
-      }
-    }
-
     public long FirstSeen
     {
       get
@@ -170,12 +170,12 @@ namespace Tarzan.Nfx.Model
     [Serializable]
     #endif
     public struct Isset {
+      public bool Uid;
       public bool Protocol;
       public bool SourceAddress;
       public bool SourcePort;
       public bool DestinationAddress;
       public bool DestinationPort;
-      public bool FlowId;
       public bool FirstSeen;
       public bool LastSeen;
       public bool Packets;
@@ -202,42 +202,42 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                Protocol = iprot.ReadString();
+                Uid = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 2:
               if (field.Type == TType.String) {
-                SourceAddress = iprot.ReadString();
+                Protocol = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 3:
+              if (field.Type == TType.String) {
+                SourceAddress = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 4:
               if (field.Type == TType.I32) {
                 SourcePort = iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
-            case 4:
+            case 5:
               if (field.Type == TType.String) {
                 DestinationAddress = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
-            case 5:
+            case 6:
               if (field.Type == TType.I32) {
                 DestinationPort = iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 6:
-              if (field.Type == TType.String) {
-                FlowId = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -291,10 +291,18 @@ namespace Tarzan.Nfx.Model
         TStruct struc = new TStruct("PacketFlow");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
+        if (Uid != null && __isset.Uid) {
+          field.Name = "Uid";
+          field.Type = TType.String;
+          field.ID = 1;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(Uid);
+          oprot.WriteFieldEnd();
+        }
         if (Protocol != null && __isset.Protocol) {
           field.Name = "Protocol";
           field.Type = TType.String;
-          field.ID = 1;
+          field.ID = 2;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(Protocol);
           oprot.WriteFieldEnd();
@@ -302,7 +310,7 @@ namespace Tarzan.Nfx.Model
         if (SourceAddress != null && __isset.SourceAddress) {
           field.Name = "SourceAddress";
           field.Type = TType.String;
-          field.ID = 2;
+          field.ID = 3;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(SourceAddress);
           oprot.WriteFieldEnd();
@@ -310,7 +318,7 @@ namespace Tarzan.Nfx.Model
         if (__isset.SourcePort) {
           field.Name = "SourcePort";
           field.Type = TType.I32;
-          field.ID = 3;
+          field.ID = 4;
           oprot.WriteFieldBegin(field);
           oprot.WriteI32(SourcePort);
           oprot.WriteFieldEnd();
@@ -318,7 +326,7 @@ namespace Tarzan.Nfx.Model
         if (DestinationAddress != null && __isset.DestinationAddress) {
           field.Name = "DestinationAddress";
           field.Type = TType.String;
-          field.ID = 4;
+          field.ID = 5;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(DestinationAddress);
           oprot.WriteFieldEnd();
@@ -326,17 +334,9 @@ namespace Tarzan.Nfx.Model
         if (__isset.DestinationPort) {
           field.Name = "DestinationPort";
           field.Type = TType.I32;
-          field.ID = 5;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(DestinationPort);
-          oprot.WriteFieldEnd();
-        }
-        if (FlowId != null && __isset.FlowId) {
-          field.Name = "FlowId";
-          field.Type = TType.String;
           field.ID = 6;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(FlowId);
+          oprot.WriteI32(DestinationPort);
           oprot.WriteFieldEnd();
         }
         if (__isset.FirstSeen) {
@@ -383,6 +383,12 @@ namespace Tarzan.Nfx.Model
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("PacketFlow(");
       bool __first = true;
+      if (Uid != null && __isset.Uid) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("Uid: ");
+        __sb.Append(Uid);
+      }
       if (Protocol != null && __isset.Protocol) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
@@ -412,12 +418,6 @@ namespace Tarzan.Nfx.Model
         __first = false;
         __sb.Append("DestinationPort: ");
         __sb.Append(DestinationPort);
-      }
-      if (FlowId != null && __isset.FlowId) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("FlowId: ");
-        __sb.Append(FlowId);
       }
       if (__isset.FirstSeen) {
         if(!__first) { __sb.Append(", "); }

@@ -4,8 +4,10 @@ using Cassandra.Mapping;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.Model.Cassandra;
 
 namespace Tarzan.Nfx.Ingest
 {
@@ -13,71 +15,68 @@ namespace Tarzan.Nfx.Ingest
     {
         private IPEndPoint m_endpoint;
         private string m_keyspace;
-        private ISession m_session;
-        private IMapper m_mapper;
-        private Table<Model.PacketFlow> m_flowTable;
-        private Table<Model.Host> m_hostTable;
-        private Table<Model.Service> m_serviceTable;
-        private Table<Model.DnsInfo> m_dnsTable;
-        private Table<Model.HttpInfo> m_httpTable;
+        private AffDataset m_dataset;
 
         public CassandraWriter(IPEndPoint endpoint, string keyspace)
         {
             this.m_endpoint = endpoint;
             this.m_keyspace = keyspace;
+            m_dataset = new AffDataset(m_endpoint, m_keyspace);
         }
 
-        internal void DeleteKeyspace()
+        public void DeleteKeyspace()
         {
-            var cluster = Cluster.Builder().AddContactPoint(m_endpoint).Build();
-            using (var session = cluster.Connect())
+            AffDataset.DeleteKeyspace(m_endpoint, m_keyspace);
+        }
+
+        public void Initialize()
+        {
+            m_dataset.Connect();
+        }
+
+        public void Shutdown()
+        {
+            m_dataset.Close();
+        }
+
+        public async Task WriteAll(FileInfo fileinfo, FlowTable table)
+        {
+            Console.WriteLine($"{DateTime.Now} Writing CAPTURES...");
+            await WriteCapture(fileinfo);
+            Console.WriteLine($"{DateTime.Now} Writing FLOWS...");
+            await WriteFlows(table);
+            Console.WriteLine($"{DateTime.Now} Writing HOSTS...");
+            await WriteHosts(table);
+            Console.WriteLine($"{DateTime.Now} Writing SERVICES...");
+            await WriteServices(table);
+            Console.WriteLine($"{DateTime.Now} Writing DNS...");
+            await WriteDns(table);
+            Console.WriteLine($"{DateTime.Now} Writing HTTP...");
+            await WriteHttp(table);
+        }
+
+        async Task WriteCapture(FileInfo fileinfo)
+        {
+            var capture = new Capture
             {
-                session.Execute($"DROP KEYSPACE IF EXISTS {m_keyspace}");
-            }
+                Uid = Guid.NewGuid().ToString(),
+                CreationTime = new DateTimeOffset(fileinfo.CreationTime).ToUnixTimeMilliseconds(),
+                Name = fileinfo.Name,
+                Length = fileinfo.Length,
+                Hash = "",
+            };
+            await m_dataset.CaptureTable.Insert(capture).ExecuteAsync();
         }
 
-        internal void Setup()
+        async Task WriteFlows(FlowTable table)
         {
-            Model.Cassandra.ModelMapping.AutoRegister(MappingConfiguration.Global);
 
-            var cluster = Cluster.Builder().AddContactPoint(m_endpoint).WithDefaultKeyspace(m_keyspace).Build();     
-            m_session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
-            m_mapper = new Mapper(m_session);
-
-            m_flowTable = new Table<Model.PacketFlow>(m_session);
-            m_flowTable.CreateIfNotExists();
-            m_hostTable = new Table<Model.Host>(m_session);
-            m_hostTable.CreateIfNotExists();
-            m_serviceTable = new Table<Model.Service>(m_session);
-            m_serviceTable.CreateIfNotExists();
-            m_dnsTable = new Table<Model.DnsInfo>(m_session);
-            m_dnsTable.CreateIfNotExists();
-            m_httpTable = new Table<Model.HttpInfo>(m_session);
-            m_httpTable.CreateIfNotExists();
-        }
-
-        internal void Write(FlowTable table)
-        {
-            WriteFlows(table);
-            WriteHosts(table);
-            WriteServices(table);
-            WriteDns(table);
-            WriteHttp(table);
-        }
-
-        internal void Shutdown()
-        {
-            m_session.Cluster.Shutdown();
-        }
-
-
-        void WriteFlows(FlowTable table)
-        {
             foreach (var flow in table.Entries)
             {
+                var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);                    
                 var flowPoco = new PacketFlow
                 {
-                    FlowId = flow.Value.FlowId.ToString(),
+                    Uid = uid.ToString(),
                     Protocol = flow.Key.Protocol.ToString(),
                     SourceAddress = flow.Key.SourceEndpoint.Address.ToString(),
                     SourcePort = flow.Key.SourceEndpoint.Port,
@@ -88,11 +87,17 @@ namespace Tarzan.Nfx.Ingest
                     Octets = flow.Value.Octets,
                     Packets = flow.Value.Packets
                 };
-                var insert = m_flowTable.Insert(flowPoco);
-                insert.Execute();
+                await m_dataset.FlowTable.Insert(flowPoco).ExecuteAsync();
+                var objectPoco = new AffObject
+                {
+                    ObjectName = flowPoco.ObjectName,
+                    ObjectType = nameof(PacketFlow)
+                };
+                
+                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
             }
         }
-        void WriteHosts(FlowTable table)
+        async Task WriteHosts(FlowTable table)
         {
             var srcHosts = table.Entries.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });
@@ -102,25 +107,25 @@ namespace Tarzan.Nfx.Ingest
 
             foreach (var host in srcHosts)
             {
-                var insert = m_hostTable.Insert(host);
-                insert.Execute();
+                var insert = m_dataset.HostTable.Insert(host);
+                await insert.ExecuteAsync();
             }
             
             foreach (var host in dstHosts)
             {
-                m_mapper.Update<Model.Host>("SET downflows=?, octetsRecv=?, packetsRecv=? WHERE address=?", host.DownFlows, host.OctetsRecv, host.PacketsRecv, host.Address);
+                await m_dataset.Mapper.UpdateAsync<Model.Host>("SET downflows=?, octetsRecv=?, packetsRecv=? WHERE address=?", host.DownFlows, host.OctetsRecv, host.PacketsRecv, host.Address);
             }
         }
 
        
-        private void WriteServices(FlowTable table)
+        private async Task WriteServices(FlowTable table)
         {
             var services = table.Entries
                 .GroupBy(f => f.Value.ServiceName)
                 .Select(f =>
                     new Model.Service
                     {
-                        Name = f.Key,
+                        ServiceName = f.Key,
                         Flows = f.Count(),
                         Packets = f.Sum(x => x.Value.Packets),
                         MaxPackets = f.Max(x => x.Value.Packets),
@@ -134,22 +139,28 @@ namespace Tarzan.Nfx.Ingest
                     }); 
             foreach(var service in services)
             {
-                var insert = m_serviceTable.Insert(service);
-                insert.Execute();
+                var insert = m_dataset.ServiceTable.Insert(service);
+                await insert.ExecuteAsync();
             }
         }
 
-        private void WriteDns(FlowTable flowTable)
+        private async Task WriteDns(FlowTable flowTable)
         {
             var dnsInfos = flowTable.Entries.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
             foreach(var dnsInfo in dnsInfos)
             {
-                var insert = m_dnsTable.Insert(dnsInfo);
-                insert.Execute();
+                var insert = m_dataset.DnsTable.Insert(dnsInfo);
+                await insert.ExecuteAsync();
+                var objectPoco = new AffObject
+                {
+                    ObjectName = dnsInfo.ObjectName,
+                    ObjectType = nameof(DnsObject)
+                };
+                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
             }
         }
 
-        private void DebugSeqnum(TcpStream stream)
+        private void DebugSeqnum(Guid flowId, TcpStream stream)
         {
             var contents = "timeval, SYN, FIN, RST, ACK, PSH, Seq, Ack, Len, Exp"+Environment.NewLine;
             foreach(var packet in TcpStream.SegmentMap(stream))
@@ -157,21 +168,28 @@ namespace Tarzan.Nfx.Ingest
                 var nextSeqNum = packet.SequenceNumber + packet.Length + (packet.Syn || packet.Fin || packet.Rst ? 1 : 0);
                 contents += $"{packet.Timeval.Date}, {packet.Syn}, {packet.Fin}, {packet.Rst}, {packet.Ack}, {packet.Psh}, {packet.SequenceNumber}, {packet.AcknowledgmentNumber}, {packet.Length}, {nextSeqNum}"+Environment.NewLine;
             }
-            File.WriteAllText(stream.FlowId.ToString() + ".csv", contents);
+
+            File.WriteAllText(flowId.ToString() + ".csv", contents);
         }
 
         
 
-        private void WriteHttp(FlowTable flowTable)
+        private async Task WriteHttp(FlowTable flowTable)
         {
             var httpFlows = flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
             var httpStreams = TcpStream.Split(httpFlows).ToList();
-            httpStreams.ForEach(x=> DebugSeqnum(x.Value));
+            //httpStreams.ForEach(x=> DebugSeqnum(PacketFlow.NewUid(x.Key.Protocol.ToString(), x.Key.SourceEndpoint, x.Key.DestinationEndpoint, x.Value.FirstSeen), x.Value));
             var httpInfos = TcpStream.Pair(httpStreams).SelectMany(c => HttpAnalyzer.Inspect(c));
             foreach (var httpInfo in httpInfos)
             {
-                var insert = m_httpTable.Insert(httpInfo);
-                insert.Execute();
+                var insert = m_dataset.HttpTable.Insert(httpInfo);
+                await insert.ExecuteAsync();
+                var objectPoco = new AffObject
+                {
+                    ObjectName = httpInfo.ObjectName,
+                    ObjectType = nameof(HttpObject)
+                };
+                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
             }
         }
     }

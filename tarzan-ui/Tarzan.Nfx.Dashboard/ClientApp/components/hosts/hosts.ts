@@ -8,7 +8,6 @@ export default class HostsComponent extends Vue {
     dataSource: Host[] = [];
     currentPage: number = 1;
     totalItems: number = 0;
-    itemFilter: string = "*";
     perPage = 10;
 
     mounted() {

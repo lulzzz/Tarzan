@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import { TableViewComponent } from '../templates/tableViewComponent';
 import { Component } from 'vue-property-decorator';
-import { HttpInfo } from '../../api/models';
+import { HttpObject } from '../../api/models';
 import { FileSaver } from '../../utils/file-saver';
 import { Base64 } from 'js-base64';
 import { Buffer } from 'buffer';
 import { stringify } from 'query-string';
 
 @Component
-export default class HttpComponent extends TableViewComponent<HttpInfo> {
-    cachedItems: { [id: string]: HttpInfo; } = {};
+export default class HttpComponent extends TableViewComponent<HttpObject> {
+    cachedItems: { [id: string]: HttpObject; } = {};
 
     constructor() {
         super("api/http/");        
@@ -28,7 +28,7 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
             let fetchString = `api/http/item/${flowId}/${transactionId}`;
             const res = await fetch(fetchString);
             const json = await res.json();
-            return json as HttpInfo;
+            return json as HttpObject;
         }
         return this.cachedItems[key];
     }
@@ -67,7 +67,7 @@ export default class HttpComponent extends TableViewComponent<HttpInfo> {
         console.log("Downloading " + flowId + "/" + transactionId);
         this.getItem(flowId, transactionId).then(item => {
             if (item) {
-                console.log("Getting " + item.flowId + "/" + item.transactionId);
+                console.log("Getting " + item.flowUid + "/" + item.objectIndex);
                 let chunks = item.responseBodyChunks ? item.responseBodyChunks : []; 
                 let content = this.getBody(item.responseContentType, item.responseBodyChunks);
                 let filename = item.uri ? item.uri : "file.raw";

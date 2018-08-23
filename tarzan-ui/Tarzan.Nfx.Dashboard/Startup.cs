@@ -1,5 +1,4 @@
 using Cassandra;
-using Cassandra.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
@@ -7,11 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NSwag.AspNetCore;
-using System;
 using System.Net;
 using System.Reflection;
-using Tarzan.Nfx.Dashboard.DataAccess;
-using Tarzan.Nfx.Dashboard.DataAccess.Cassandra;
+using Tarzan.Nfx.Model;
+using Tarzan.Nfx.Model.Cassandra;
 
 namespace Tarzan.Nfx.Dashboard
 {
@@ -31,25 +29,11 @@ namespace Tarzan.Nfx.Dashboard
             services.AddSwagger();
 
             var keyspace = "testbed";
-            var cluster = Cluster.Builder()
-                .AddContactPoints(new IPEndPoint(IPAddress.Loopback, 9042))
-                .Build();
-            var session = cluster.Connect(keyspace);
-            Model.Cassandra.ModelMapping.AutoRegister(MappingConfiguration.Global);
+            var dataset = new AffDataset(new IPEndPoint(IPAddress.Loopback, 9042), keyspace);
+            dataset.Connect();
 
-            var capturesDataAccess = new DataAccess.Mock.CapturesDataAccess();
-            var flowsDataAccess = new FlowsDataAccess(session);
-            var hostsDataAccess = new HostsDataAccesss(session);
-            var servicesDataAccess = new ServicesDataAccesss(session);
-            var dnsDataAccess = new DnsDataAccesss(session);
-
-            services.AddSingleton<ISession>(session);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.PacketFlow, Guid>>(flowsDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Host, string>>(hostsDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Service, string>>(servicesDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.Capture, Guid>>(capturesDataAccess);
-            services.AddSingleton<ITableDataAccess<Tarzan.Nfx.Model.DnsInfo, Guid, string>>(dnsDataAccess);
-
+            services.AddSingleton<IAffDataset>(dataset);
+            services.AddSingleton<ISession>(dataset.Session);            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

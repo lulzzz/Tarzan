@@ -10,8 +10,10 @@ namespace Tarzan.Nfx.Model
     {
         public static Map<Host> Mapping =>
             new Map<Host>()
-                .TableName("hosts")
-                .PartitionKey("address")
+                .TableName(Pluralizer.Pluralize(nameof(Host)))
+                .PartitionKey(nameof(Host.Address))
                 .Column(f => f.__isset, cc => cc.Ignore());
+
+        public string ObjectName => $"urn:aff4:host/{this.Address}";
     }
 }

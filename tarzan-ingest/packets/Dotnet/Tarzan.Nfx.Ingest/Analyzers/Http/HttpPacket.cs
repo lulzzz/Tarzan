@@ -19,7 +19,6 @@ namespace Netdx.Packets.Core
         private HttpHeader m_header;
         private HttpBody m_body;
 
-
         public HttpPacket(KaitaiStream io, KaitaiStruct parent = null, HttpPacket root = null) : base(io)
         {
             m_parent = parent;

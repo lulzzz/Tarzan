@@ -21,75 +21,124 @@ using Tarzan.Nfx.Model;
 namespace Tarzan.Nfx.Ingest
 {
     class TrackFlows
-    {        
+    {
         public static string Name => "track-flows";
         public static Action<CommandLineApplication> Configuration =>
             (CommandLineApplication target) =>
             {
                 target.Description = "Track flows and write flow records to the specified output.";
 
-                var inputFile = target.Option("-r", "Read packet data from infile, can be any supported capture file format (including gzipped files).", CommandOptionType.SingleValue);
-                var captureInterface = target.Option("-i", "Set the name of the network interface or pipe to use for live packet capture.", CommandOptionType.SingleValue);
-                var cassandraNode = target.Option("-w", "Specifies address of the Cassandra DB node to store flow records.", CommandOptionType.SingleValue);
-                var cassandraKeyspace = target.Option("-n", "Specifies the namespace/keyspace in Cassandra DB.", CommandOptionType.SingleValue);
+                var optionInputFile = target.Option("-file", "Read packet data from specified PCAP file. The file should have any supported capture file format (including gzipped files).", CommandOptionType.SingleValue);
+                var optionInputFolder = target.Option("-folder", "Read packet data from PCAP files in the specified folder.", CommandOptionType.SingleValue);
+                var optionInterface = target.Option("-live", "Read packet data from the network interface.", CommandOptionType.SingleValue);
+                var optionCassandra = target.Option("-cassandra", "Specifies address of the Cassandra DB node to store flow records.", CommandOptionType.SingleValue);
+                var optionKeyspace = target.Option("-namespace", "Specifies the keyspace in Cassandra DB.", CommandOptionType.SingleValue);
+                var optionCreate = target.Option("-create", "Creates/initializes the keyspace in Cassandra DB. The existing keyspace will be deleted.", CommandOptionType.NoValue);
+                var optionSequential = target.Option("-sequential", "Run in sequential mode.", CommandOptionType.NoValue);
 
-                ICaptureDevice GetInputDevice()
+                IEnumerable<(ICaptureDevice Device, FileInfo Info)> GetInputDevice()
                 {
-                    if (!inputFile.HasValue() && !captureInterface.HasValue())
+                    var devices = new List<(ICaptureDevice Device, FileInfo Info)>();
+                    if (optionInputFile.HasValue())
                     {
-                        throw new ArgumentException("Either input file (-r <infile>) or capture interface (-i <capint>) must be specified.");
-                    }
-                    ICaptureDevice inputDevice = null;
-                    if (inputFile.HasValue())
-                    {
-                        inputDevice = new SharpPcap.LibPcap.CaptureFileReaderDevice(inputFile.Value());
+                        var fileinfo = new FileInfo(optionInputFile.Value());
+                        var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
                         LinkLayers = inputDevice.LinkType;
+                        devices.Add((inputDevice, fileinfo));
                     }
-                    if (captureInterface.HasValue())
+                    if (optionInterface.HasValue())
                     {
-                        if (Int32.TryParse(captureInterface.Value(), out var interfaceIndex))
+                        if (Int32.TryParse(optionInterface.Value(), out var interfaceIndex))
                         {
                             if (interfaceIndex < CaptureDeviceList.Instance.Count)
                             {
-                                inputDevice = CaptureDeviceList.Instance[interfaceIndex];
+                                
+                                var inputDevice = CaptureDeviceList.Instance[interfaceIndex];
                                 LinkLayers = inputDevice.LinkType;
+                                devices.Add((inputDevice, new FileInfo(inputDevice.Name)));
                             }
                             else
                             {
-                                throw new ArgumentException($"Interface index: {captureInterface.Value()} is invalid. This value should be between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
+                                throw new ArgumentException($"Interface index: {optionInterface.Value()} is invalid. This value should be between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
                             }
                         }
                         else
                         {
-                            throw new ArgumentException($"Invalid interface index: {captureInterface.Value()}. This should be an integer value between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
+                            throw new ArgumentException($"Invalid interface index: {optionInterface.Value()}. This should be an integer value between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
                         }
                     }
-                    return inputDevice;
+                    if(optionInputFolder.HasValue())
+                    {
+                        var dir = new DirectoryInfo(optionInputFolder.Value());
+                        foreach(var fileinfo in dir.EnumerateFiles("*.?cap"))
+                        {
+                            var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
+                            LinkLayers = inputDevice.LinkType;
+                            devices.Add((inputDevice, fileinfo));
+                        }
+                    }
+                    return devices;
+                }
+
+
+                Action<(ICaptureDevice Device, FileInfo Info)> CreateProcessor(CassandraWriter cassandraWriter)
+                {
+                    return async ((ICaptureDevice Device, FileInfo Info) input) =>
+                    {
+                        Console.WriteLine($"{DateTime.Now} Opening input '{input.Device.Name}'.");
+                        Console.WriteLine($"{DateTime.Now} Start tracking flows...");
+                        var flowTracker = new FlowTracker(input.Device);
+                        await flowTracker.TrackAsync();
+                        Console.WriteLine($"{DateTime.Now} Tracking flows finished, flow count={flowTracker.Table.Count}");
+
+                        Console.WriteLine($"{DateTime.Now} Start detecting services.");
+                        var serviceDetector = new ServiceDetector();
+                        foreach (var flow in flowTracker.Table.Entries)
+                        {
+                            flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
+                        }
+                        Console.WriteLine($"{DateTime.Now} Detecting services finished.");
+
+                        Console.WriteLine($"{DateTime.Now} Writing data...");
+                        await cassandraWriter.WriteAll(input.Info, flowTracker.Table);
+                    };
                 }
 
                 target.OnExecute(() =>
-                {                    
-                    var device = GetInputDevice();
-
-                    var flowTracker = new FlowTracker(device);
-                    flowTracker.Track();
-
-
-                    var serviceDetector = new ServiceDetector();
-                    foreach(var flow in flowTracker.Table.Entries)
+                {
+                    if (!optionKeyspace.HasValue())
                     {
-                        flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
+                        throw new ArgumentException("Keyspace is not specified.");
                     }
 
-                    var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(cassandraNode.Value() ?? "localhost:9042", 9042), cassandraKeyspace.Value() ?? $"ingest_{DateTime.Now.ToString()}");
+                    var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(optionCassandra.Value() ?? "localhost:9042", 9042), optionKeyspace.Value());
+                    if (optionCreate.HasValue())
+                    {
+                        Console.WriteLine($"{DateTime.Now} Deleting keyspace '{optionKeyspace.Value()}'...");
+                        cassandraWriter.DeleteKeyspace();
+                    }
 
-                    cassandraWriter.DeleteKeyspace();
+                    var devices = GetInputDevice().ToArray();
 
-                    cassandraWriter.Setup();
+                    Console.WriteLine($"{DateTime.Now} Initializing keyspace '{optionKeyspace.Value()}'...");
+                    cassandraWriter.Initialize();
 
-                    cassandraWriter.Write(flowTracker.Table);
+                    var processInput = CreateProcessor(cassandraWriter);
 
-                    cassandraWriter.Shutdown();                   
+                    if (optionSequential.HasValue())
+                    {
+                        foreach (var device in devices)
+                        {
+                            processInput(device);
+                        }
+                    }
+                    else
+                    {
+                        Parallel.ForEach(devices, processInput);
+                    }
+                    Console.WriteLine($"{DateTime.Now} All Done. Closing connection to Cassandra..");
+                    cassandraWriter.Shutdown();
+                    Console.WriteLine($"{DateTime.Now} Ok.");
                     return 0;
                 });
             };

@@ -14,10 +14,18 @@ namespace Tarzan.Nfx.Ingest.Analyzers
     {
         private static HttpPacket ParseHttpPacket(Packet packet)
         {
-            var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
-            var stream = new KaitaiStream(tcpPacket.PayloadData ?? new byte[0]);
-            var httpPacket = new HttpPacket(stream);
-            return httpPacket;
+            try
+            {
+
+                var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
+                var stream = new KaitaiStream(tcpPacket.PayloadData ?? new byte[0]);
+                var httpPacket = new HttpPacket(stream);
+                return httpPacket;
+            }
+            catch(Exception)
+            {
+                return new HttpPacket(new KaitaiStream(new byte[0]));
+            }
         }
 
         private static List<List<(HttpPacket Packet, PosixTimeval Timeval)>> EmptyAccumulator()
@@ -39,14 +47,19 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             return acc;
         }
 
-        public static IEnumerable<Model.HttpInfo> Inspect(TcpConversation conversation)
+        public static IEnumerable<Model.HttpObject> Inspect(TcpConversation conversation)
         {
             var requests = conversation.RequestFlow.Value.SegmentList.Select(p => (Packet: ParseHttpPacket(p.Packet), Time: p.Timeval)).Aggregate(EmptyAccumulator(), Accumulate);
 
             var responses = conversation.ResponseFlow.Value.SegmentList.Select(p => (Packet: ParseHttpPacket(p.Packet), Time: p.Timeval)).Aggregate(EmptyAccumulator(), Accumulate);
 
             var transactions = requests.Zip(responses, (request, response) => (Request:request, Response:response)).Select((item,index) => (Transaction: item, TransactionId: index+1));
-                     
+
+            var flowUid = PacketFlow.NewUid(conversation.RequestFlow.Key.Protocol.ToString(),
+                    conversation.RequestFlow.Key.SourceEndpoint,
+                    conversation.RequestFlow.Key.DestinationEndpoint,
+                    conversation.RequestFlow.Value.FirstSeen);
+
             foreach (var (Transaction, TransactionId) in transactions)
             {
                 var transactionRequest = Transaction.Request.FirstOrDefault().Packet;
@@ -60,10 +73,10 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 var requestBytes = Transaction.Request.Select(x => x.Packet.Body.Bytes).ToList();
                 var responseBytes = Transaction.Response.Select(x => x.Packet.Body.Bytes).ToList();
 
-                var httpInfo = new HttpInfo
+                var httpInfo = new HttpObject
                 {
-                    FlowId = conversation.RequestFlow.Value.FlowId.ToString(),
-                    TransactionId = TransactionId.ToString(),
+                    FlowUid = flowUid.ToString(),
+                    ObjectIndex = TransactionId.ToString("D4"),
                     Timestamp = new DateTimeOffset(Transaction.Request.FirstOrDefault().Timeval.Date).ToUnixTimeMilliseconds(),
                     Method = transactionRequest.Request.Command,
                     Version = transactionRequest.Request.Version,

@@ -8,10 +8,11 @@
 
 
 
-export class DnsInfo implements IDnsInfo {
+export class DnsObject implements IDnsObject {
     __isset!: Isset;
-    flowId?: string | undefined;
-    dnsId?: string | undefined;
+    objectName?: string | undefined;
+    flowUid?: string | undefined;
+    transactionId?: string | undefined;
     timestamp!: number;
     client?: string | undefined;
     server?: string | undefined;
@@ -20,7 +21,7 @@ export class DnsInfo implements IDnsInfo {
     dnsQuery?: string | undefined;
     dnsAnswer?: string | undefined;
 
-    constructor(data?: IDnsInfo) {
+    constructor(data?: IDnsObject) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -35,8 +36,9 @@ export class DnsInfo implements IDnsInfo {
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset.fromJS(data["__isset"]) : new Isset();
-            this.flowId = data["flowId"];
-            this.dnsId = data["dnsId"];
+            this.objectName = data["objectName"];
+            this.flowUid = data["flowUid"];
+            this.transactionId = data["transactionId"];
             this.timestamp = data["timestamp"];
             this.client = data["client"];
             this.server = data["server"];
@@ -47,9 +49,9 @@ export class DnsInfo implements IDnsInfo {
         }
     }
 
-    static fromJS(data: any): DnsInfo {
+    static fromJS(data: any): DnsObject {
         data = typeof data === 'object' ? data : {};
-        let result = new DnsInfo();
+        let result = new DnsObject();
         result.init(data);
         return result;
     }
@@ -57,8 +59,9 @@ export class DnsInfo implements IDnsInfo {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
-        data["flowId"] = this.flowId;
-        data["dnsId"] = this.dnsId;
+        data["objectName"] = this.objectName;
+        data["flowUid"] = this.flowUid;
+        data["transactionId"] = this.transactionId;
         data["timestamp"] = this.timestamp;
         data["client"] = this.client;
         data["server"] = this.server;
@@ -70,10 +73,11 @@ export class DnsInfo implements IDnsInfo {
     }
 }
 
-export interface IDnsInfo {
+export interface IDnsObject {
     __isset: Isset;
-    flowId?: string | undefined;
-    dnsId?: string | undefined;
+    objectName?: string | undefined;
+    flowUid?: string | undefined;
+    transactionId?: string | undefined;
     timestamp: number;
     client?: string | undefined;
     server?: string | undefined;
@@ -84,8 +88,8 @@ export interface IDnsInfo {
 }
 
 export class Isset implements IIsset {
-    flowId!: boolean;
-    dnsId!: boolean;
+    flowUid!: boolean;
+    transactionId!: boolean;
     timestamp!: boolean;
     client!: boolean;
     server!: boolean;
@@ -105,8 +109,8 @@ export class Isset implements IIsset {
 
     init(data?: any) {
         if (data) {
-            this.flowId = data["flowId"];
-            this.dnsId = data["dnsId"];
+            this.flowUid = data["flowUid"];
+            this.transactionId = data["transactionId"];
             this.timestamp = data["timestamp"];
             this.client = data["client"];
             this.server = data["server"];
@@ -126,8 +130,8 @@ export class Isset implements IIsset {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["flowId"] = this.flowId;
-        data["dnsId"] = this.dnsId;
+        data["flowUid"] = this.flowUid;
+        data["transactionId"] = this.transactionId;
         data["timestamp"] = this.timestamp;
         data["client"] = this.client;
         data["server"] = this.server;
@@ -140,8 +144,8 @@ export class Isset implements IIsset {
 }
 
 export interface IIsset {
-    flowId: boolean;
-    dnsId: boolean;
+    flowUid: boolean;
+    transactionId: boolean;
     timestamp: boolean;
     client: boolean;
     server: boolean;
@@ -161,6 +165,7 @@ export class Host implements IHost {
     octetsRecv!: number;
     packetsSent!: number;
     packetsRecv!: number;
+    objectName?: string | undefined;
 
     constructor(data?: IHost) {
         if (data) {
@@ -185,6 +190,7 @@ export class Host implements IHost {
             this.octetsRecv = data["octetsRecv"];
             this.packetsSent = data["packetsSent"];
             this.packetsRecv = data["packetsRecv"];
+            this.objectName = data["objectName"];
         }
     }
 
@@ -206,6 +212,7 @@ export class Host implements IHost {
         data["octetsRecv"] = this.octetsRecv;
         data["packetsSent"] = this.packetsSent;
         data["packetsRecv"] = this.packetsRecv;
+        data["objectName"] = this.objectName;
         return data;
     }
 }
@@ -220,6 +227,7 @@ export interface IHost {
     octetsRecv: number;
     packetsSent: number;
     packetsRecv: number;
+    objectName?: string | undefined;
 }
 
 export class Isset2 implements IIsset2 {
@@ -286,10 +294,10 @@ export interface IIsset2 {
     packetsRecv: boolean;
 }
 
-export class HttpInfo implements IHttpInfo {
+export class HttpObject implements IHttpObject {
     __isset!: Isset3;
-    flowId?: string | undefined;
-    transactionId?: string | undefined;
+    flowUid?: string | undefined;
+    objectIndex?: string | undefined;
     timestamp!: number;
     client?: string | undefined;
     server?: string | undefined;
@@ -311,8 +319,9 @@ export class HttpInfo implements IHttpInfo {
     responseBodyChunks?: string[] | undefined;
     requestContentType?: string | undefined;
     responseContentType?: string | undefined;
+    objectName?: string | undefined;
 
-    constructor(data?: IHttpInfo) {
+    constructor(data?: IHttpObject) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -327,8 +336,8 @@ export class HttpInfo implements IHttpInfo {
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset3.fromJS(data["__isset"]) : new Isset3();
-            this.flowId = data["flowId"];
-            this.transactionId = data["transactionId"];
+            this.flowUid = data["flowUid"];
+            this.objectIndex = data["objectIndex"];
             this.timestamp = data["timestamp"];
             this.client = data["client"];
             this.server = data["server"];
@@ -366,12 +375,13 @@ export class HttpInfo implements IHttpInfo {
             }
             this.requestContentType = data["requestContentType"];
             this.responseContentType = data["responseContentType"];
+            this.objectName = data["objectName"];
         }
     }
 
-    static fromJS(data: any): HttpInfo {
+    static fromJS(data: any): HttpObject {
         data = typeof data === 'object' ? data : {};
-        let result = new HttpInfo();
+        let result = new HttpObject();
         result.init(data);
         return result;
     }
@@ -379,8 +389,8 @@ export class HttpInfo implements IHttpInfo {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
-        data["flowId"] = this.flowId;
-        data["transactionId"] = this.transactionId;
+        data["flowUid"] = this.flowUid;
+        data["objectIndex"] = this.objectIndex;
         data["timestamp"] = this.timestamp;
         data["client"] = this.client;
         data["server"] = this.server;
@@ -418,14 +428,15 @@ export class HttpInfo implements IHttpInfo {
         }
         data["requestContentType"] = this.requestContentType;
         data["responseContentType"] = this.responseContentType;
+        data["objectName"] = this.objectName;
         return data;
     }
 }
 
-export interface IHttpInfo {
+export interface IHttpObject {
     __isset: Isset3;
-    flowId?: string | undefined;
-    transactionId?: string | undefined;
+    flowUid?: string | undefined;
+    objectIndex?: string | undefined;
     timestamp: number;
     client?: string | undefined;
     server?: string | undefined;
@@ -447,11 +458,12 @@ export interface IHttpInfo {
     responseBodyChunks?: string[] | undefined;
     requestContentType?: string | undefined;
     responseContentType?: string | undefined;
+    objectName?: string | undefined;
 }
 
 export class Isset3 implements IIsset3 {
-    flowId!: boolean;
-    transactionId!: boolean;
+    flowUid!: boolean;
+    objectIndex!: boolean;
     timestamp!: boolean;
     client!: boolean;
     server!: boolean;
@@ -485,8 +497,8 @@ export class Isset3 implements IIsset3 {
 
     init(data?: any) {
         if (data) {
-            this.flowId = data["flowId"];
-            this.transactionId = data["transactionId"];
+            this.flowUid = data["flowUid"];
+            this.objectIndex = data["objectIndex"];
             this.timestamp = data["timestamp"];
             this.client = data["client"];
             this.server = data["server"];
@@ -520,8 +532,8 @@ export class Isset3 implements IIsset3 {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["flowId"] = this.flowId;
-        data["transactionId"] = this.transactionId;
+        data["flowUid"] = this.flowUid;
+        data["objectIndex"] = this.objectIndex;
         data["timestamp"] = this.timestamp;
         data["client"] = this.client;
         data["server"] = this.server;
@@ -548,8 +560,8 @@ export class Isset3 implements IIsset3 {
 }
 
 export interface IIsset3 {
-    flowId: boolean;
-    transactionId: boolean;
+    flowUid: boolean;
+    objectIndex: boolean;
     timestamp: boolean;
     client: boolean;
     server: boolean;
@@ -575,7 +587,7 @@ export interface IIsset3 {
 
 export class Service implements IService {
     __isset!: Isset4;
-    name?: string | undefined;
+    serviceName?: string | undefined;
     flows!: number;
     packets!: number;
     minPackets!: number;
@@ -602,7 +614,7 @@ export class Service implements IService {
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset4.fromJS(data["__isset"]) : new Isset4();
-            this.name = data["name"];
+            this.serviceName = data["serviceName"];
             this.flows = data["flows"];
             this.packets = data["packets"];
             this.minPackets = data["minPackets"];
@@ -626,7 +638,7 @@ export class Service implements IService {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
-        data["name"] = this.name;
+        data["serviceName"] = this.serviceName;
         data["flows"] = this.flows;
         data["packets"] = this.packets;
         data["minPackets"] = this.minPackets;
@@ -643,7 +655,7 @@ export class Service implements IService {
 
 export interface IService {
     __isset: Isset4;
-    name?: string | undefined;
+    serviceName?: string | undefined;
     flows: number;
     packets: number;
     minPackets: number;
@@ -657,7 +669,7 @@ export interface IService {
 }
 
 export class Isset4 implements IIsset4 {
-    name!: boolean;
+    serviceName!: boolean;
     flows!: boolean;
     packets!: boolean;
     minPackets!: boolean;
@@ -680,7 +692,7 @@ export class Isset4 implements IIsset4 {
 
     init(data?: any) {
         if (data) {
-            this.name = data["name"];
+            this.serviceName = data["serviceName"];
             this.flows = data["flows"];
             this.packets = data["packets"];
             this.minPackets = data["minPackets"];
@@ -703,7 +715,7 @@ export class Isset4 implements IIsset4 {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
+        data["serviceName"] = this.serviceName;
         data["flows"] = this.flows;
         data["packets"] = this.packets;
         data["minPackets"] = this.minPackets;
@@ -719,7 +731,7 @@ export class Isset4 implements IIsset4 {
 }
 
 export interface IIsset4 {
-    name: boolean;
+    serviceName: boolean;
     flows: boolean;
     packets: boolean;
     minPackets: boolean;
@@ -733,99 +745,14 @@ export interface IIsset4 {
 }
 
 export class Capture implements ICapture {
-    id!: string;
+    __isset!: Isset5;
+    uid?: string | undefined;
     name?: string | undefined;
-    type?: string | undefined;
-    size!: number;
-    createdOn!: Date;
-    uploadedOn!: Date;
+    creationTime!: number;
+    length!: number;
     hash?: string | undefined;
-    author?: string | undefined;
-    notes?: string | undefined;
-    tags?: string[] | undefined;
 
     constructor(data?: ICapture) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.id = data["id"];
-            this.name = data["name"];
-            this.type = data["type"];
-            this.size = data["size"];
-            this.createdOn = data["createdOn"] ? new Date(data["createdOn"].toString()) : <any>undefined;
-            this.uploadedOn = data["uploadedOn"] ? new Date(data["uploadedOn"].toString()) : <any>undefined;
-            this.hash = data["hash"];
-            this.author = data["author"];
-            this.notes = data["notes"];
-            if (data["tags"] && data["tags"].constructor === Array) {
-                this.tags = [];
-                for (let item of data["tags"])
-                    this.tags.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): Capture {
-        data = typeof data === 'object' ? data : {};
-        let result = new Capture();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["type"] = this.type;
-        data["size"] = this.size;
-        data["createdOn"] = this.createdOn ? this.createdOn.toISOString() : <any>undefined;
-        data["uploadedOn"] = this.uploadedOn ? this.uploadedOn.toISOString() : <any>undefined;
-        data["hash"] = this.hash;
-        data["author"] = this.author;
-        data["notes"] = this.notes;
-        if (this.tags && this.tags.constructor === Array) {
-            data["tags"] = [];
-            for (let item of this.tags)
-                data["tags"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface ICapture {
-    id: string;
-    name?: string | undefined;
-    type?: string | undefined;
-    size: number;
-    createdOn: Date;
-    uploadedOn: Date;
-    hash?: string | undefined;
-    author?: string | undefined;
-    notes?: string | undefined;
-    tags?: string[] | undefined;
-}
-
-export class PacketFlow implements IPacketFlow {
-    __isset!: Isset5;
-    protocol?: string | undefined;
-    sourceAddress?: string | undefined;
-    sourcePort!: number;
-    destinationAddress?: string | undefined;
-    destinationPort!: number;
-    flowId?: string | undefined;
-    firstSeen!: number;
-    lastSeen!: number;
-    packets!: number;
-    octets!: number;
-
-    constructor(data?: IPacketFlow) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -840,16 +767,134 @@ export class PacketFlow implements IPacketFlow {
     init(data?: any) {
         if (data) {
             this.__isset = data["__isset"] ? Isset5.fromJS(data["__isset"]) : new Isset5();
+            this.uid = data["uid"];
+            this.name = data["name"];
+            this.creationTime = data["creationTime"];
+            this.length = data["length"];
+            this.hash = data["hash"];
+        }
+    }
+
+    static fromJS(data: any): Capture {
+        data = typeof data === 'object' ? data : {};
+        let result = new Capture();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["uid"] = this.uid;
+        data["name"] = this.name;
+        data["creationTime"] = this.creationTime;
+        data["length"] = this.length;
+        data["hash"] = this.hash;
+        return data;
+    }
+}
+
+export interface ICapture {
+    __isset: Isset5;
+    uid?: string | undefined;
+    name?: string | undefined;
+    creationTime: number;
+    length: number;
+    hash?: string | undefined;
+}
+
+export class Isset5 implements IIsset5 {
+    uid!: boolean;
+    name!: boolean;
+    creationTime!: boolean;
+    length!: boolean;
+    hash!: boolean;
+
+    constructor(data?: IIsset5) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.uid = data["uid"];
+            this.name = data["name"];
+            this.creationTime = data["creationTime"];
+            this.length = data["length"];
+            this.hash = data["hash"];
+        }
+    }
+
+    static fromJS(data: any): Isset5 {
+        data = typeof data === 'object' ? data : {};
+        let result = new Isset5();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uid"] = this.uid;
+        data["name"] = this.name;
+        data["creationTime"] = this.creationTime;
+        data["length"] = this.length;
+        data["hash"] = this.hash;
+        return data;
+    }
+}
+
+export interface IIsset5 {
+    uid: boolean;
+    name: boolean;
+    creationTime: boolean;
+    length: boolean;
+    hash: boolean;
+}
+
+export class PacketFlow implements IPacketFlow {
+    __isset!: Isset6;
+    uid?: string | undefined;
+    protocol?: string | undefined;
+    sourceAddress?: string | undefined;
+    sourcePort!: number;
+    destinationAddress?: string | undefined;
+    destinationPort!: number;
+    firstSeen!: number;
+    lastSeen!: number;
+    packets!: number;
+    octets!: number;
+    objectName?: string | undefined;
+
+    constructor(data?: IPacketFlow) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.__isset = new Isset6();
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.__isset = data["__isset"] ? Isset6.fromJS(data["__isset"]) : new Isset6();
+            this.uid = data["uid"];
             this.protocol = data["protocol"];
             this.sourceAddress = data["sourceAddress"];
             this.sourcePort = data["sourcePort"];
             this.destinationAddress = data["destinationAddress"];
             this.destinationPort = data["destinationPort"];
-            this.flowId = data["flowId"];
             this.firstSeen = data["firstSeen"];
             this.lastSeen = data["lastSeen"];
             this.packets = data["packets"];
             this.octets = data["octets"];
+            this.objectName = data["objectName"];
         }
     }
 
@@ -863,47 +908,49 @@ export class PacketFlow implements IPacketFlow {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["__isset"] = this.__isset ? this.__isset.toJSON() : <any>undefined;
+        data["uid"] = this.uid;
         data["protocol"] = this.protocol;
         data["sourceAddress"] = this.sourceAddress;
         data["sourcePort"] = this.sourcePort;
         data["destinationAddress"] = this.destinationAddress;
         data["destinationPort"] = this.destinationPort;
-        data["flowId"] = this.flowId;
         data["firstSeen"] = this.firstSeen;
         data["lastSeen"] = this.lastSeen;
         data["packets"] = this.packets;
         data["octets"] = this.octets;
+        data["objectName"] = this.objectName;
         return data;
     }
 }
 
 export interface IPacketFlow {
-    __isset: Isset5;
+    __isset: Isset6;
+    uid?: string | undefined;
     protocol?: string | undefined;
     sourceAddress?: string | undefined;
     sourcePort: number;
     destinationAddress?: string | undefined;
     destinationPort: number;
-    flowId?: string | undefined;
     firstSeen: number;
     lastSeen: number;
     packets: number;
     octets: number;
+    objectName?: string | undefined;
 }
 
-export class Isset5 implements IIsset5 {
+export class Isset6 implements IIsset6 {
+    uid!: boolean;
     protocol!: boolean;
     sourceAddress!: boolean;
     sourcePort!: boolean;
     destinationAddress!: boolean;
     destinationPort!: boolean;
-    flowId!: boolean;
     firstSeen!: boolean;
     lastSeen!: boolean;
     packets!: boolean;
     octets!: boolean;
 
-    constructor(data?: IIsset5) {
+    constructor(data?: IIsset6) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -914,12 +961,12 @@ export class Isset5 implements IIsset5 {
 
     init(data?: any) {
         if (data) {
+            this.uid = data["uid"];
             this.protocol = data["protocol"];
             this.sourceAddress = data["sourceAddress"];
             this.sourcePort = data["sourcePort"];
             this.destinationAddress = data["destinationAddress"];
             this.destinationPort = data["destinationPort"];
-            this.flowId = data["flowId"];
             this.firstSeen = data["firstSeen"];
             this.lastSeen = data["lastSeen"];
             this.packets = data["packets"];
@@ -927,21 +974,21 @@ export class Isset5 implements IIsset5 {
         }
     }
 
-    static fromJS(data: any): Isset5 {
+    static fromJS(data: any): Isset6 {
         data = typeof data === 'object' ? data : {};
-        let result = new Isset5();
+        let result = new Isset6();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["uid"] = this.uid;
         data["protocol"] = this.protocol;
         data["sourceAddress"] = this.sourceAddress;
         data["sourcePort"] = this.sourcePort;
         data["destinationAddress"] = this.destinationAddress;
         data["destinationPort"] = this.destinationPort;
-        data["flowId"] = this.flowId;
         data["firstSeen"] = this.firstSeen;
         data["lastSeen"] = this.lastSeen;
         data["packets"] = this.packets;
@@ -950,13 +997,13 @@ export class Isset5 implements IIsset5 {
     }
 }
 
-export interface IIsset5 {
+export interface IIsset6 {
+    uid: boolean;
     protocol: boolean;
     sourceAddress: boolean;
     sourcePort: boolean;
     destinationAddress: boolean;
     destinationPort: boolean;
-    flowId: boolean;
     firstSeen: boolean;
     lastSeen: boolean;
     packets: boolean;

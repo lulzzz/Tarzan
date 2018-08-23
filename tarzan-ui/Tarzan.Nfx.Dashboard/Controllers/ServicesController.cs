@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Cassandra.Data.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Tarzan.Nfx.Dashboard.DataAccess;
+using System.Linq;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.Model.Cassandra;
 
 namespace Tarzan.Nfx.Dashboard
 {
@@ -9,36 +11,30 @@ namespace Tarzan.Nfx.Dashboard
     [Route("api/services")]
     public class ServicesController : Controller
     {
-        ITableDataAccess<Service, string> m_dataAccess;
-        public ServicesController(ITableDataAccess<Service, string> dataAccess)
+        IAffDataset m_dataset;
+        public ServicesController(IAffDataset dataset)
         {
-            m_dataAccess = dataAccess;
+            m_dataset = dataset;
         }
 
         [HttpGet("count")]
         public int GetCount()
         {
-            return m_dataAccess.Count();
+            return (int)m_dataset.ServiceTable.Count().Execute();
         }
 
         // GET: api/hosts
         [HttpGet("range/{start}/count/{length}")]
         public IEnumerable<Service> Get(int start, int length)
         {
-            return m_dataAccess.FetchRange(start, length); 
+            return m_dataset.ServiceTable.Execute().Skip(start).Take(length);
         }
 
         // GET: api/hosts/5
-        [HttpGet("item/{address}")]
-        public Service Get(string address)
+        [HttpGet("item/{serviceName}")]
+        public Service Get(string serviceName)
         {
-            return m_dataAccess.FetchItem(address);
-        }
-                
-        // PUT: api/hosts/5
-        [HttpPut("item/{address}")]
-        public void Put(string address, [FromBody]Service value)
-        {
-        }        
+            return m_dataset.ServiceTable.Where(x => x.ServiceName == serviceName).FirstOrDefault().Execute();
+        }                
     }
 }

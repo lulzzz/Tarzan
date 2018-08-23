@@ -16,13 +16,10 @@ namespace Tarzan.Nfx.Ingest
 
         public IList<(TcpPacket Packet, PosixTimeval Timeval)> SegmentList { get; private set; }
 
-        public Guid FlowId { get; private set; }
-
         public string ServiceName { get; set; }
 
-        public TcpStream(Guid flowId, long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTimeval)> list)
+        public TcpStream(long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTimeval)> list)
         {
-            FlowId = flowId;
             FirstSeen = firstSeen;
             LastSeen = lastSeen;
             Octets = octets;
@@ -32,7 +29,8 @@ namespace Tarzan.Nfx.Ingest
        
         public static TcpStream From((TcpPacket packet, PosixTimeval timeval) capture)
         {
-            return new TcpStream(Guid.NewGuid(), (long)capture.timeval.MicroSeconds, (long)capture.timeval.MicroSeconds, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(TcpPacket, PosixTimeval)> { capture })
+            var unixtime = capture.timeval.ToUnixTimeMilliseconds();
+            return new TcpStream(unixtime, unixtime, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(TcpPacket, PosixTimeval)> { capture })
             {
                 TcpInitialSequenceNumber = capture.packet.SequenceNumber
             };
@@ -46,7 +44,6 @@ namespace Tarzan.Nfx.Ingest
         public static TcpStream Merge(TcpStream f1, TcpStream f2)
         {
             return new TcpStream(
-                f1.FlowId,
                 Math.Min(f1.FirstSeen, f2.FirstSeen),
                 Math.Max(f1.FirstSeen, f2.FirstSeen),
                 f1.Octets + f2.Octets,

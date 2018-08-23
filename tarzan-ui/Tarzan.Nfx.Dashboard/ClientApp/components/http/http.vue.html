@@ -111,7 +111,7 @@
                     <el-table-column type="expand" width="50">
                         <template slot-scope="props">
                             <el-row style="margin-bottom:10px">
-                                ObjectId: {{ props.row.flowId}}/{{props.row.transactionId}}
+                                ObjectId: {{ props.row.flowUid}}/{{props.row.objectIndex}}
                             </el-row>
                             <el-col :span="12">
                                 <el-card shadow="never">
@@ -120,12 +120,12 @@
                                         <el-popover width="800"
                                                     trigger="click">
                                             <code>
-                                                {{ getRequestContent(props.row.flowId,props.row.transactionId) }}
+                                                {{ getRequestContent(props.row.flowUid,props.row.objectIndex) }}
                                             </code>
                                             <el-button slot="reference" icon="el-icon-view" style="float: right;" circle size="mini" />
                                         </el-popover>
                                         <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
-                                                   @click="downloadRequestContent(props.row.flowId,props.row.transactionId)" />
+                                                   @click="downloadRequestContent(props.row.flowUid,props.row.objectIndex)" />
                                     </div>
                                     <div class="fixed-font">
                                         {{ props.row.method }} {{ props.row.uri }} {{ props.row.version }}
@@ -147,7 +147,7 @@
                                             <el-button style="float: right;" slot="reference" icon="el-icon-view" circle size="mini" />
                                         </el-popover>                                        
                                         <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
-                                                   @click="downloadResponseContent(props.row.flowId,props.row.transactionId)" />
+                                                   @click="downloadResponseContent(props.row.flowUid,props.row.objectIndex)" />
 
                                     </div>
                                     <div class="fixed-font">

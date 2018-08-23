@@ -3,19 +3,51 @@
 
 namespace csharp Tarzan.Nfx.Model
 
-struct PacketFlow {
-    1: string Protocol;
-    2: string SourceAddress;
-    3: i32 SourcePort;
-    4: string DestinationAddress;
-    5: i32 DestinationPort;
-    6: string FlowId;
+// Represents an AFF4 Object in the Object Catalogue. 
+// Objects are addresable by their name which is unique. 
+// Name of the object uses URN notation.
+struct AffObject {
+    // Name of the object using URN notation, for example, "urn:aff4:83a3d6db-85d5-4730-8216-1987853bc4d2".
+    1: string ObjectName;
+    // Type of the object, for example, "PacketFlow".
+    2: string ObjectType;
+    // Name of the interface to access the object. It can be null if default interface derived from ObjectType is to be used. 
+    3: string Interface;
+    // Location of the object. It can be null if the object is stored in the implicit location (Cassandra cluster).
+    4: string Stored;
+}
+// Represents a single AFF4 statement. It is a tripple (Subject, Attribute, Value).
+struct AffStatement {
+    1: string Subject;
+    2: string Attribute;
+    3: string Value;
+}
+
+struct Capture {
+  1: string Uid;
+  2: string Name;
+  3: i64 CreationTime;
+  4: i64 Length;
+  5: string Hash;
+}
+
+// Object namespace: urn:aff4:flows/
+// Object name: UID.Generate[FirstSeen, Protocol, SourceAddress, SourcePort, DestinationAddress, DestinationPort]
+struct PacketFlow { 
+    1: string Uid;
+    2: string Protocol;
+    3: string SourceAddress;
+    4: i32 SourcePort;
+    5: string DestinationAddress;
+    6: i32 DestinationPort;
     7: i64 FirstSeen;
     8: i64 LastSeen;
     9: i32 Packets;
     10: i64 Octets;
 }
 
+// Object namespace:  urn:aff4:hosts/
+// Object name: [Address]
 struct Host {
     1: string Address;
     2: string Hostname;
@@ -27,8 +59,10 @@ struct Host {
     8: i32 PacketsRecv;
 }
 
+// Object namespace: urn:aff4:services/
+// Object name:  [SERVICE NAME]
 struct Service {
-    1: string Name;
+    1: string ServiceName;
     2: i32 Flows;
     3: i32 Packets;
     4: i32 MinPackets;
@@ -42,10 +76,11 @@ struct Service {
 }
 
 //--- APPLICATIONS ------------------------------------------------------
-struct DnsInfo {
-    // Refers to flow containing answer packet
-    1: string FlowId;
-    2: string DnsId;
+// Object namespace: urn:aff4:dns/
+// Object name: [FlowUid]/[TransactionId]
+struct DnsObject {
+    1: string FlowUid;    
+    2: string TransactionId;
     5: i64 Timestamp;
     6: string Client;
     7: string Server;
@@ -56,10 +91,12 @@ struct DnsInfo {
 }
 
 // Holds information about a single HTTP Request/response.
-struct HttpInfo {
+// Object namespace: urn:aff4:http/   
+// Object name:     [FlowUid]/[ObjectIndex]
+struct HttpObject {    
     // Refers to flow containing request packet
-    1: string FlowId; 
-    2: string TransactionId;    
+    1: string FlowUid; 
+    2: string ObjectIndex;    
     4: i64 Timestamp;
     5: string Client;
     6: string Server;

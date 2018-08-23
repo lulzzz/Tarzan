@@ -23,16 +23,11 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\providers\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="DataAccess\Mock\flowstat.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

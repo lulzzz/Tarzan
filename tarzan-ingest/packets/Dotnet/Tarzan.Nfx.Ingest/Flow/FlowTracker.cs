@@ -24,7 +24,7 @@ namespace Tarzan.Nfx.Ingest
         public FlowIndex Index => m_index;
         public FlowTable Table => m_table;
 
-        public void Track()
+        public async Task TrackAsync()
         {
             var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, PacketStream>(m_table, m_table, m_table);
             var captureTsc = new TaskCompletionSource<CaptureStoppedEventStatus>();
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Ingest
             {
                 var packet = Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
                 var flowRecord = tracker.UpdateFlow((packet, e.Packet.Timeval), out var flowKey);
-                m_index.Add(++packetCount, packetOffset, flowKey);
+                //m_index.Add(++packetCount, packetOffset, flowKey);
                 packetOffset += e.Packet.Data.Length + 4 * sizeof(uint);
             }
             void Device_OnCaptureStopped(object sender, CaptureStoppedEventStatus status)
@@ -47,8 +47,7 @@ namespace Tarzan.Nfx.Ingest
 
             m_device.Open();
             m_device.Capture();
-            // following will block until capture is completed. 
-            var result = captureTask.Result;
+            await captureTask;
             m_device.Close();
         }
     }

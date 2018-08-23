@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Cassandra.Data.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Tarzan.Nfx.Dashboard.DataAccess;
+using System.Linq;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Dashboard
@@ -9,36 +10,27 @@ namespace Tarzan.Nfx.Dashboard
     [Route("api/hosts")]
     public class HostsController : Controller
     {
-        ITableDataAccess<Host,string> m_dataAccess;
-        public HostsController(ITableDataAccess<Host, string> dataAccess)
+        IAffDataset m_dataset;
+        public HostsController(IAffDataset dataset)
         {
-            m_dataAccess = dataAccess;
+            m_dataset = dataset;
         }
 
         [HttpGet("count")]
-        public int GetCount()
-        {
-            return m_dataAccess.Count();
-        }
+        public int GetCount() => (int)m_dataset.HostTable.Count().Execute();
 
         // GET: api/hosts
         [HttpGet("range/{start}/count/{length}")]
         public IEnumerable<Host> Get(int start, int length)
         {
-            return m_dataAccess.FetchRange(start, length); 
+            return m_dataset.HostTable.Execute().Skip(start).Take(length);
         }
 
         // GET: api/hosts/5
         [HttpGet("item/{address}")]
         public Host Get(string address)
         {
-            return m_dataAccess.FetchItem(address);
-        }
-                
-        // PUT: api/hosts/5
-        [HttpPut("item/{address}")]
-        public void Put(string address, [FromBody]Host value)
-        {
-        }        
+            return m_dataset.HostTable.Where(x => x.Address == address).FirstOrDefault().Execute();
+        }     
     }
 }

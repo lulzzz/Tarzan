@@ -28,8 +28,16 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column prop="firstSeen" label="First" width="100" />
-                    <el-table-column prop="lastSeen" label="Last" width="100" />
+                    <el-table-column label="Time" width="200">
+                        <template slot-scope="props">
+                            {{ new Date(props.row.firstSeen).toString() }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Duration" width="100">
+                        <template slot-scope="props">
+                            {{ (props.row.lastSeen - props.row.firstSeen) / 1000 }} s
+                        </template>
+                    </el-table-column>                  
                     <el-table-column prop="packets" label="Packets" width="150" />
                     <el-table-column prop="octets" label="Octets" width="150" />
                 </el-table>

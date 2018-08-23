@@ -6,25 +6,23 @@ using IPEndPoint = System.Net.IPEndPoint;
 using SharpPcap;
 using System.Threading;
 using System.IO;
+using System.Collections.Concurrent;
 
 namespace Tarzan.Nfx.Ingest
 {
     class FlowTable : IFlowTable<FlowKey, PacketStream>, IKeyProvider<FlowKey, (Packet, PosixTimeval)>, IRecordProvider<(Packet, PosixTimeval), PacketStream>
     {
-        Dictionary<FlowKey, PacketStream> m_table = new Dictionary<FlowKey, PacketStream>();
-
-        public object Count => m_table.Count;
+        ConcurrentDictionary<FlowKey, PacketStream> m_table = new ConcurrentDictionary<FlowKey, PacketStream>();
 
         public IEnumerable<KeyValuePair<FlowKey, PacketStream>> Entries => m_table;
 
+
+        public int Count => m_table.Count;
+
         public PacketStream Delete(FlowKey key)
         {
-            lock (LockObject)
-            {
                 m_table.Remove(key, out var record);
-
                 return record;
-            }
         }
 
         public bool Exists(FlowKey key)
@@ -34,10 +32,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void FlushAll()
         {
-            lock (LockObject)
-            {
                 m_table.Clear();
-            }
         }
 
         public PacketStream Get(FlowKey key)
@@ -90,27 +85,6 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        /// <summary>
-        /// Lock object to control entering to the critical section. 
-        /// </summary>
-        private readonly object LockObject = new object();
-
-        /// <summary>
-        /// Leaves the critical section. 
-        /// </summary>
-        public void Exit()
-        {
-            Monitor.Exit(LockObject);    
-        }
-
-        /// <summary>
-        /// Enters the critical section. 
-        /// </summary>
-        public void Enter()
-        {
-            Monitor.Enter(LockObject);
-        }
-
         public PacketStream GetRecord((Packet, PosixTimeval) capture)
         {
             return PacketStream.From(capture);
@@ -118,40 +92,12 @@ namespace Tarzan.Nfx.Ingest
 
         public PacketStream Merge(FlowKey key, PacketStream value)
         {
-
-            var stored = m_table.GetValueOrDefault(key);
-            PacketStream newValue;
-            if (stored != null)
-            {
-                newValue = PacketStream.Merge(stored, value);
-            }
-            else
-            {
-                newValue = value;
-            }
-            lock (LockObject)
-            {
-                return m_table[key] = newValue;
-            }
+            return m_table.AddOrUpdate(key, value, (k, v) => PacketStream.Merge(v, value));
         }
 
         public void Put(FlowKey key, PacketStream value)
         {
-            lock (LockObject)
-            {
-                m_table[key] = value;
-            }
-        }
-
-
-        public void Write(Stream stream)
-        {
-
-        }
-
-        public void Read(Stream stream)
-        {
-            
+            m_table[key] = value;
         }
     }
 }

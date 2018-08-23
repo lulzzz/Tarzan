@@ -42,7 +42,7 @@ namespace Tarzan.Nfx.Ingest
             {
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
             }
-            catch (ArgumentException e)
+        catch (ArgumentException e)
             {
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
             }

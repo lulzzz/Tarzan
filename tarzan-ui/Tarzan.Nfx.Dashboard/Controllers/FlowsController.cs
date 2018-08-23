@@ -1,19 +1,19 @@
+using Cassandra.Data.Linq;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tarzan.Nfx.Model;
-using IFlowsDataAccess = Tarzan.Nfx.Dashboard.DataAccess.ITableDataAccess<Tarzan.Nfx.Model.PacketFlow, System.Guid>;
 namespace Tarzan.Nfx.Dashboard.Controllers
 {
     [Produces("application/json")]
     [Route("api/Flows")]
     public class FlowsController : Controller
     {
-        IFlowsDataAccess m_dataAccess;
+        IAffDataset m_dataset;
 
-        public FlowsController(IFlowsDataAccess dataAccess)
+        public FlowsController(IAffDataset dataset)
         {
-            m_dataAccess = dataAccess;
+            m_dataset = dataset;
         }
 
         /// <summary>
@@ -23,24 +23,23 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         [HttpGet("count")]
         public int FetchRecordCount()
         {
-            return m_dataAccess.Count();
+            return (int)m_dataset.FlowTable.Count().Execute();
         }
 
         [HttpGet("range/{start}/count/{length}")]
         public IEnumerable<PacketFlow> FetchRange(int start, int length)
         {
-            return m_dataAccess.FetchRange(start, length);
+            return m_dataset.FlowTable.Execute().Skip(start).Take(length);
         }
         /// <summary>
         /// Gets the flow record of the specified id.
         /// </summary>
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
-        [HttpGet("item/{id}")]
-        public PacketFlow FetchRecordById(string id)
+        [HttpGet("item/{uid}")]
+        public PacketFlow FetchRecordById(string uid)
         {
-            var uuid = Guid.Parse(id);
-            return m_dataAccess.FetchItem(uuid);
+            return m_dataset.FlowTable.Where(x => x.Uid == uid).FirstOrDefault().Execute();
         }
     }
 }

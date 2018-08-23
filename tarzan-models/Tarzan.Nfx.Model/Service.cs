@@ -9,8 +9,8 @@ namespace Tarzan.Nfx.Model
     {
         public static Map<Service> Mapping =>
             new Map<Service>()
-                .TableName("services")
-                .PartitionKey("name")
+                .TableName(Pluralizer.Pluralize(nameof(Service)))
+                .PartitionKey(nameof(Service.ServiceName))
                 .Column(f => f.__isset, cc => cc.Ignore());
     }
 }

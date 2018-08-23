@@ -13,14 +13,14 @@ namespace Tarzan.Nfx.Dashboard
     [Route("api/http")]
     public class HttpController : Controller
     {
-        private Table<HttpInfo> m_table;
-        public HttpController(ISession session)
+        private IAffDataset m_dataset;
+        public HttpController(IAffDataset dataset)
         {
-            m_table = new Table<HttpInfo>(session);            
+            m_dataset = dataset;            
         }
 
         Regex sizeWithUnitRegex = new Regex(@"(\d+)\s*(\w*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Func<HttpInfo, bool> CreateFilterPredicate(HttpInfoFilter filter)
+        Func<HttpObject, bool> CreateFilterPredicate(HttpInfoFilter filter)
         {            
             long? getSize(string sizeString)
             {
@@ -44,7 +44,7 @@ namespace Tarzan.Nfx.Dashboard
             var minSize = getSize(filter.AtLeastSize);
             var maxSize = getSize(filter.AtMostSize);
             var contentList = filter.ContentTypeList;
-            return (HttpInfo x) =>
+            return (HttpObject x) =>
              {
                  var url = (x.Host ?? String.Empty) + (x.Uri ?? String.Empty);                  
                  if (!String.IsNullOrWhiteSpace(filter.Uri) && !url.Contains(filter.Uri)) return false;
@@ -58,11 +58,11 @@ namespace Tarzan.Nfx.Dashboard
         [HttpGet("count")]
         public int GetCount([FromQuery]HttpInfoFilter filter)
         {
-            return (from row in m_table
-             select new HttpInfo()
+            return (from row in m_dataset.HttpTable
+             select new HttpObject()
              {
-                 FlowId = row.FlowId,
-                 TransactionId = row.TransactionId,
+                 FlowUid = row.FlowUid,
+                 ObjectIndex = row.ObjectIndex,
                  Host = row.Host,
                  Uri = row.Uri,
                  ResponseBodyLength = row.ResponseBodyLength,
@@ -71,12 +71,12 @@ namespace Tarzan.Nfx.Dashboard
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<HttpInfo> Get(int start, int length, [FromQuery]HttpInfoFilter filter)
+        public IEnumerable<HttpObject> Get(int start, int length, [FromQuery]HttpInfoFilter filter)
         {
-            var source = (from row in m_table select new HttpInfo()
+            var source = (from row in m_dataset.HttpTable select new HttpObject()
             {
-                FlowId = row.FlowId,
-                TransactionId = row.TransactionId,
+                FlowUid = row.FlowUid,
+                ObjectIndex = row.ObjectIndex,
                 Client = row.Client,
                 Server = row.Server,
                 Timestamp = row.Timestamp,
@@ -98,10 +98,10 @@ namespace Tarzan.Nfx.Dashboard
             return filteredSource.OrderBy(x=>x.Timestamp).Skip(start).Take(length);
         }
 
-        [HttpGet("item/{flowId}/{transactionId}")]
-        public HttpInfo Get(string flowId, string transactionId)
+        [HttpGet("item/{flowUId}/{objectIndex}")]
+        public HttpObject Get(string flowUId, string objectIndex)
         {
-            return (from row in m_table where row.FlowId == flowId && row.TransactionId == transactionId select row).FirstOrDefault().Execute();
+            return m_dataset.HttpTable.Where(x => x.FlowUid == flowUId && x.ObjectIndex == objectIndex).FirstOrDefault().Execute();
         }                    
     }
 }
