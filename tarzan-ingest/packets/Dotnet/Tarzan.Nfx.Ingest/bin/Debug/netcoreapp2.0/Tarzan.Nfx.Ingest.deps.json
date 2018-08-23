@@ -1,13 +1,15 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "32638cb36cbe213168f32e5fbc991d490bda68ee"
+    "signature": "ad1f23d1314763380deab4d59f08430c76c4d47c"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.0": {
       "Tarzan.Nfx.Ingest/1.0.0": {
         "dependencies": {
+          "Apache.Ignite": "2.6.0",
+          "Apache.Ignite.Linq": "2.6.0",
           "CassandraCSharpDriver": "3.6.0",
           "Microsoft.Extensions.CommandLineUtils": "1.1.1",
           "Netdx.ConversationTracker": "1.0.0",
@@ -18,6 +20,30 @@
         },
         "runtime": {
           "Tarzan.Nfx.Ingest.dll": {}
+        }
+      },
+      "Apache.Ignite/2.6.0": {
+        "runtime": {
+          "lib/net40/Apache.Ignite.Core.dll": {
+            "assemblyVersion": "2.6.0.30134",
+            "fileVersion": "2.6.0.30134"
+          },
+          "lib/net40/Apache.Ignite.exe": {
+            "assemblyVersion": "2.6.0.30134",
+            "fileVersion": "2.6.0.30134"
+          }
+        }
+      },
+      "Apache.Ignite.Linq/2.6.0": {
+        "dependencies": {
+          "Apache.Ignite": "2.6.0",
+          "Remotion.Linq": "2.0.1"
+        },
+        "runtime": {
+          "lib/net40/Apache.Ignite.Linq.dll": {
+            "assemblyVersion": "2.6.0.30134",
+            "fileVersion": "2.6.0.30134"
+          }
         }
       },
       "CassandraCSharpDriver/3.6.0": {
@@ -189,6 +215,14 @@
           "lib/netstandard2.0/PacketDotNet.dll": {
             "assemblyVersion": "0.16.0.0",
             "fileVersion": "0.16.0.0"
+          }
+        }
+      },
+      "Remotion.Linq/2.0.1": {
+        "runtime": {
+          "lib/net45/Remotion.Linq.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.1.0"
           }
         }
       },
@@ -1267,6 +1301,20 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Apache.Ignite/2.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-mofeIxWqPkCpfuNZMKN3voLUvrXfxoPnbvCeLlUw3WZR2UX0UUY/xaIG688kYQSJ1jPuLyIwUN2ASuBDNIcpNw==",
+      "path": "apache.ignite/2.6.0",
+      "hashPath": "apache.ignite.2.6.0.nupkg.sha512"
+    },
+    "Apache.Ignite.Linq/2.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-RylyOOMYDTZrwEVYwSwTj8HEoCt6cfplN3DWb7kVcXpiJBC9mwyEXkWQ/qSsVQQhEDPPhawCWwYOxw/oXUpc4Q==",
+      "path": "apache.ignite.linq/2.6.0",
+      "hashPath": "apache.ignite.linq.2.6.0.nupkg.sha512"
+    },
     "CassandraCSharpDriver/3.6.0": {
       "type": "package",
       "serviceable": true,
@@ -1350,6 +1398,13 @@
       "sha512": "sha512-OFO2+5DvKwvvCTzmO710q+voedigryPS7iax67i3YeOlBcypLS8Y2TTxj+Bx409+lLRfqFZ/pdatMSCJehmgtQ==",
       "path": "packetdotnet.standard/0.16.0",
       "hashPath": "packetdotnet.standard.0.16.0.nupkg.sha512"
+    },
+    "Remotion.Linq/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-SIO6HDH6CU9GC2IZGBrc6q5X5vRhfatXrg9cVavCEG9W6v5e88b+vXjmLGQEorch4sYEIImRr+ODyUMyrmrqAg==",
+      "path": "remotion.linq/2.0.1",
+      "hashPath": "remotion.linq.2.0.1.nupkg.sha512"
     },
     "runtime.native.System/4.0.0": {
       "type": "package",

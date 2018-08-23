@@ -24,6 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
     <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Netdx.ConversationTracker" Version="1.0.0" />
