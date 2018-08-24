@@ -23,10 +23,10 @@ namespace Tarzan.Nfx.Ingest
             var commandLineApplication = new CommandLineApplication(true);
             commandLineApplication.Command(TrackFlows.Name, TrackFlows.Configuration);
             commandLineApplication.Command(PrintInterfaces.Name, PrintInterfaces.Configuration);
-
+            commandLineApplication.Command(StartIgniteServer.Name, StartIgniteServer.Configuration);
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.Name = typeof(Program).Assembly.GetName().Name;
-            commandLineApplication.FullName = $"Lwm2mDump Tool ({typeof(Program).Assembly.GetName().Version})";
+            commandLineApplication.FullName = $"Tarzan.Nfx Packet Traces Ingestor ({typeof(Program).Assembly.GetName().Version})";
 
             commandLineApplication.OnExecute(() =>
             {

@@ -26,11 +26,10 @@ namespace Tarzan.Nfx.Ingest
 
         public async Task TrackAsync()
         {
-            var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, PacketStream>(m_table, m_table, m_table);
+            var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, PacketStream>(m_table, new KeyProvider(), new RecordProvider());
             var captureTsc = new TaskCompletionSource<CaptureStoppedEventStatus>();
             var captureTask = captureTsc.Task;
             var packetOffset = 6 * sizeof(uint);
-            var packetCount = 0;
             m_device.OnPacketArrival += Device_OnPacketArrival;
             m_device.OnCaptureStopped += Device_OnCaptureStopped;
             void Device_OnPacketArrival(object sender, CaptureEventArgs e)

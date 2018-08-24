@@ -1,22 +1,25 @@
-﻿using Cassandra;
-using Cassandra.Data.Linq;
-using Cassandra.Mapping;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache.Configuration;
+using Apache.Ignite.Core.Client;
+using Apache.Ignite.Core.Compute;
+using Apache.Ignite.Core.Discovery.Tcp;
+using Apache.Ignite.Core.Discovery.Tcp.Static;
+using Apache.Ignite.Core.Lifecycle;
+using Apache.Ignite.Core.Log;
+using Apache.Ignite.Core.Resource;
 using Microsoft.Extensions.CommandLineUtils;
 using Netdx.ConversationTracker;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
-using Tarzan.Nfx.Model;
+using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
 {
@@ -35,13 +38,13 @@ namespace Tarzan.Nfx.Ingest
                 var optionKeyspace = target.Option("-namespace", "Specifies the keyspace in Cassandra DB.", CommandOptionType.SingleValue);
                 var optionCreate = target.Option("-create", "Creates/initializes the keyspace in Cassandra DB. The existing keyspace will be deleted.", CommandOptionType.NoValue);
                 var optionSequential = target.Option("-sequential", "Run in sequential mode.", CommandOptionType.NoValue);
+                var optionIgnite = target.Option("-ignite", "Run as Ignite client. Processing occurs in Ignite server cluster.", CommandOptionType.NoValue);
 
-                IEnumerable<(ICaptureDevice Device, FileInfo Info)> GetInputDevice()
+                IEnumerable<(ICaptureDevice Device, FileInfo Info)> GetInputDevice(IEnumerable<FileInfo> inputFileList)
                 {
                     var devices = new List<(ICaptureDevice Device, FileInfo Info)>();
-                    if (optionInputFile.HasValue())
-                    {
-                        var fileinfo = new FileInfo(optionInputFile.Value());
+                    foreach(var fileinfo in inputFileList)
+                    { 
                         var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
                         LinkLayers = inputDevice.LinkType;
                         devices.Add((inputDevice, fileinfo));
@@ -65,16 +68,6 @@ namespace Tarzan.Nfx.Ingest
                         else
                         {
                             throw new ArgumentException($"Invalid interface index: {optionInterface.Value()}. This should be an integer value between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
-                        }
-                    }
-                    if(optionInputFolder.HasValue())
-                    {
-                        var dir = new DirectoryInfo(optionInputFolder.Value());
-                        foreach(var fileinfo in dir.EnumerateFiles("*.?cap"))
-                        {
-                            var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
-                            LinkLayers = inputDevice.LinkType;
-                            devices.Add((inputDevice, fileinfo));
                         }
                     }
                     return devices;
@@ -106,6 +99,30 @@ namespace Tarzan.Nfx.Ingest
 
                 target.OnExecute(() =>
                 {
+
+                    var fileList = new List<FileInfo>();
+                    if (optionInputFolder.HasValue())
+                    {
+                        var dir = new DirectoryInfo(optionInputFolder.Value());
+                        foreach (var fileinfo in dir.EnumerateFiles("*.?cap"))
+                        {
+                            var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
+                            LinkLayers = inputDevice.LinkType;
+                            fileList.Add(fileinfo);
+                        }
+                    }
+                    if (optionInputFile.HasValue())
+                    {
+                        var fileinfo = new FileInfo(optionInputFile.Value());
+                        fileList.Add(fileinfo);
+                    }
+
+                    if (optionIgnite.HasValue())
+                    {
+                        RunAsIgnite(fileList.Select(x=>x.FullName));
+                        return 0;
+                    }
+
                     if (!optionKeyspace.HasValue())
                     {
                         throw new ArgumentException("Keyspace is not specified.");
@@ -118,7 +135,7 @@ namespace Tarzan.Nfx.Ingest
                         cassandraWriter.DeleteKeyspace();
                     }
 
-                    var devices = GetInputDevice().ToArray();
+                    var devices = GetInputDevice(fileList);
 
                     Console.WriteLine($"{DateTime.Now} Initializing keyspace '{optionKeyspace.Value()}'...");
                     cassandraWriter.Initialize();
@@ -142,6 +159,53 @@ namespace Tarzan.Nfx.Ingest
                     return 0;
                 });
             };
+
+
+
+
+        static void RunAsIgnite(IEnumerable<string> fileList)
+        {          
+            using (var ignite = Ignition.Start(GlobalIgniteConfiguration.Default))
+            {
+                var compute = ignite.GetCluster().GetCompute();
+                compute.Run(fileList.Select(x=> new ComputeAction { FileName = x }));
+                // get inform about results:
+                var cache = FlowCache.GetCache(ignite);
+                Console.WriteLine($"Total flows {cache.Count()}");
+            }
+        }
+
+        class ComputeAction : IComputeAction
+        {
+            public string FileName { get; set; }
+
+            [InstanceResource]
+            private readonly IIgnite m_ignite;
+
+            public void Invoke()
+            {
+                Console.WriteLine($"APP: Start processing file '{FileName}'");
+                var flowTracker = new IgniteFlowTracker(m_ignite, FileName);
+                flowTracker.TrackAsync().Wait();
+                Console.WriteLine($"APP: Processing done.");
+            }
+        }
+
+        class ConsoleLogger : ILogger
+        {
+            public void Log(LogLevel level, string message, object[] args,
+                            IFormatProvider formatProvider, string category,
+                            string nativeErrorInfo, Exception ex)
+            {
+                Console.Error.WriteLine(message);
+            }
+
+            public bool IsEnabled(LogLevel level)
+            {
+                // Accept any level.
+                return true;
+            }
+        }
 
         public static LinkLayers LinkLayers { get; private set; }
     }

@@ -23,3 +23,4 @@ C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarz
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.Model.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\obj\Debug\netcoreapp2.0\Tarzan.Nfx.Ingest.csproj.CopyComplete
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\service-names-port-numbers.csv
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\run_ignite_cluster.cmd
