@@ -80,20 +80,23 @@ namespace Tarzan.Nfx.Ingest
                     {
                         Console.WriteLine($"{DateTime.Now} Opening input '{input.Device.Name}'.");
                         Console.WriteLine($"{DateTime.Now} Start tracking flows...");
-                        var flowTracker = new FlowTracker(input.Device);
-                        await flowTracker.TrackAsync();
-                        Console.WriteLine($"{DateTime.Now} Tracking flows finished, flow count={flowTracker.Table.Count}");
+                        input.Device.Open();
+                        var flowTracker = new FlowTracker(new CaptureDeviceProvider(input.Device));
+                        flowTracker.CaptureAll();
+                        input.Device.Close();
+
+                        Console.WriteLine($"{DateTime.Now} Tracking flows finished, flow count={flowTracker.FlowTable.Count}");
 
                         Console.WriteLine($"{DateTime.Now} Start detecting services.");
                         var serviceDetector = new ServiceDetector();
-                        foreach (var flow in flowTracker.Table.Entries)
+                        foreach (var flow in flowTracker.FlowTable)
                         {
                             flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
                         }
                         Console.WriteLine($"{DateTime.Now} Detecting services finished.");
 
                         Console.WriteLine($"{DateTime.Now} Writing data...");
-                        await cassandraWriter.WriteAll(input.Info, flowTracker.Table);
+                        await cassandraWriter.WriteAll(input.Info, flowTracker.FlowTable);
                     };
                 }
 
@@ -186,7 +189,7 @@ namespace Tarzan.Nfx.Ingest
             {
                 Console.WriteLine($"APP: Start processing file '{FileName}'");
                 var flowTracker = new IgniteFlowTracker(m_ignite, FileName);
-                flowTracker.TrackAsync().Wait();
+                flowTracker.Track();
                 Console.WriteLine($"APP: Processing done.");
             }
         }

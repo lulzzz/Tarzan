@@ -100,6 +100,8 @@ namespace Netdx.PacketDecoders
         public UInt16 DestinationPort => BinaryPrimitives.ReadUInt16BigEndian(DestinationPortBytes);
         Span<Byte> DestinationPortBytes => new Span<byte>(_bytes, Fields.DestinationPortPosition, 2);
 
+        public IPEndPoint SourceEndpoint => new IPEndPoint(new IPAddress(SourceAddress.ToArray()), SourcePort);
+        public IPEndPoint DestinationEndpoint => new IPEndPoint(new IPAddress(DestinationAddress.ToArray()), DestinationPort);
 
         public static PacketFlowKey GetKey(byte[] bytes)
         {

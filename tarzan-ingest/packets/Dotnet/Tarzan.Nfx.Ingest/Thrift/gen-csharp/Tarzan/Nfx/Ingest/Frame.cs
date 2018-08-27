@@ -24,7 +24,7 @@ namespace Tarzan.Nfx.Ingest
   public partial class Frame : TBase
   {
     private long _Timestamp;
-    private short _LinkLayer;
+    private LinkLayerType _LinkLayer;
     private byte[] _Data;
 
     public long Timestamp
@@ -40,7 +40,11 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public short LinkLayer
+    /// <summary>
+    /// 
+    /// <seealso cref="LinkLayerType"/>
+    /// </summary>
+    public LinkLayerType LinkLayer
     {
       get
       {
@@ -103,8 +107,8 @@ namespace Tarzan.Nfx.Ingest
               }
               break;
             case 2:
-              if (field.Type == TType.I16) {
-                LinkLayer = iprot.ReadI16();
+              if (field.Type == TType.I32) {
+                LinkLayer = (LinkLayerType)iprot.ReadI32();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -147,10 +151,10 @@ namespace Tarzan.Nfx.Ingest
         }
         if (__isset.LinkLayer) {
           field.Name = "LinkLayer";
-          field.Type = TType.I16;
+          field.Type = TType.I32;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI16(LinkLayer);
+          oprot.WriteI32((int)LinkLayer);
           oprot.WriteFieldEnd();
         }
         if (Data != null && __isset.Data) {

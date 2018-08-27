@@ -1,7 +1,9 @@
 ﻿using Cassandra;
 using Cassandra.Data.Linq;
 using Cassandra.Mapping;
+using Netdx.PacketDecoders;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,7 +41,7 @@ namespace Tarzan.Nfx.Ingest
             m_dataset.Close();
         }
 
-        public async Task WriteAll(FileInfo fileinfo, FlowTable table)
+        public async Task WriteAll(FileInfo fileinfo, IDictionary<PacketFlowKey, PacketStream> table)
         {
             Console.WriteLine($"{DateTime.Now} Writing CAPTURES...");
             await WriteCapture(fileinfo);
@@ -68,10 +70,10 @@ namespace Tarzan.Nfx.Ingest
             await m_dataset.CaptureTable.Insert(capture).ExecuteAsync();
         }
 
-        async Task WriteFlows(FlowTable table)
+        async Task WriteFlows(IDictionary<PacketFlowKey, PacketStream> table)
         {
 
-            foreach (var flow in table.Entries)
+            foreach (var flow in table)
             {
                 var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);                    
                 var flowPoco = new PacketFlow
@@ -97,12 +99,12 @@ namespace Tarzan.Nfx.Ingest
                 await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
             }
         }
-        async Task WriteHosts(FlowTable table)
+        async Task WriteHosts(IDictionary<PacketFlowKey, PacketStream> table)
         {
-            var srcHosts = table.Entries.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
+            var srcHosts = table.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });
 
-            var dstHosts = table.Entries.GroupBy(x => x.Key.DestinationEndpoint.Address).Select(t =>
+            var dstHosts = table.GroupBy(x => x.Key.DestinationEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), DownFlows = t.Count(), PacketsRecv = t.Sum(p => p.Value.Packets), OctetsRecv = t.Sum(p => p.Value.Octets) });
 
             foreach (var host in srcHosts)
@@ -118,9 +120,9 @@ namespace Tarzan.Nfx.Ingest
         }
 
        
-        private async Task WriteServices(FlowTable table)
+        private async Task WriteServices(IDictionary<PacketFlowKey, PacketStream> table)
         {
-            var services = table.Entries
+            var services = table
                 .GroupBy(f => f.Value.ServiceName)
                 .Select(f =>
                     new Model.Service
@@ -144,9 +146,9 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        private async Task WriteDns(FlowTable flowTable)
+        private async Task WriteDns(IDictionary<PacketFlowKey, PacketStream> table)
         {
-            var dnsInfos = flowTable.Entries.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
+            var dnsInfos = table.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
             foreach(var dnsInfo in dnsInfos)
             {
                 var insert = m_dataset.DnsTable.Insert(dnsInfo);
@@ -166,7 +168,7 @@ namespace Tarzan.Nfx.Ingest
             foreach(var packet in TcpStream.SegmentMap(stream))
             {
                 var nextSeqNum = packet.SequenceNumber + packet.Length + (packet.Syn || packet.Fin || packet.Rst ? 1 : 0);
-                contents += $"{packet.Timeval.Date}, {packet.Syn}, {packet.Fin}, {packet.Rst}, {packet.Ack}, {packet.Psh}, {packet.SequenceNumber}, {packet.AcknowledgmentNumber}, {packet.Length}, {nextSeqNum}"+Environment.NewLine;
+                contents += $"{packet.Timeval}, {packet.Syn}, {packet.Fin}, {packet.Rst}, {packet.Ack}, {packet.Psh}, {packet.SequenceNumber}, {packet.AcknowledgmentNumber}, {packet.Length}, {nextSeqNum}"+Environment.NewLine;
             }
 
             File.WriteAllText(flowId.ToString() + ".csv", contents);
@@ -174,9 +176,9 @@ namespace Tarzan.Nfx.Ingest
 
         
 
-        private async Task WriteHttp(FlowTable flowTable)
+        private async Task WriteHttp(IDictionary<PacketFlowKey, PacketStream> table)
         {
-            var httpFlows = flowTable.Entries.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
+            var httpFlows = table.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
             var httpStreams = TcpStream.Split(httpFlows).ToList();
             //httpStreams.ForEach(x=> DebugSeqnum(PacketFlow.NewUid(x.Key.Protocol.ToString(), x.Key.SourceEndpoint, x.Key.DestinationEndpoint, x.Value.FirstSeen), x.Value));
             var httpInfos = TcpStream.Pair(httpStreams).SelectMany(c => HttpAnalyzer.Inspect(c));

@@ -26,5 +26,10 @@ namespace Netdx.PacketDecoders
         {
             return new PosixTime((uint)(v / 1000), (uint)((v % 1000) * 1000));
         }
+
+        public override string ToString()
+        {
+            return $"{m_seconds}.{m_micros.ToString("D6")}s";
+        }
     }
 }

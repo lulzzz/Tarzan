@@ -16,11 +16,11 @@ namespace Tarzan.Nfx.Ingest
     {
         public long TcpInitialSequenceNumber { get; set; }
 
-        public IList<(TcpPacket Packet, PosixTimeval Timeval)> SegmentList { get; private set; }
+        public IList<(TcpPacket Packet, PosixTime Timeval)> SegmentList { get; private set; }
 
         public string ServiceName { get; set; }
 
-        public TcpStream(long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTimeval)> list)
+        public TcpStream(long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTime)> list)
         {
             FirstSeen = firstSeen;
             LastSeen = lastSeen;
@@ -29,10 +29,10 @@ namespace Tarzan.Nfx.Ingest
             SegmentList = list;
         }
        
-        public static TcpStream From((TcpPacket packet, PosixTimeval timeval) capture)
+        public static TcpStream From((TcpPacket packet, PosixTime timeval) capture)
         {
             var unixtime = capture.timeval.ToUnixTimeMilliseconds();
-            return new TcpStream(unixtime, unixtime, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(TcpPacket, PosixTimeval)> { capture })
+            return new TcpStream(unixtime, unixtime, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(TcpPacket, PosixTime)> { capture })
             {
                 TcpInitialSequenceNumber = capture.packet.SequenceNumber
             };
@@ -85,25 +85,26 @@ namespace Tarzan.Nfx.Ingest
                 // search for SYN, FIN or RST
                 // SYN means to create a new flow 
                 // FIN and RST means to finish the current flow
-                foreach (var (packet, timeval) in flowRecord.PacketList)
+                foreach (var frame in flowRecord.FrameList)
                 {
+                    var packet = Packet.ParsePacket((LinkLayers)frame.LinkLayer, frame.Data);
                     var tcp = packet.Extract(typeof(TcpPacket)) as TcpPacket;
                     if (tcp.Syn || currentFlowRecord == null)
                     {
                         if (currentFlowRecord != null) yield return KeyValuePair.Create(flowKey, currentFlowRecord);
-                        currentFlowRecord = From((tcp, timeval));
+                        currentFlowRecord = From((tcp, frame.UnixTimestamp));
                         currentFlowRecord.TcpInitialSequenceNumber = tcp.SequenceNumber;
                     }
                     else
                     {
-                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((tcp, timeval)));
+                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((tcp, frame.UnixTimestamp)));
                     }
                 }
                 if (currentFlowRecord != null) yield return KeyValuePair.Create(flowKey, currentFlowRecord);
             }
         }
 
-        public static IEnumerable<(PosixTimeval Timeval, bool Syn, bool Fin, bool Rst, bool Ack, bool Psh, long SequenceNumber, long AcknowledgmentNumber, int Length)> SegmentMap(TcpStream stream)
+        public static IEnumerable<(PosixTime Timeval, bool Syn, bool Fin, bool Rst, bool Ack, bool Psh, long SequenceNumber, long AcknowledgmentNumber, int Length)> SegmentMap(TcpStream stream)
         {
             foreach (var (packet, timeval) in stream.SegmentList)
             {

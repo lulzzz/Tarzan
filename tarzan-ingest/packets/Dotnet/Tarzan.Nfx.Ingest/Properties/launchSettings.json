@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "flowstat-cassandra": {
+    "ignite-folder": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-32\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create -sequential -ignite"
+      "commandLineArgs": "track-flows -folder D:\\Captures\\ids\\testbed-12jun-32 -cassandra \"localhost\" -namespace testbed -create -ignite"
+    },
+    "ignite-file": {
+      "commandName": "Project",
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-512\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create -ignite"
     }
   }
 }

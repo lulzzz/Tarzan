@@ -24,27 +24,28 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             // DNS response?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
             {
-                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, flowRecord.PacketList);
+                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, flowRecord.FrameList);
                 return dns;
             }
 
             // DNS request?
             if (flowKey.Protocol == ProtocolType.Udp && destinationEndpoint.Port == 53)
             {
-                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, flowRecord.PacketList);
+                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, flowRecord.FrameList);
                 return dns;
             }
             return Array.Empty<Model.DnsObject>();
         }
 
 
-        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, Guid flowId, IEnumerable<(Packet packet, PosixTimeval time)> packetList)
+        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, Guid flowId, IEnumerable<Frame> packetList)
         {
             var result = new List<DnsObject>(); 
-            foreach ((var packet, var time) in packetList)
+            foreach (var frame in packetList)
             {
                 try
                 {
+                    var packet = Packet.ParsePacket((LinkLayers)frame.LinkLayer, frame.Data);
                     var udpPacket = packet.Extract(typeof(UdpPacket)) as UdpPacket;
                     var stream = new KaitaiStream(udpPacket.PayloadData);
                     var dnsPacket = new Netdx.Packets.Core.DnsPacket(stream);
@@ -54,7 +55,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                         {
                             Client = client.ToString(),
                             Server = server.ToString(),
-                            Timestamp = time.ToUnixTimeMilliseconds(),
+                            Timestamp = frame.Timestamp,
                             FlowUid = flowId.ToString(),
                             TransactionId = $"{dnsPacket.TransactionId.ToString("X4")}-{index.ToString("D4")}",
                             DnsType = answer.Type.ToString().ToUpperInvariant(),

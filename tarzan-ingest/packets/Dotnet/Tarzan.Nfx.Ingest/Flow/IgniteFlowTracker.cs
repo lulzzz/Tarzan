@@ -17,7 +17,7 @@ namespace Tarzan.Nfx.Ingest
 {
     class PcapFileReaderDevice : ICaptureDevice
     {
-        string m_filename;
+        readonly string m_filename;
         private BinaryReader m_reader;
         private LinkLayers m_network;
 
@@ -164,7 +164,6 @@ namespace Tarzan.Nfx.Ingest
 
     partial class IgniteFlowTracker
     {
-        public int FlowCount { get; internal set; }
         private ICaptureDevice m_device;
         private IIgnite m_ignite;
 
@@ -180,37 +179,23 @@ namespace Tarzan.Nfx.Ingest
             m_device = new PcapFileReaderDevice(inputFile);
         }
 
-
-        public async Task TrackAsync()
+        public void Track()
         {
-            var flowTable = new FlowTable();
-            var tracker = new Tracker<(Packet, PosixTimeval), FlowKey, PacketStream>(flowTable, new KeyProvider(), new RecordProvider());
-            var packetCount = 0;
             m_device.Open();
             var sw = new Stopwatch();
             sw.Start();
             Console.Write("Processing Capture");
-            while(true)
-            {
-                var capture = m_device.GetNextPacket();
-                if (capture == null) break;
-                //var packet = Packet.ParsePacket(capture.LinkLayerType, capture.Data);
-                //var flowRecord = tracker.UpdateFlow((packet, capture.Timeval), out var flowKey);
-                // log every time we process hundred thousands packets
-                if ((++packetCount % 1000) == 0) Console.Write('.');
-            }
+            var flowTracker = new FlowTracker(new CaptureDeviceProvider(m_device));
+            flowTracker.CaptureAll();
+            m_device.Close();
             sw.Stop();
-            Console.WriteLine($"Done ({sw.Elapsed}), packets={packetCount}, flows={flowTable.Count}.");
+            Console.WriteLine($"Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
             var globalTable = new FlowCache(m_ignite);
-            /// THIS CODE DOES NOT WORK!!!
-            using (var ldr = globalTable.GetDataStreamer())
+            using (var loader = globalTable.GetDataStreamer())
             {
                 // STREAMING: https://apacheignite-net.readme.io/docs/streaming
-                foreach (var item in flowTable.Entries)
-                {
-                    await ldr.AddData(item.Key.ToString(), item.Value);
-                    Console.Write(':');
-                }
+                // TODO: Currently it does not add flows already in cache, use transformer instead...
+                loader.AddData(flowTracker.FlowTable);
             }
         }
     }

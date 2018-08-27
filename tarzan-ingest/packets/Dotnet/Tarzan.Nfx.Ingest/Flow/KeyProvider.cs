@@ -7,8 +7,8 @@ using SharpPcap;
 
 namespace Tarzan.Nfx.Ingest
 {
-        class KeyProvider : IKeyProvider<PacketFlowKey, Packet>
-        {
+    class KeyProvider : IKeyProvider<PacketFlowKey, Packet>
+    {
         public PacketFlowKey GetKey(Packet packet)
         {
             PacketFlowKey GetUdpFlowKey(UdpPacket udp)
@@ -52,4 +52,5 @@ namespace Tarzan.Nfx.Ingest
                     }
             }
         }
+    }
 }

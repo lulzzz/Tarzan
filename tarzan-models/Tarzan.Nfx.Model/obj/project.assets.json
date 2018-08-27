@@ -4792,23 +4792,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\rysavy\\.nuget\\packages\\": {},
+    "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj",
+      "projectUniqueName": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj",
       "projectName": "Tarzan.Nfx.Model",
-      "projectPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj",
-      "packagesPath": "C:\\Users\\rysavy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\obj\\",
+      "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj",
+      "packagesPath": "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Ondrej Rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

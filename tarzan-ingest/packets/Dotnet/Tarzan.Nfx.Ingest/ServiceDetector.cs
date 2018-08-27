@@ -1,4 +1,5 @@
 ﻿using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,7 +59,7 @@ namespace Tarzan.Nfx.Ingest
 
         }
 
-        public string DetectService(FlowKey flowKey, PacketStream FlowValue)
+        public string DetectService(PacketFlowKey flowKey, PacketStream FlowValue)
         {
             string getServiceName(string protocol, int port)
             {
@@ -71,7 +72,7 @@ namespace Tarzan.Nfx.Ingest
                     return $"{protocol.ToLowerInvariant()}/{port}";
                 }
             }
-            var serviceName = getServiceName(flowKey.Protocol.ToString(), Math.Min(flowKey.SourceEndpoint.Port, flowKey.DestinationEndpoint.Port));
+            var serviceName = getServiceName(flowKey.Protocol.ToString(), Math.Min(flowKey.SourcePort, flowKey.DestinationPort));
             return serviceName;
         }
     }

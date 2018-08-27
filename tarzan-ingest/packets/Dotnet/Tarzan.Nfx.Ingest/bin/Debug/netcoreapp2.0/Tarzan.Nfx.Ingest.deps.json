@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "4f5d2aecba0cb2575689f64bb0856190fe9fa39d"
+    "signature": "c88b85ea6926081535fc46a8a29f2eca1ee98c0e"
   },
   "compilationOptions": {},
   "targets": {
@@ -11,7 +11,7 @@
           "Apache.Ignite": "2.6.0",
           "CassandraCSharpDriver": "3.6.0",
           "Microsoft.Extensions.CommandLineUtils": "1.1.1",
-          "Netdx.ConversationTracker": "1.0.0",
+          "Netdx.PacketDecoders": "1.0.0",
           "Newtonsoft.Json": "11.0.2",
           "PacketDotNet.Standard": "0.16.0",
           "SharpPcap.Standard": "4.4.0",
@@ -175,13 +175,9 @@
           }
         }
       },
-      "Netdx.ConversationTracker/1.0.0": {
-        "dependencies": {
-          "System.Memory": "4.5.0",
-          "Tnidea.Thrift": "0.9.3"
-        },
+      "MurmurHash.NETStandard/1.0.0": {
         "runtime": {
-          "lib/netstandard2.0/Netdx.ConversationTracker.dll": {
+          "lib/netstandard1.4/MurmurHash-net-core.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -588,14 +584,14 @@
           "System.Threading": "4.0.11"
         }
       },
-      "System.Memory/4.5.0": {
+      "System.Memory/4.5.1": {
         "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "4.5.0"
+          "System.Runtime.CompilerServices.Unsafe": "4.5.1"
         },
         "runtime": {
           "lib/netstandard2.0/System.Memory.dll": {
             "assemblyVersion": "4.0.1.0",
-            "fileVersion": "4.6.26515.6"
+            "fileVersion": "4.6.26606.5"
           }
         }
       },
@@ -848,7 +844,7 @@
           "Microsoft.NETCore.Targets": "1.1.0"
         }
       },
-      "System.Runtime.CompilerServices.Unsafe/4.5.0": {
+      "System.Runtime.CompilerServices.Unsafe/4.5.1": {
         "runtime": {
           "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll": {
             "assemblyVersion": "4.0.4.0",
@@ -1087,7 +1083,7 @@
       },
       "System.Security.Cryptography.ProtectedData/4.5.0": {
         "dependencies": {
-          "System.Memory": "4.5.0"
+          "System.Memory": "4.5.1"
         },
         "runtime": {
           "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
@@ -1305,6 +1301,16 @@
           }
         }
       },
+      "Netdx.PacketDecoders/1.0.0": {
+        "dependencies": {
+          "MurmurHash.NETStandard": "1.0.0",
+          "System.Memory": "4.5.1",
+          "System.Runtime.CompilerServices.Unsafe": "4.5.1"
+        },
+        "runtime": {
+          "Netdx.PacketDecoders.dll": {}
+        }
+      },
       "Tarzan.Nfx.Model/1.0.0": {
         "dependencies": {
           "CassandraCSharpDriver": "3.6.0",
@@ -1393,12 +1399,12 @@
       "path": "microsoft.win32.registry/4.0.0",
       "hashPath": "microsoft.win32.registry.4.0.0.nupkg.sha512"
     },
-    "Netdx.ConversationTracker/1.0.0": {
+    "MurmurHash.NETStandard/1.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Amq9ThIKEDRpH1l/HoWKGcp7c9tGSS0+JuWKae6TpxTLNXvgFrngvWJ1F3BNbFoum+GUm/X+4E1DCt/kqep/Qw==",
-      "path": "netdx.conversationtracker/1.0.0",
-      "hashPath": "netdx.conversationtracker.1.0.0.nupkg.sha512"
+      "sha512": "sha512-lLRxC9lpvargERqamiNHNVmBqrz0oU4Ctf57ZBOcNzOTSDYu8xIT0LDy4nWFqi6slt4JpvuQ4Qm0vh2F5wqUhg==",
+      "path": "murmurhash.netstandard/1.0.0",
+      "hashPath": "murmurhash.netstandard.1.0.0.nupkg.sha512"
     },
     "Newtonsoft.Json/11.0.2": {
       "type": "package",
@@ -1631,12 +1637,12 @@
       "path": "system.linq.expressions/4.1.0",
       "hashPath": "system.linq.expressions.4.1.0.nupkg.sha512"
     },
-    "System.Memory/4.5.0": {
+    "System.Memory/4.5.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-P56/L4B9vhz0YFTC4qIXFgx+VgMhg3JhCm5/EASihTotyjwmBt2QEAQdmd2tNctYET/w0CRJzVH1cwxgbKGnDQ==",
-      "path": "system.memory/4.5.0",
-      "hashPath": "system.memory.4.5.0.nupkg.sha512"
+      "sha512": "sha512-vcG3/MbfpxznMkkkaAblJi7RHOmuP7kawQMhDgLSuA1tRpRQYsFSCTxRSINDUgn2QNn2jWeLxv8er5BXbyACkw==",
+      "path": "system.memory/4.5.1",
+      "hashPath": "system.memory.4.5.1.nupkg.sha512"
     },
     "System.Net.Http/4.1.0": {
       "type": "package",
@@ -1764,12 +1770,12 @@
       "path": "system.runtime/4.3.0",
       "hashPath": "system.runtime.4.3.0.nupkg.sha512"
     },
-    "System.Runtime.CompilerServices.Unsafe/4.5.0": {
+    "System.Runtime.CompilerServices.Unsafe/4.5.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6zBxkHYemB0kQiHP3vGXGRXejZVoNVuMn2paUuqKKi5Wyjkxfkp+D0rd0c3VrGwotidRINt6KpOi2smL4VkJKw==",
-      "path": "system.runtime.compilerservices.unsafe/4.5.0",
-      "hashPath": "system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512"
+      "sha512": "sha512-qUJMNWhbm9oZ3XaMFiEMiYmRPszbnXIkRIi7+4b2Md2xZ6JUOepf0/kY3S85qistRohl9OdMe4PsO+RdG2kTIQ==",
+      "path": "system.runtime.compilerservices.unsafe/4.5.1",
+      "hashPath": "system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512"
     },
     "System.Runtime.Extensions/4.1.0": {
       "type": "package",
@@ -2001,6 +2007,11 @@
       "sha512": "sha512-1+cF+117xniNP9o0Zr0pnPh9zeduR1ROfq5yd0PRU73P3xf2utMBVvcLBtxN4OYkJtqqjNpUivetLq+yZZ59pg==",
       "path": "tnidea.thrift/0.9.3",
       "hashPath": "tnidea.thrift.0.9.3.nupkg.sha512"
+    },
+    "Netdx.PacketDecoders/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "Tarzan.Nfx.Model/1.0.0": {
       "type": "project",

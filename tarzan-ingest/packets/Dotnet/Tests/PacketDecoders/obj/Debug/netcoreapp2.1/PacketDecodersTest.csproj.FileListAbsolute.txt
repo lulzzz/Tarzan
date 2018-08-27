@@ -12,3 +12,17 @@ C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\Packe
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.pdb
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.dll
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.deps.json
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.runtimeconfig.json
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.runtimeconfig.dev.json
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\PacketDecodersTest.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Netdx.PacketDecoders.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Netdx.PacketDecoders.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.csprojAssemblyReference.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.csproj.CoreCompileInputs.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.AssemblyInfoInputs.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.AssemblyInfo.cs
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.csproj.CopyComplete
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.pdb

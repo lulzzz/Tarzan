@@ -1,4 +1,5 @@
 ﻿using Kaitai;
+using Netdx.PacketDecoders;
 using Netdx.Packets.Core;
 using PacketDotNet;
 using SharpPcap;
@@ -28,12 +29,12 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             }
         }
 
-        private static List<List<(HttpPacket Packet, PosixTimeval Timeval)>> EmptyAccumulator()
+        private static List<List<(HttpPacket Packet, PosixTime Timeval)>> EmptyAccumulator()
         {
-            return new List<List<(HttpPacket, PosixTimeval)>> { new List<(HttpPacket, PosixTimeval)>() };
+            return new List<List<(HttpPacket, PosixTime)>> { new List<(HttpPacket, PosixTime)>() };
         }
 
-        private static List<List<(HttpPacket, PosixTimeval)>> Accumulate(List<List<(HttpPacket, PosixTimeval)>> acc, (HttpPacket Packet, PosixTimeval Time) arg)
+        private static List<List<(HttpPacket, PosixTime)>> Accumulate(List<List<(HttpPacket, PosixTime)>> acc, (HttpPacket Packet, PosixTime Time) arg)
         {
             // data packets are added to the existing http transaction:
             if (arg.Packet.PacketType == HttpPacketType.Data)
@@ -42,7 +43,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             }
             else
             {
-                acc.Add(new List<(HttpPacket, PosixTimeval)> { arg });
+                acc.Add(new List<(HttpPacket, PosixTime)> { arg });
             }
             return acc;
         }
@@ -77,7 +78,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 {
                     FlowUid = flowUid.ToString(),
                     ObjectIndex = TransactionId.ToString("D4"),
-                    Timestamp = new DateTimeOffset(Transaction.Request.FirstOrDefault().Timeval.Date).ToUnixTimeMilliseconds(),
+                    Timestamp = Transaction.Request.FirstOrDefault().Timeval.ToUnixTimeMilliseconds(),
                     Method = transactionRequest.Request.Command,
                     Version = transactionRequest.Request.Version,
                     Uri = transactionRequest.Request.Uri,

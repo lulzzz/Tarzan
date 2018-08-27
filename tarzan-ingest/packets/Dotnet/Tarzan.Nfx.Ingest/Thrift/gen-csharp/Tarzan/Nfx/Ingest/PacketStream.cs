@@ -27,6 +27,7 @@ namespace Tarzan.Nfx.Ingest
     private long _LastSeen;
     private long _Octets;
     private int _Packets;
+    private string _ServiceName;
     private List<Frame> _FrameList;
 
     public long FirstSeen
@@ -81,6 +82,19 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
+    public string ServiceName
+    {
+      get
+      {
+        return _ServiceName;
+      }
+      set
+      {
+        __isset.ServiceName = true;
+        this._ServiceName = value;
+      }
+    }
+
     public List<Frame> FrameList
     {
       get
@@ -104,6 +118,7 @@ namespace Tarzan.Nfx.Ingest
       public bool LastSeen;
       public bool Octets;
       public bool Packets;
+      public bool ServiceName;
       public bool FrameList;
     }
 
@@ -154,6 +169,13 @@ namespace Tarzan.Nfx.Ingest
               }
               break;
             case 5:
+              if (field.Type == TType.String) {
+                ServiceName = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 10:
               if (field.Type == TType.List) {
                 {
                   FrameList = new List<Frame>();
@@ -224,10 +246,18 @@ namespace Tarzan.Nfx.Ingest
           oprot.WriteI32(Packets);
           oprot.WriteFieldEnd();
         }
+        if (ServiceName != null && __isset.ServiceName) {
+          field.Name = "ServiceName";
+          field.Type = TType.String;
+          field.ID = 5;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(ServiceName);
+          oprot.WriteFieldEnd();
+        }
         if (FrameList != null && __isset.FrameList) {
           field.Name = "FrameList";
           field.Type = TType.List;
-          field.ID = 5;
+          field.ID = 10;
           oprot.WriteFieldBegin(field);
           {
             oprot.WriteListBegin(new TList(TType.Struct, FrameList.Count));
@@ -274,6 +304,12 @@ namespace Tarzan.Nfx.Ingest
         __first = false;
         __sb.Append("Packets: ");
         __sb.Append(Packets);
+      }
+      if (ServiceName != null && __isset.ServiceName) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("ServiceName: ");
+        __sb.Append(ServiceName);
       }
       if (FrameList != null && __isset.FrameList) {
         if(!__first) { __sb.Append(", "); }
