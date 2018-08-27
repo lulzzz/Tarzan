@@ -1,5 +1,6 @@
 ﻿using Apache.Ignite.Core.Binary;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using PacketDotNet.Ieee80211;
 using SharpPcap;
@@ -18,10 +19,10 @@ namespace Tarzan.Nfx.Ingest
     /// </summary>
     public class PacketStream : FlowRecord, IBinarizable
     {
-        public IList<(Packet packet, PosixTimeval timeval)> PacketList { get; private set; }
+        public IList<Frame> PacketList { get; private set; }
         public string ServiceName { get; set; }
 
-        protected PacketStream(long firstSeen, long lastSeen, long octets, int packets, List<(Packet, PosixTimeval)> list)
+        protected PacketStream(long firstSeen, long lastSeen, long octets, int packets, List<Frame> list)
         {
             FirstSeen = firstSeen;
             LastSeen = lastSeen;
@@ -29,11 +30,23 @@ namespace Tarzan.Nfx.Ingest
             Packets = packets;
             PacketList = list;
         }
-        public static PacketStream From((Packet packet, PosixTimeval timeval) capture)
+        public static PacketStream From(Frame frame)
         {
-            var unixtime = capture.timeval.ToUnixTimeMilliseconds();
-            return new PacketStream(unixtime, unixtime, capture.packet.BytesHighPerformance.BytesLength, 1, new List<(Packet, PosixTimeval)> { capture });
+            var unixtime = frame.Timestamp.ToUnixTimeMilliseconds();
+            return new PacketStream(unixtime, unixtime, frame.Data.Length, 1, new List<Frame> { frame });
         }                     
+
+
+        public static PacketStream Update(PacketStream ps, Frame f)
+        {
+            var ts = f.Timestamp.ToUnixTimeMilliseconds();
+            ps.FirstSeen = Math.Min(ps.FirstSeen, ts);
+            ps.LastSeen = Math.Max(ps.LastSeen, ts);
+            ps.Octets += f.Data.Length;
+            ps.Packets++;
+            ps.PacketList.Add(f);
+            return ps;
+        }
         /// <summary>
         /// Merges two existing flow records. It takes uuid from the first record.
         /// </summary>
@@ -106,7 +119,7 @@ namespace Tarzan.Nfx.Ingest
             TProtocol tProtocol = new TBinaryProtocol(new TStreamTransport(stream, stream));
             this.Read(tProtocol);
             reader.ReadString(nameof(ServiceName));
-            PacketList = new List<(Packet packet, PosixTimeval timeval)>();
+            PacketList = new List<Frame>();
             for(var index = 0; ; index++)
             {
                 var packet = reader.ReadByteArray($"Packet_{index.ToString("D8")}");

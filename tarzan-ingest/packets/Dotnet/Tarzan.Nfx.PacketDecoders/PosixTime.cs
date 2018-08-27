@@ -22,7 +22,7 @@ namespace Netdx.PacketDecoders
             return (long)((this.Seconds * 1000) + (this.MicroSeconds / 1000));
         }
 
-        internal static PosixTime FromUnixTimeMilliseconds(long v)
+        public static PosixTime FromUnixTimeMilliseconds(long v)
         {
             return new PosixTime((uint)(v / 1000), (uint)((v % 1000) * 1000));
         }

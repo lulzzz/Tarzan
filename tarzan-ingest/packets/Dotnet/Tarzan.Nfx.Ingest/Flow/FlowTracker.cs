@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using SharpPcap;
 
@@ -10,19 +11,18 @@ namespace Tarzan.Nfx.Ingest
 {
     class FlowTracker
     {
+        Dictionary<PacketFlowKey, PacketStream> m_flowTable;
         private ICaptureDevice m_device;
-        private FlowTable m_table;
         private FlowIndex m_index;
 
         public FlowTracker(ICaptureDevice device)
         {
             this.m_device = device;
-            m_table = new FlowTable();
             m_index = new FlowIndex(1000, 100, (int)m_device.LinkType);
+            m_flowTable = new Dictionary<PacketFlowKey, PacketStream>();
         }
 
         public FlowIndex Index => m_index;
-        public FlowTable Table => m_table;
 
         public async Task TrackAsync()
         {
@@ -45,8 +45,19 @@ namespace Tarzan.Nfx.Ingest
             }
 
             m_device.Open();
-            m_device.Capture();
-            await captureTask;
+            RawCapture packet = null;
+            while((packet = m_device.GetNextPacket()) != null)
+            { 
+                var key = PacketFlowKey.GetKey(packet.Data);
+                if (m_flowTable.TryGetValue(key, out var lst))
+                {
+                    lst.PacketList.Add(packet);
+                }
+                else
+                {
+                    m_flowTable[key] = new List<RawCapture> { packet };
+                }
+            }
             m_device.Close();
         }
     }

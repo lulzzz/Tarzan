@@ -1,9 +1,11 @@
 ﻿using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace Tarzan.Nfx.Ingest
 {
@@ -57,10 +59,10 @@ namespace Tarzan.Nfx.Ingest
         /// </summary>
         /// <param name="flows">Enumerable collection of source flows to find matching TCP streams.</param>
         /// <returns>A collection of TCP conversations.</returns>
-        public static IEnumerable<TcpConversation> Pair(IEnumerable<KeyValuePair<FlowKey, TcpStream>> flows)
+        public static IEnumerable<TcpConversation> Pair(IEnumerable<KeyValuePair<PacketFlowKey, TcpStream>> flows)
         {
-            var downFlows = flows.Where(f => f.Key.DestinationEndpoint.Port < f.Key.SourceEndpoint.Port);
-            var upFlows = flows.Where(f => f.Key.DestinationEndpoint.Port > f.Key.SourceEndpoint.Port);
+            var downFlows = flows.Where(f => f.Key.DestinationPort < f.Key.SourcePort);
+            var upFlows = flows.Where(f => f.Key.DestinationPort > f.Key.SourcePort);
             var conversationCandidates = downFlows.Join(upFlows, f => f.Key, f => f.Key, (f1, f2) => new TcpConversation { RequestFlow = f1, ResponseFlow = f2 }, new TcpConversation.Comparer());
             return conversationCandidates.Where(c => c.RequestFlow.Value.IntersectsWith(c.ResponseFlow.Value));
         }
@@ -75,9 +77,9 @@ namespace Tarzan.Nfx.Ingest
         /// the new TCP stream. 
         /// </remarks>
         /// <returns></returns>
-        public static IEnumerable<KeyValuePair<FlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<FlowKey, PacketStream>> flows)
+        public static IEnumerable<KeyValuePair<PacketFlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
         {
-            foreach (var (flowKey, flowRecord) in flows.Where(f => f.Key.Protocol == ProtocolType.TCP))
+            foreach (var (flowKey, flowRecord) in flows.Where(f => f.Key.Protocol == ProtocolType.Tcp))
             {
                 TcpStream currentFlowRecord = null;
                 // search for SYN, FIN or RST

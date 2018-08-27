@@ -1,10 +1,12 @@
 ﻿using Kaitai;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using Tarzan.Nfx.Model;
 
@@ -12,21 +14,24 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class DnsAnalyzer
     {    
-        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream flowRecord)
+        public static IEnumerable<Model.DnsObject> Inspect(PacketFlowKey flowKey, PacketStream flowRecord)
         {
-            var flowId = PacketFlow.NewUid(flowKey.Protocol.ToString(), flowKey.SourceEndpoint, flowKey.DestinationEndpoint, flowRecord.FirstSeen);
+            var sourceEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.SourceAddress.ToArray()), flowKey.SourcePort);
+            var destinationEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.DestinationAddress.ToArray()), flowKey.DestinationPort);
+
+            var flowId = PacketFlow.NewUid(flowKey.Protocol.ToString(), sourceEndpoint, destinationEndpoint, flowRecord.FirstSeen);
 
             // DNS response?
-            if (flowKey.Protocol == ProtocolType.UDP && flowKey.SourceEndpoint.Port == 53)
+            if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
             {
-                var dns = InspectPackets(flowKey.DestinationEndpoint, flowKey.SourceEndpoint, flowId, flowRecord.PacketList);
+                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, flowRecord.PacketList);
                 return dns;
             }
 
             // DNS request?
-            if (flowKey.Protocol == ProtocolType.UDP && flowKey.DestinationEndpoint.Port == 53)
+            if (flowKey.Protocol == ProtocolType.Udp && destinationEndpoint.Port == 53)
             {
-                var dns = InspectPackets(flowKey.SourceEndpoint, flowKey.DestinationEndpoint, flowId, flowRecord.PacketList);
+                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, flowRecord.PacketList);
                 return dns;
             }
             return Array.Empty<Model.DnsObject>();

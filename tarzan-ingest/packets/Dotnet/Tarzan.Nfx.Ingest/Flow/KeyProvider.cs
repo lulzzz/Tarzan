@@ -1,55 +1,55 @@
 ﻿using System;
+using System.Net;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using SharpPcap;
 
 namespace Tarzan.Nfx.Ingest
 {
-        class KeyProvider : IKeyProvider<FlowKey, (Packet, PosixTimeval)>
+        class KeyProvider : IKeyProvider<PacketFlowKey, Packet>
         {
-            public FlowKey GetKey((Packet, PosixTimeval) capture)
+        public PacketFlowKey GetKey(Packet packet)
+        {
+            PacketFlowKey GetUdpFlowKey(UdpPacket udp)
             {
-                var packet = capture.Item1;
-                FlowKey GetUdpFlowKey(UdpPacket udp)
-                {
-                    return new FlowKey()
-                    {
-                        Protocol = ProtocolType.UDP,
-                        SourceEndpoint = new IPEndPoint((udp.ParentPacket as IpPacket).SourceAddress, udp.SourcePort),
-                        DestinationEndpoint = new IPEndPoint((udp.ParentPacket as IpPacket).DestinationAddress, udp.DestinationPort),
-                    };
-                }
-                FlowKey GetTcpFlowKey(TcpPacket tcp)
-                {
-                    return new FlowKey()
-                    {
-                        Protocol = ProtocolType.TCP,
-                        SourceEndpoint = new IPEndPoint((tcp.ParentPacket as IpPacket).SourceAddress, tcp.SourcePort),
-                        DestinationEndpoint = new IPEndPoint((tcp.ParentPacket as IpPacket).DestinationAddress, tcp.DestinationPort),
-                    };
-                }
-                FlowKey GetIpFlowKey(IpPacket ip)
-                {
-                    return new FlowKey()
-                    {
-                        Protocol = ip.Version == IpVersion.IPv4 ? ProtocolType.IP : ProtocolType.IPv6,
-                        SourceEndpoint = new IPEndPoint(ip.SourceAddress, 0),
-                        DestinationEndpoint = new IPEndPoint(ip.DestinationAddress, 0),
-                    };
-                }
+                return PacketFlowKey.Create((byte)IPProtocolType.UDP,
+                    (udp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
+                    udp.SourcePort,
+                    (udp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
+                    udp.DestinationPort);
+            }
+            PacketFlowKey GetTcpFlowKey(TcpPacket tcp)
+            {
+                return PacketFlowKey.Create(
+                    (byte)IPProtocolType.TCP,
+                    (tcp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
+                    tcp.SourcePort,
+                    (tcp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
+                    tcp.DestinationPort);
+            }
+            PacketFlowKey GetIpFlowKey(IpPacket ip)
+            {
+                return PacketFlowKey.Create(
+                    (byte)(ip.Version == IpVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
+                    ip.SourceAddress.GetAddressBytes(), 0,
+                    ip.DestinationAddress.GetAddressBytes(), 0
+                );
+            }
 
-                switch ((TransportPacket)packet.Extract(typeof(TransportPacket)))
-                {
-                    case UdpPacket udp: return GetUdpFlowKey(udp);
-                    case TcpPacket tcp: return GetTcpFlowKey(tcp);
-                    default:
-                        switch ((InternetPacket)packet.Extract(typeof(InternetPacket)))
-                        {
-                            case IpPacket ip: return GetIpFlowKey(ip);
-                            default: return FlowKey.None;
+            switch ((TransportPacket)packet.Extract(typeof(TransportPacket)))
+            {
+                case UdpPacket udp: return GetUdpFlowKey(udp);
+                case TcpPacket tcp: return GetTcpFlowKey(tcp);
+                default:
+                    switch ((InternetPacket)packet.Extract(typeof(InternetPacket)))
+                    {
+                        case IpPacket ip: return GetIpFlowKey(ip);
+                        default:
+                            return PacketFlowKey.Create((byte)IPProtocolType.NONE,
+                       IPAddress.None.GetAddressBytes(), 0, IPAddress.None.GetAddressBytes(), 0);
 
-                        }
-                }
+                    }
             }
         }
 }

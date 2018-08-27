@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
+
 namespace Tarzan.Nfx.Ingest
 {
     /// <summary>
@@ -43,7 +45,7 @@ namespace Tarzan.Nfx.Ingest
 
             public PcapPseudoheader Header => m_header;
 
-            public bool Add(FlowKey flowkey)
+            public bool Add(PacketFlowKey flowkey)
             {
                 lock (m_syncObject)
                 {
@@ -59,12 +61,19 @@ namespace Tarzan.Nfx.Ingest
                     }
                 }
             }
-            public bool Contains(FlowKey flowkey)
+            public bool Contains(PacketFlowKey flowkey)
             {
                 return m_filter.Contains(flowkey.ToString());
             }
+
+
         }
 
+        public class PcapPseudoheader
+        {
+            public int LinkType { get; set; }
+            public long FileOffset { get; set; }
+        }
 
         int m_linkType;
         int m_packetFlowRatio;
@@ -94,7 +103,7 @@ namespace Tarzan.Nfx.Ingest
             m_lastBlock = null;
         }
 
-        public void Add(int packetNumber, long packetOffset, FlowKey flowkey)
+        public void Add(int packetNumber, long packetOffset, PacketFlowKey flowkey)
         {
 
             if (m_lastBlock == null)
@@ -115,7 +124,7 @@ namespace Tarzan.Nfx.Ingest
         /// </summary>
         /// <param name="flowKey"></param>
         /// <returns>An enumerable of blocks containg the packets of the given flow key.</returns>
-        public IEnumerable<PcapPseudoheader> Filter(FlowKey flowKey)
+        public IEnumerable<PcapPseudoheader> Filter(PacketFlowKey flowKey)
         {
             return m_filterArray.Where(x => x.Contains(flowKey)).Select(x => x.Header); 
         }
