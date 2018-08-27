@@ -1,15 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using Apache.Ignite.Core.Binary;
 using Netdx.ConversationTracker;
 using PacketDotNet;
-using SharpPcap;
-using System.Linq;
-using Apache.Ignite.Core.Binary;
-using Thrift.Protocol;
-using System.IO;
-using Thrift.Transport;
 using PacketDotNet.Ieee80211;
+using SharpPcap;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Thrift.Protocol;
+using Thrift.Transport;
 
 namespace Tarzan.Nfx.Ingest
 {

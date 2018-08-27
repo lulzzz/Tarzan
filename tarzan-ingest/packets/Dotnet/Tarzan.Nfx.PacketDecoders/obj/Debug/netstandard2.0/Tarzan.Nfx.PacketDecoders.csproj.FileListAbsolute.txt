@@ -1,0 +1,9 @@
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\bin\Debug\netstandard2.0\Netdx.PacketDecoders.deps.json
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\bin\Debug\netstandard2.0\Netdx.PacketDecoders.dll
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\bin\Debug\netstandard2.0\Netdx.PacketDecoders.pdb
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Tarzan.Nfx.PacketDecoders.csprojAssemblyReference.cache
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Tarzan.Nfx.PacketDecoders.csproj.CoreCompileInputs.cache
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Tarzan.Nfx.PacketDecoders.AssemblyInfoInputs.cache
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Tarzan.Nfx.PacketDecoders.AssemblyInfo.cs
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Netdx.PacketDecoders.dll
+C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\obj\Debug\netstandard2.0\Netdx.PacketDecoders.pdb

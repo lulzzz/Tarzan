@@ -362,17 +362,16 @@
           }
         }
       },
-      "Netdx.ConversationTracker/1.0.0": {
+      "MurmurHash.NETStandard/1.0.0": {
         "type": "package",
         "dependencies": {
-          "System.Memory": "4.4.0-preview1-25305-02",
-          "Tnidea.Thrift": "0.9.3"
+          "NETStandard.Library": "1.6.1"
         },
         "compile": {
-          "lib/netstandard2.0/Netdx.ConversationTracker.dll": {}
+          "lib/netstandard1.4/MurmurHash-net-core.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/Netdx.ConversationTracker.dll": {}
+          "lib/netstandard1.4/MurmurHash-net-core.dll": {}
         }
       },
       "NETStandard.Library/2.0.0": {
@@ -1431,7 +1430,7 @@
           "lib/netstandard1.6/System.Linq.Expressions.dll": {}
         }
       },
-      "System.Memory/4.5.0": {
+      "System.Memory/4.5.1": {
         "type": "package",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.5.0"
@@ -1796,10 +1795,10 @@
           "ref/netstandard1.5/System.Runtime.dll": {}
         }
       },
-      "System.Runtime.CompilerServices.Unsafe/4.5.0": {
+      "System.Runtime.CompilerServices.Unsafe/4.5.1": {
         "type": "package",
         "compile": {
-          "ref/netstandard2.0/_._": {}
+          "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
           "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll": {}
@@ -2424,6 +2423,21 @@
           "lib/netstandard1.3/Tnidea.Thrift.dll": {}
         }
       },
+      "Netdx.PacketDecoders/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "MurmurHash.NETStandard": "1.0.0",
+          "System.Memory": "4.5.1",
+          "System.Runtime.CompilerServices.Unsafe": "4.5.1"
+        },
+        "compile": {
+          "bin/placeholder/Netdx.PacketDecoders.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Netdx.PacketDecoders.dll": {}
+        }
+      },
       "Tarzan.Nfx.Model/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -2975,14 +2989,14 @@
         "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Registry.dll"
       ]
     },
-    "Netdx.ConversationTracker/1.0.0": {
-      "sha512": "Amq9ThIKEDRpH1l/HoWKGcp7c9tGSS0+JuWKae6TpxTLNXvgFrngvWJ1F3BNbFoum+GUm/X+4E1DCt/kqep/Qw==",
+    "MurmurHash.NETStandard/1.0.0": {
+      "sha512": "lLRxC9lpvargERqamiNHNVmBqrz0oU4Ctf57ZBOcNzOTSDYu8xIT0LDy4nWFqi6slt4JpvuQ4Qm0vh2F5wqUhg==",
       "type": "package",
-      "path": "netdx.conversationtracker/1.0.0",
+      "path": "murmurhash.netstandard/1.0.0",
       "files": [
-        "lib/netstandard2.0/Netdx.ConversationTracker.dll",
-        "netdx.conversationtracker.1.0.0.nupkg.sha512",
-        "netdx.conversationtracker.nuspec"
+        "lib/netstandard1.4/MurmurHash-net-core.dll",
+        "murmurhash.netstandard.1.0.0.nupkg.sha512",
+        "murmurhash.netstandard.nuspec"
       ]
     },
     "NETStandard.Library/2.0.0": {
@@ -4700,39 +4714,25 @@
         "system.linq.expressions.nuspec"
       ]
     },
-    "System.Memory/4.5.0": {
-      "sha512": "P56/L4B9vhz0YFTC4qIXFgx+VgMhg3JhCm5/EASihTotyjwmBt2QEAQdmd2tNctYET/w0CRJzVH1cwxgbKGnDQ==",
+    "System.Memory/4.5.1": {
+      "sha512": "vcG3/MbfpxznMkkkaAblJi7RHOmuP7kawQMhDgLSuA1tRpRQYsFSCTxRSINDUgn2QNn2jWeLxv8er5BXbyACkw==",
       "type": "package",
-      "path": "system.memory/4.5.0",
+      "path": "system.memory/4.5.1",
       "files": [
         ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
         "lib/netcoreapp2.1/_._",
         "lib/netstandard1.1/System.Memory.dll",
         "lib/netstandard1.1/System.Memory.xml",
         "lib/netstandard2.0/System.Memory.dll",
         "lib/netstandard2.0/System.Memory.xml",
-        "lib/uap10.0.16300/_._",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "ref/MonoAndroid10/_._",
-        "ref/MonoTouch10/_._",
         "ref/netcoreapp2.1/_._",
         "ref/netstandard1.1/System.Memory.dll",
         "ref/netstandard1.1/System.Memory.xml",
         "ref/netstandard2.0/System.Memory.dll",
         "ref/netstandard2.0/System.Memory.xml",
-        "ref/uap10.0.16300/_._",
-        "ref/xamarinios10/_._",
-        "ref/xamarinmac20/_._",
-        "ref/xamarintvos10/_._",
-        "ref/xamarinwatchos10/_._",
-        "system.memory.4.5.0.nupkg.sha512",
+        "system.memory.4.5.1.nupkg.sha512",
         "system.memory.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -5690,10 +5690,10 @@
         "system.runtime.nuspec"
       ]
     },
-    "System.Runtime.CompilerServices.Unsafe/4.5.0": {
-      "sha512": "6zBxkHYemB0kQiHP3vGXGRXejZVoNVuMn2paUuqKKi5Wyjkxfkp+D0rd0c3VrGwotidRINt6KpOi2smL4VkJKw==",
+    "System.Runtime.CompilerServices.Unsafe/4.5.1": {
+      "sha512": "qUJMNWhbm9oZ3XaMFiEMiYmRPszbnXIkRIi7+4b2Md2xZ6JUOepf0/kY3S85qistRohl9OdMe4PsO+RdG2kTIQ==",
       "type": "package",
-      "path": "system.runtime.compilerservices.unsafe/4.5.0",
+      "path": "system.runtime.compilerservices.unsafe/4.5.1",
       "files": [
         ".signature.p7s",
         "LICENSE.TXT",
@@ -5704,13 +5704,11 @@
         "lib/netstandard1.0/System.Runtime.CompilerServices.Unsafe.xml",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/uap10.0.16300/_._",
         "ref/netstandard1.0/System.Runtime.CompilerServices.Unsafe.dll",
         "ref/netstandard1.0/System.Runtime.CompilerServices.Unsafe.xml",
         "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "ref/uap10.0.16300/_._",
-        "system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512",
+        "system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512",
         "system.runtime.compilerservices.unsafe.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -7204,6 +7202,11 @@
         "tnidea.thrift.nuspec"
       ]
     },
+    "Netdx.PacketDecoders/1.0.0": {
+      "type": "project",
+      "path": "../Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj",
+      "msbuildProject": "../Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj"
+    },
     "Tarzan.Nfx.Model/1.0.0": {
       "type": "project",
       "path": "../../../../tarzan-models/Tarzan.Nfx.Model/Tarzan.Nfx.Model.csproj",
@@ -7216,7 +7219,7 @@
       "CassandraCSharpDriver >= 3.6.0",
       "Microsoft.Extensions.CommandLineUtils >= 1.1.1",
       "Microsoft.NETCore.App >= 2.0.0",
-      "Netdx.ConversationTracker >= 1.0.0",
+      "Netdx.PacketDecoders >= 1.0.0",
       "Newtonsoft.Json >= 11.0.2",
       "PacketDotNet.Standard >= 0.16.0",
       "SharpPcap.Standard >= 4.4.0",
@@ -7225,27 +7228,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
+    "C:\\Users\\rysavy\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\Tarzan.Nfx.Ingest.csproj",
+      "projectUniqueName": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\Tarzan.Nfx.Ingest.csproj",
       "projectName": "Tarzan.Nfx.Ingest",
-      "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\Tarzan.Nfx.Ingest.csproj",
-      "packagesPath": "C:\\Users\\Ondrej Rysavy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\obj\\",
+      "projectPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\Tarzan.Nfx.Ingest.csproj",
+      "packagesPath": "C:\\Users\\rysavy\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Ingest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Ondrej Rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
+        "C:\\Users\\rysavy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
@@ -7257,8 +7257,11 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj": {
-              "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj"
+            "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.PacketDecoders\\Tarzan.Nfx.PacketDecoders.csproj": {
+              "projectPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.PacketDecoders\\Tarzan.Nfx.PacketDecoders.csproj"
+            },
+            "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj": {
+              "projectPath": "C:\\Users\\rysavy\\Documents\\GitHub\\Tarzan\\tarzan-models\\Tarzan.Nfx.Model\\Tarzan.Nfx.Model.csproj"
             }
           }
         }
@@ -7288,10 +7291,6 @@
             "target": "Package",
             "version": "[2.0.0, )",
             "autoReferenced": true
-          },
-          "Netdx.ConversationTracker": {
-            "target": "Package",
-            "version": "[1.0.0, )"
           },
           "Newtonsoft.Json": {
             "target": "Package",
