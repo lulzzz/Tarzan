@@ -1,5 +1,6 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache;
 using Apache.Ignite.Core.Cache.Configuration;
 using Apache.Ignite.Core.Client;
 using Apache.Ignite.Core.Compute;
@@ -10,6 +11,7 @@ using Apache.Ignite.Core.Log;
 using Apache.Ignite.Core.Resource;
 using Microsoft.Extensions.CommandLineUtils;
 using Netdx.ConversationTracker;
+using Netdx.PacketDecoders;
 using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
@@ -23,7 +25,7 @@ using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
 {
-    class TrackFlows
+    partial class TrackFlows
     {
         public static string Name => "track-flows";
         public static Action<CommandLineApplication> Configuration =>
@@ -33,46 +35,24 @@ namespace Tarzan.Nfx.Ingest
 
                 var optionInputFile = target.Option("-file", "Read packet data from specified PCAP file. The file should have any supported capture file format (including gzipped files).", CommandOptionType.SingleValue);
                 var optionInputFolder = target.Option("-folder", "Read packet data from PCAP files in the specified folder.", CommandOptionType.SingleValue);
-                var optionInterface = target.Option("-live", "Read packet data from the network interface.", CommandOptionType.SingleValue);
+
                 var optionCassandra = target.Option("-cassandra", "Specifies address of the Cassandra DB node to store flow records.", CommandOptionType.SingleValue);
                 var optionKeyspace = target.Option("-namespace", "Specifies the keyspace in Cassandra DB.", CommandOptionType.SingleValue);
                 var optionCreate = target.Option("-create", "Creates/initializes the keyspace in Cassandra DB. The existing keyspace will be deleted.", CommandOptionType.NoValue);
-                var optionSequential = target.Option("-sequential", "Run in sequential mode.", CommandOptionType.NoValue);
+
+                var optionRunInParallel = target.Option("-parallel", "Run in parallel mode.", CommandOptionType.NoValue);
                 var optionIgnite = target.Option("-ignite", "Run as Ignite client. Processing occurs in Ignite server cluster.", CommandOptionType.NoValue);
 
-                IEnumerable<(ICaptureDevice Device, FileInfo Info)> GetInputDevice(IEnumerable<FileInfo> inputFileList)
+                IEnumerable<(ICaptureDevice Device, FileInfo Info)> GetDevicesForFiles(IEnumerable<FileInfo> inputFileList)
                 {
                     var devices = new List<(ICaptureDevice Device, FileInfo Info)>();
                     foreach(var fileinfo in inputFileList)
                     { 
                         var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
-                        LinkLayers = inputDevice.LinkType;
                         devices.Add((inputDevice, fileinfo));
-                    }
-                    if (optionInterface.HasValue())
-                    {
-                        if (Int32.TryParse(optionInterface.Value(), out var interfaceIndex))
-                        {
-                            if (interfaceIndex < CaptureDeviceList.Instance.Count)
-                            {
-                                
-                                var inputDevice = CaptureDeviceList.Instance[interfaceIndex];
-                                LinkLayers = inputDevice.LinkType;
-                                devices.Add((inputDevice, new FileInfo(inputDevice.Name)));
-                            }
-                            else
-                            {
-                                throw new ArgumentException($"Interface index: {optionInterface.Value()} is invalid. This value should be between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
-                            }
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"Invalid interface index: {optionInterface.Value()}. This should be an integer value between 0 and {CaptureDeviceList.Instance.Count - 1}. Use print-interfaces command to see available options.");
-                        }
                     }
                     return devices;
                 }
-
 
                 Action<(ICaptureDevice Device, FileInfo Info)> CreateProcessor(CassandraWriter cassandraWriter)
                 {
@@ -88,11 +68,7 @@ namespace Tarzan.Nfx.Ingest
                         Console.WriteLine($"{DateTime.Now} Tracking flows finished, flow count={flowTracker.FlowTable.Count}");
 
                         Console.WriteLine($"{DateTime.Now} Start detecting services.");
-                        var serviceDetector = new ServiceDetector();
-                        foreach (var flow in flowTracker.FlowTable)
-                        {
-                            flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
-                        }
+
                         Console.WriteLine($"{DateTime.Now} Detecting services finished.");
 
                         Console.WriteLine($"{DateTime.Now} Writing data...");
@@ -100,9 +76,9 @@ namespace Tarzan.Nfx.Ingest
                     };
                 }
 
-                target.OnExecute(() =>
-                {
 
+                IList<FileInfo> GetFileList()
+                {
                     var fileList = new List<FileInfo>();
                     if (optionInputFolder.HasValue())
                     {
@@ -110,7 +86,6 @@ namespace Tarzan.Nfx.Ingest
                         foreach (var fileinfo in dir.EnumerateFiles("*.?cap"))
                         {
                             var inputDevice = new CaptureFileReaderDevice(fileinfo.FullName);
-                            LinkLayers = inputDevice.LinkType;
                             fileList.Add(fileinfo);
                         }
                     }
@@ -119,43 +94,48 @@ namespace Tarzan.Nfx.Ingest
                         var fileinfo = new FileInfo(optionInputFile.Value());
                         fileList.Add(fileinfo);
                     }
+                    return fileList;
+                }
 
-                    if (optionIgnite.HasValue())
+                target.OnExecute(() =>
+                {
+
+                    var fileList = GetFileList();
+
+                    if (fileList.Count == 0)
                     {
-                        RunAsIgnite(fileList.Select(x=>x.FullName));
-                        return 0;
+                        throw new ArgumentException("At least one source file has to be specified.");
                     }
 
+                    // initialize Cassandra datastore:
                     if (!optionKeyspace.HasValue())
                     {
                         throw new ArgumentException("Keyspace is not specified.");
                     }
 
                     var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(optionCassandra.Value() ?? "localhost:9042", 9042), optionKeyspace.Value());
+
                     if (optionCreate.HasValue())
                     {
                         Console.WriteLine($"{DateTime.Now} Deleting keyspace '{optionKeyspace.Value()}'...");
                         cassandraWriter.DeleteKeyspace();
                     }
 
-                    var devices = GetInputDevice(fileList);
-
                     Console.WriteLine($"{DateTime.Now} Initializing keyspace '{optionKeyspace.Value()}'...");
                     cassandraWriter.Initialize();
 
-                    var processInput = CreateProcessor(cassandraWriter);
+                    // run processing pipeline:
 
-                    if (optionSequential.HasValue())
+                    if (optionIgnite.HasValue())
                     {
-                        foreach (var device in devices)
-                        {
-                            processInput(device);
-                        }
+                        RunAsIgnite(cassandraWriter, fileList.Select(x => x.FullName));
+                        return 0;
                     }
                     else
                     {
-                        Parallel.ForEach(devices, processInput);
+                        RunInProcess(fileList.Select(x => x.FullName), optionRunInParallel.HasValue());
                     }
+
                     Console.WriteLine($"{DateTime.Now} All Done. Closing connection to Cassandra..");
                     cassandraWriter.Shutdown();
                     Console.WriteLine($"{DateTime.Now} Ok.");
@@ -164,33 +144,41 @@ namespace Tarzan.Nfx.Ingest
             };
 
 
+        static void RunInProcess(IEnumerable<string> fileList, bool parallel)
+        {
+            if (parallel)
+            {
+                Parallel.ForEach(fileList, x => { var c = new TrackFlowComputeAction { FileName = x }; c.Invoke(); });
+            }
+            else
+            {
+                foreach (var filename in fileList)
+                {
+                    var c = new TrackFlowComputeAction { FileName = filename }; c.Invoke();
+                }
+            }
+        }
 
-
-        static void RunAsIgnite(IEnumerable<string> fileList)
+        static void RunAsIgnite(CassandraWriter cassandraWriter, IEnumerable<string> fileList)
         {          
             using (var ignite = Ignition.Start(GlobalIgniteConfiguration.Default))
             {
                 var compute = ignite.GetCluster().GetCompute();
-                compute.Run(fileList.Select(x=> new ComputeAction { FileName = x }));
-                // get inform about results:
+                compute.Run(fileList.Select(x=> new TrackFlowComputeAction { FileName = x }));
+
                 var cache = FlowCache.GetCache(ignite);
                 Console.WriteLine($"Total flows {cache.Count()}");
-            }
-        }
 
-        class ComputeAction : IComputeAction
-        {
-            public string FileName { get; set; }
+                var serviceDetector = new ServiceDetector();
+                foreach (var flow in cache)
+                {
+                    flow.Value.ServiceName = serviceDetector.DetectService(flow.Key, flow.Value);
+                    cache.Invoke()
+                    cache.Put(flow.Key, flow.Value);
+                }
 
-            [InstanceResource]
-            private readonly IIgnite m_ignite;
+                cassandraWriter.WriteAll(input.Info, flowTracker.FlowTable);
 
-            public void Invoke()
-            {
-                Console.WriteLine($"APP: Start processing file '{FileName}'");
-                var flowTracker = new IgniteFlowTracker(m_ignite, FileName);
-                flowTracker.Track();
-                Console.WriteLine($"APP: Processing done.");
             }
         }
 
@@ -210,7 +198,32 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        public static LinkLayers LinkLayers { get; private set; }
+        class UpdateServiceName : ICacheEntryProcessor<PacketFlowKey, PacketStream, string, PacketStream>
+        {
+            public PacketStream Process(IMutableCacheEntry<PacketFlowKey, PacketStream> entry, string arg)
+            {
+                entry.Value.ServiceName = arg;
+                return entry.Value;
+            }
+        }
+
+        private class DetectServiceComputeAction : IComputeAction
+        {
+            ServiceDetector m_serviceDetector = new ServiceDetector();
+            [InstanceResource]
+            private readonly IIgnite m_ignite;
+            public void Invoke()
+            {
+                // GET all local flows and identify their service names:
+                var cache = FlowCache.GetLocalCache(m_ignite);
+                var updateServiceName = new UpdateServiceName();
+                foreach (var flow in cache)
+                {
+                    var serviceName = m_serviceDetector.DetectService(flow.Key, flow.Value);
+                    cache.Invoke(flow.Key, updateServiceName, serviceName);
+                }
+            }
+        }
     }
 }
 

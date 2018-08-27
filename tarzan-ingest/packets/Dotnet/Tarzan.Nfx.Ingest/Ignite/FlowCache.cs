@@ -40,5 +40,10 @@ namespace Tarzan.Nfx.Ingest.Ignite
         {
             return this.Cache.Ignite.GetDataStreamer<PacketFlowKey, PacketStream>(nameof(FlowCache));
         }
+
+        internal static ICache<PacketFlowKey, PacketStream> GetLocalCache(object ignite)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
