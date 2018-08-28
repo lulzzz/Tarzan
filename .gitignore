@@ -326,3 +326,17 @@ node_modules/
 # Local History for Visual Studio
 .localhistory/
 
+*.pdb
+*.pdb
+tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Model.dll
+tarzan-models/Tarzan.Nfx.Model/obj/Debug/netstandard2.0/Tarzan.Nfx.Model.dll
+tarzan-models/Tarzan.Nfx.Model/obj/Debug/netstandard2.0/Tarzan.Nfx.Model.pdb
+tarzan-models/Tarzan.Nfx.Model/bin/Debug/netstandard2.0/Tarzan.Nfx.Model.dll
+tarzan-models/Tarzan.Nfx.Model/bin/Debug/netstandard2.0/Tarzan.Nfx.Model.pdb
+tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/obj/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.dll
+tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/obj/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.pdb
+.vs/Tarzan/v15/.suo
+.vs/Tarzan/v15/Server/sqlite3/storage.ide
+.vs/Tarzan/v15/Server/sqlite3/storage.ide-wal
+tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.dll
+tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.pdb

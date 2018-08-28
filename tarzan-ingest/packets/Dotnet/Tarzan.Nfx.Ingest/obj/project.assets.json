@@ -13,6 +13,19 @@
           "lib/net40/Apache.Ignite.exe": {}
         }
       },
+      "Apache.Ignite.Linq/2.6.0": {
+        "type": "package",
+        "dependencies": {
+          "Apache.Ignite": "[2.6.0]",
+          "Remotion.Linq": "[2.0.1]"
+        },
+        "compile": {
+          "lib/net40/Apache.Ignite.Linq.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Apache.Ignite.Linq.dll": {}
+        }
+      },
       "CassandraCSharpDriver/3.6.0": {
         "type": "package",
         "dependencies": {
@@ -634,6 +647,15 @@
           "lib/netstandard2.0/System.dll": {},
           "lib/netstandard2.0/mscorlib.dll": {},
           "lib/netstandard2.0/netstandard.dll": {}
+        }
+      },
+      "Remotion.Linq/2.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Remotion.Linq.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Remotion.Linq.dll": {}
         }
       },
       "runtime.native.System/4.0.0": {
@@ -2502,6 +2524,18 @@
         "tools/Uninstall.ps1"
       ]
     },
+    "Apache.Ignite.Linq/2.6.0": {
+      "sha512": "RylyOOMYDTZrwEVYwSwTj8HEoCt6cfplN3DWb7kVcXpiJBC9mwyEXkWQ/qSsVQQhEDPPhawCWwYOxw/oXUpc4Q==",
+      "type": "package",
+      "path": "apache.ignite.linq/2.6.0",
+      "files": [
+        "apache.ignite.linq.2.6.0.nupkg.sha512",
+        "apache.ignite.linq.nuspec",
+        "lib/net40/Apache.Ignite.Linq.XML",
+        "lib/net40/Apache.Ignite.Linq.dll",
+        "linqpad-samples/QueryExample.linq"
+      ]
+    },
     "CassandraCSharpDriver/3.6.0": {
       "sha512": "Hgo0MNRoQ5Gmo8rnKY0vEWMYwhpSq8XJ6kxShMYbzmvxdL9WSkfVhTUEdFnHzhyzTfQmTbdvT06LEABWKrmvag==",
       "type": "package",
@@ -3278,6 +3312,23 @@
         "lib/netstandard2.0/netstandard.xml",
         "packetdotnet.standard.0.16.0.nupkg.sha512",
         "packetdotnet.standard.nuspec"
+      ]
+    },
+    "Remotion.Linq/2.0.1": {
+      "sha512": "SIO6HDH6CU9GC2IZGBrc6q5X5vRhfatXrg9cVavCEG9W6v5e88b+vXjmLGQEorch4sYEIImRr+ODyUMyrmrqAg==",
+      "type": "package",
+      "path": "remotion.linq/2.0.1",
+      "files": [
+        "lib/net35/Remotion.Linq.XML",
+        "lib/net35/Remotion.Linq.dll",
+        "lib/net40/Remotion.Linq.XML",
+        "lib/net40/Remotion.Linq.dll",
+        "lib/net45/Remotion.Linq.dll",
+        "lib/net45/Remotion.Linq.xml",
+        "lib/portable-net45+win+wpa81+wp80/Remotion.Linq.dll",
+        "lib/portable-net45+win+wpa81+wp80/Remotion.Linq.xml",
+        "remotion.linq.2.0.1.nupkg.sha512",
+        "remotion.linq.nuspec"
       ]
     },
     "runtime.native.System/4.0.0": {
@@ -7216,6 +7267,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "Apache.Ignite >= 2.6.0",
+      "Apache.Ignite.Linq >= 2.6.0",
       "CassandraCSharpDriver >= 3.6.0",
       "Microsoft.Extensions.CommandLineUtils >= 1.1.1",
       "Microsoft.NETCore.App >= 2.0.0",
@@ -7279,6 +7331,10 @@
             "target": "Package",
             "version": "[2.6.0, )"
           },
+          "Apache.Ignite.Linq": {
+            "target": "Package",
+            "version": "[2.6.0, )"
+          },
           "CassandraCSharpDriver": {
             "target": "Package",
             "version": "[3.6.0, )"
@@ -7324,6 +7380,26 @@
       "warningLevel": 1,
       "message": "Package 'Apache.Ignite 2.6.0' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.0'. This package may not be fully compatible with your project.",
       "libraryId": "Apache.Ignite",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Apache.Ignite.Linq 2.6.0' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Apache.Ignite.Linq",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Remotion.Linq 2.0.1' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Remotion.Linq",
       "targetGraphs": [
         ".NETCoreApp,Version=v2.0"
       ]

@@ -1,49 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Apache.Ignite.Core;
+﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Cache;
+using Apache.Ignite.Core.Cache.Query;
+using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Datastream;
-using Netdx.ConversationTracker;
+using Apache.Ignite.Core.Resource;
 using Netdx.PacketDecoders;
+using System;
+using System.Threading.Tasks;
 
 namespace Tarzan.Nfx.Ingest.Ignite
 {
-    class FlowCache
+    public class FlowCache
     {
-        public static ICache<PacketFlowKey, PacketStream> GetCache(IIgnite ignite) => ignite.GetOrCreateCache<PacketFlowKey, PacketStream>(nameof(FlowCache));
+        readonly ICacheEntryProcessor<PacketFlowKey, PacketStream, PacketStream, PacketStream> m_cacheEntryProcessor = new MergePacketStream();
 
-        CacheEntryProcessor m_cacheEntryProcessor = new CacheEntryProcessor();
+        class MergePacketStream : ICacheEntryProcessor<PacketFlowKey, PacketStream, PacketStream, PacketStream>
+        {
+            public PacketStream Process(IMutableCacheEntry<PacketFlowKey, PacketStream> entry, PacketStream arg)
+            {
+                entry.Value = PacketStream.Merge(entry.Value, arg);
+                return entry.Value;
+            }
+        }
+
         public ICache<PacketFlowKey, PacketStream> Cache { get; private set; }
 
         public FlowCache(IIgnite ignite)
         {
-            this.Cache = FlowCache.GetCache(ignite);
+            this.Cache = GetCache(ignite);
         }
+
         public async Task<PacketStream> UpdateAsync(PacketFlowKey key, PacketStream value)
         {
             return await Cache.InvokeAsync(key, m_cacheEntryProcessor, value);
         }
 
-        class CacheEntryProcessor : ICacheEntryProcessor<PacketFlowKey, PacketStream, PacketStream, PacketStream>
-        {
-            public PacketStream Process(IMutableCacheEntry<PacketFlowKey, PacketStream> entry, PacketStream arg)
-            {
-                entry.Value = entry.Exists ? PacketStream.Merge(entry.Value, arg) : arg;
-                return entry.Value;
-            }
-        }
-
-        internal IDataStreamer<PacketFlowKey, PacketStream> GetDataStreamer()
+        public IDataStreamer<PacketFlowKey, PacketStream> GetDataStreamer()
         {
             return this.Cache.Ignite.GetDataStreamer<PacketFlowKey, PacketStream>(nameof(FlowCache));
         }
 
-        internal static ICache<PacketFlowKey, PacketStream> GetLocalCache(object ignite)
-        {
-            throw new NotImplementedException();
-        }
+        public static ICache<PacketFlowKey, PacketStream> GetCache(IIgnite ignite) => ignite.GetOrCreateCache<PacketFlowKey, PacketStream>(nameof(FlowCache));
     }
 }

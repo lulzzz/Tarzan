@@ -2,9 +2,7 @@
 using Cassandra.Data.Linq;
 using Cassandra.Mapping;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace Tarzan.Nfx.Model.Cassandra
 {
@@ -13,25 +11,15 @@ namespace Tarzan.Nfx.Model.Cassandra
     /// </summary>
     public class AffDataset : IAffDataset
     {
-        private IPEndPoint m_endpoint;
-        private string m_keyspace;
-        private ISession m_session;
+        private readonly IPEndPoint m_endpoint;
+        private readonly string m_keyspace;
         private IMapper m_mapper;
-
-        private Table<Capture> m_captureTable;
-        private Table<PacketFlow> m_flowTable;
-        private Table<Host> m_hostTable;
-        private Table<Service> m_serviceTable;
-        private Table<DnsObject> m_dnsTable;
-        private Table<HttpObject> m_httpTable;
-        private Table<AffObject> m_catalogueTable;
-        private Table<AffStatement> m_relationsTable;
 
         /// <summary>
         /// Gets the current session used by this <see cref="AffDataset"/> object. Session object enables to 
         /// manipulate with database connection.
         /// </summary>
-        public ISession Session => m_session;
+        public ISession Session { get; private set; }
 
         public AffDataset(IPEndPoint endpoint, string keyspace)
         {
@@ -44,7 +32,7 @@ namespace Tarzan.Nfx.Model.Cassandra
         /// </summary>
         public void Close()
         {
-            m_session.Cluster.Shutdown();
+            Session.Cluster.Shutdown();
         }
 
         /// <summary>
@@ -54,7 +42,7 @@ namespace Tarzan.Nfx.Model.Cassandra
         {
             ModelMapping.AutoRegister(MappingConfiguration.Global);
             var cluster = Cluster.Builder().AddContactPoint(m_endpoint).WithDefaultKeyspace(m_keyspace).Build();
-            m_session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
+            Session = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
             CreateTables();
         }
 
@@ -64,22 +52,22 @@ namespace Tarzan.Nfx.Model.Cassandra
         private void CreateTables()
         {
 
-            m_captureTable = new Table<Model.Capture>(m_session);
-            m_captureTable.CreateIfNotExists();
-            m_flowTable = new Table<Model.PacketFlow>(m_session);
-            m_flowTable.CreateIfNotExists();
-            m_hostTable = new Table<Model.Host>(m_session);
-            m_hostTable.CreateIfNotExists();
-            m_serviceTable = new Table<Model.Service>(m_session);
-            m_serviceTable.CreateIfNotExists();
-            m_dnsTable = new Table<Model.DnsObject>(m_session);
-            m_dnsTable.CreateIfNotExists();
-            m_httpTable = new Table<Model.HttpObject>(m_session);
-            m_httpTable.CreateIfNotExists();
-            m_catalogueTable = new Table<Model.AffObject>(m_session);
-            m_catalogueTable.CreateIfNotExists();
-            m_relationsTable = new Table<Model.AffStatement>(m_session);
-            m_relationsTable.CreateIfNotExists();
+            CaptureTable = new Table<Model.Capture>(Session);
+            CaptureTable.CreateIfNotExists();
+            FlowTable = new Table<Model.PacketFlow>(Session);
+            FlowTable.CreateIfNotExists();
+            HostTable = new Table<Model.Host>(Session);
+            HostTable.CreateIfNotExists();
+            ServiceTable = new Table<Model.Service>(Session);
+            ServiceTable.CreateIfNotExists();
+            DnsTable = new Table<Model.DnsObject>(Session);
+            DnsTable.CreateIfNotExists();
+            HttpTable = new Table<Model.HttpObject>(Session);
+            HttpTable.CreateIfNotExists();
+            CatalogueTable = new Table<Model.AffObject>(Session);
+            CatalogueTable.CreateIfNotExists();
+            RelationsTable = new Table<Model.AffStatement>(Session);
+            RelationsTable.CreateIfNotExists();
         }
 
         /// <summary>
@@ -89,20 +77,20 @@ namespace Tarzan.Nfx.Model.Cassandra
         {
             get
             {
-                if (m_session == null) throw new InvalidOperationException("Invalid session object.");
-                if (m_mapper == null) m_mapper = new Mapper(m_session);
+                if (Session == null) throw new InvalidOperationException("Invalid session object.");
+                if (m_mapper == null) m_mapper = new Mapper(Session);
                 return m_mapper;
             }
         }
 
-        public Table<PacketFlow> FlowTable { get => m_flowTable;  }
-        public Table<Host> HostTable { get => m_hostTable;  }
-        public Table<Service> ServiceTable { get => m_serviceTable;  }
-        public Table<DnsObject> DnsTable { get => m_dnsTable;  }
-        public Table<HttpObject> HttpTable { get => m_httpTable; }
-        public Table<AffObject> CatalogueTable { get => m_catalogueTable;  }
-        public Table<AffStatement> RelationsTable { get => m_relationsTable; }
-        public Table<Capture> CaptureTable { get => m_captureTable; }
+        public Table<PacketFlow> FlowTable { get; private set; }
+        public Table<Host> HostTable { get; private set; }
+        public Table<Service> ServiceTable { get; private set; }
+        public Table<DnsObject> DnsTable { get; private set; }
+        public Table<HttpObject> HttpTable { get; private set; }
+        public Table<AffObject> CatalogueTable { get; private set; }
+        public Table<AffStatement> RelationsTable { get; private set; }
+        public Table<Capture> CaptureTable { get; private set; }
 
 
         /// <summary>

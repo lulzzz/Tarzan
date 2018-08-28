@@ -16,7 +16,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            Console.Write($"APP: Start processing file '{FileName}'");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Start processing file '{FileName}'...");
 
             var device = new FastPcapFileReaderDevice(FileName);
             device.Open();
@@ -28,10 +28,12 @@ namespace Tarzan.Nfx.Ingest
             flowTracker.CaptureAll();
 
             device.Close();
-            sw.Stop();
+           
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
 
-            Console.WriteLine($"Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
+            sw.Restart();
 
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Streaming to global FLOW CACHE...");
             var globalFlowTable = new FlowCache(_ignite);
             using (var loader = globalFlowTable.GetDataStreamer())
             {
@@ -40,7 +42,8 @@ namespace Tarzan.Nfx.Ingest
                 loader.AddData(flowTracker.FlowTable);
             }
 
-            Console.WriteLine($"APP: Processing done.");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}).");
+            sw.Stop();
         }
     }
 }
