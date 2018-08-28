@@ -79,12 +79,12 @@ namespace Tarzan.Nfx.Ingest
             var stream = new MemoryStream();
             TProtocol tProtocol = new TBinaryProtocol(new TStreamTransport(stream, stream));
             this.Write(tProtocol);
-            writer.WriteByteArray(nameof(FlowRecord), stream.ToArray());
+            writer.GetRawWriter().WriteByteArray(stream.ToArray());
         }
 
         public void ReadBinary(IBinaryReader reader)
         {
-            var stream = new MemoryStream(reader.ReadByteArray(nameof(FlowRecord)));
+            var stream = new MemoryStream(reader.GetRawReader().ReadByteArray());
             TProtocol tProtocol = new TBinaryProtocol(new TStreamTransport(stream, stream));
             this.Read(tProtocol);
         }

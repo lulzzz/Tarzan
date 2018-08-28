@@ -128,6 +128,7 @@ namespace Tarzan.Nfx.Ingest
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Inserting flows into Cassandra...");
                 compute.Broadcast(new WriteFlowsToCassandra(cassandraWriter.Endpoint, cassandraWriter.Keyspace));
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: DONE!");
             }
         }
 
@@ -154,9 +155,9 @@ namespace Tarzan.Nfx.Ingest
 
             public void Invoke()
             {
-                var cache = FlowCache.GetCache(m_ignite);
                 var serviceDetector = new ServiceDetector();
                 var updateProcessor = new UpdateServiceName();
+                var cache = FlowCache.GetCache(m_ignite);
                 foreach (var flow in cache.GetLocalEntries())
                 {
                     var serviceName = serviceDetector.DetectService(flow.Key, flow.Value);
@@ -192,6 +193,7 @@ namespace Tarzan.Nfx.Ingest
                 m_cassandraWriter.Initialize();
                 var cache = FlowCache.GetCache(m_ignite);
                 var flows = cache.GetLocalEntries().Select(x => KeyValuePair.Create(x.Key, x.Value));
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing {flows.Count()} flows from local cache.");
                 m_cassandraWriter.WriteFlows(flows).Wait();
                 m_cassandraWriter.Shutdown();
             }

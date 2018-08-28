@@ -17,7 +17,7 @@ namespace Tarzan.Nfx.Ingest
     {
         public static readonly IgniteConfiguration Default = new IgniteConfiguration()
         {
-            BinaryConfiguration = new BinaryConfiguration(typeof(PacketFlowKey), typeof(PacketStream)),
+            //BinaryConfiguration = new BinaryConfiguration(typeof(PacketFlowKey), typeof(PacketStream)),
             DiscoverySpi = new TcpDiscoverySpi
             {
                 IpFinder = new TcpDiscoveryStaticIpFinder

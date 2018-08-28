@@ -7,6 +7,7 @@ using Netdx.PacketDecoders;
 using Netdx.Packets.Base;
 using SharpPcap;
 using SharpPcap.LibPcap;
+using Tarzan.Nfx.Ingest;
 using Xunit;
 
 namespace PacketDecodersTests

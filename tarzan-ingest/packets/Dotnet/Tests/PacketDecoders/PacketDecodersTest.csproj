@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Tarzan.Nfx.Ingest\Tarzan.Nfx.Ingest.csproj" />
     <ProjectReference Include="..\..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
   </ItemGroup>
 

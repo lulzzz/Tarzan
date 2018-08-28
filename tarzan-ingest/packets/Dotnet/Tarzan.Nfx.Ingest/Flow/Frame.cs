@@ -32,12 +32,12 @@ namespace Tarzan.Nfx.Ingest
             /// A <see cref="System.Byte"/>
             /// </param>
             public Frame(LinkLayerType linkLayerType,
-                              PosixTime posixTime,
-                              byte[] bytes)
+                         PosixTime posixTime,
+                         byte[] bytes)
             {
-            this.LinkLayer = linkLayerType;
+                this.LinkLayer = linkLayerType;
                 this.Timestamp = posixTime.ToUnixTimeMilliseconds();
-                this._Data = bytes;
+                this.Data = bytes;
             }
     }
 }

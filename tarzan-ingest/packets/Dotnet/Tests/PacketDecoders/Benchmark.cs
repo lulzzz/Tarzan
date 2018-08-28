@@ -14,6 +14,7 @@ using Netdx.Packets.Base;
 using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
+using Tarzan.Nfx.Ingest;
 
 namespace PacketDecodersBenchmark
 {
