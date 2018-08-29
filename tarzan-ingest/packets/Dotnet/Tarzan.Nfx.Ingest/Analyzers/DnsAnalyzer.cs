@@ -1,20 +1,20 @@
-﻿using Kaitai;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Compute;
+using Apache.Ignite.Core.Resource;
+using Kaitai;
 using PacketDotNet;
-using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text;
+using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
-    public static class DnsAnalyzer
+    public class DnsAnalyzer : IComputeFunc<IEnumerable<Model.DnsObject>>
     {    
-        public static IEnumerable<Model.DnsObject> Inspect(PacketFlowKey flowKey, PacketStream flowRecord)
+        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream flowRecord)
         {
             var sourceEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.SourceAddress.ToArray()), flowKey.SourcePort);
             var destinationEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.DestinationAddress.ToArray()), flowKey.DestinationPort);
@@ -72,6 +72,22 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 }
             }
             return result;
+        }
+
+
+        [InstanceResource]
+        protected readonly IIgnite m_ignite;
+
+        public IEnumerable<DnsObject> Invoke()
+        {
+            var cache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+
+            foreach (var flow in cache.GetLocalEntries())
+            {
+                foreach (var dns in Inspect(flow.Key, flow.Value))
+                    yield return dns;
+            }
+            
         }
     }
 }

@@ -14,12 +14,10 @@ using Thrift.Transport;
 namespace Tarzan.Nfx.Ingest
 {
     /// <summary>
-    /// Extends <see cref="FlowRecord"/> with other properties, such as, <see cref="FlowId"/>, <see cref="ServiceName"/>, and mainly
-    /// <see cref="PacketList"/>.
+    /// Represents a flow record.
     /// </summary>
     public partial class PacketStream : IBinarizable
     {
-
         protected PacketStream(long firstSeen, long lastSeen, long octets, int packets, List<Frame> list)
         {
             FirstSeen = firstSeen;
@@ -32,7 +30,6 @@ namespace Tarzan.Nfx.Ingest
         {
             return new PacketStream(frame.Timestamp, frame.Timestamp, frame.Data.Length, 1, new List<Frame> { frame });
         }                     
-
 
         public static PacketStream Update(PacketStream packetStream, Frame frame)
         {
@@ -92,6 +89,18 @@ namespace Tarzan.Nfx.Ingest
             this.Packets = reader.ReadInt(nameof(Packets));
             this.ServiceName = reader.ReadString(nameof(ServiceName));
             this.FrameList = reader.ReadArray<Frame>(nameof(FrameList)).ToList();
+        }
+
+        public bool IntersectsWith(PacketStream that)
+        {
+            if (this.FirstSeen <= that.FirstSeen)
+            {
+                return that.FirstSeen <= this.LastSeen;
+            }
+            else
+            {
+                return this.FirstSeen <= that.LastSeen;
+            }
         }
     }
 }

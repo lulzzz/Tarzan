@@ -61,7 +61,7 @@ namespace Tarzan.Nfx.Ingest
 
         }
 
-        public string DetectService(PacketFlowKey flowKey, PacketStream FlowValue)
+        public string DetectService(FlowKey flowKey, PacketStream FlowValue)
         {
             string getServiceName(string protocol, int port)
             {
@@ -83,7 +83,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            var cache = new FlowCache(m_ignite);
+            var cache = m_ignite.GetCache<FlowKey,PacketStream>(IgniteConfiguration.FlowCache);
             foreach (var flow in cache.GetLocalEntries())
             {
                 flow.Value.ServiceName = DetectService(flow.Key, flow.Value);

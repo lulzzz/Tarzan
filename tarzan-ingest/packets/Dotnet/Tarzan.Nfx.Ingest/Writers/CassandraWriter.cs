@@ -57,33 +57,31 @@ namespace Tarzan.Nfx.Ingest
             await m_dataset.CaptureTable.Insert(capture).ExecuteAsync();
         }
 
-        public void WriteFlows(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
+        public void WriteFlow(FlowKey flowKey, PacketStream flowValue)
         {
-            foreach(var flow in flows)
+            var uid = PacketFlow.NewUid(flowKey.Protocol.ToString(), flowKey.SourceEndpoint, flowKey.DestinationEndpoint, flowValue.FirstSeen);
+            var flowPoco = new PacketFlow
             {
-                var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);
-                var flowPoco = new PacketFlow
-                {
-                    Uid = uid.ToString(),
-                    Protocol = flow.Key.Protocol.ToString(),
-                    SourceAddress = flow.Key.SourceEndpoint.Address.ToString(),
-                    SourcePort = flow.Key.SourceEndpoint.Port,
-                    DestinationAddress = flow.Key.DestinationEndpoint.Address.ToString(),
-                    DestinationPort = flow.Key.DestinationEndpoint.Port,
-                    FirstSeen = flow.Value.FirstSeen,
-                    LastSeen = flow.Value.LastSeen,
-                    Octets = flow.Value.Octets,
-                    Packets = flow.Value.Packets
-                };
-                m_dataset.FlowTable.Insert(flowPoco).Execute();
-                var objectPoco = new AffObject
-                {
-                    ObjectName = flowPoco.ObjectName,
-                    ObjectType = nameof(PacketFlow)
-                };
+                Uid = uid.ToString(),
+                Protocol = flowKey.Protocol.ToString(),
+                SourceAddress = flowKey.SourceEndpoint.Address.ToString(),
+                SourcePort = flowKey.SourceEndpoint.Port,
+                DestinationAddress = flowKey.DestinationEndpoint.Address.ToString(),
+                DestinationPort = flowKey.DestinationEndpoint.Port,
+                FirstSeen = flowValue.FirstSeen,
+                LastSeen = flowValue.LastSeen,
+                Octets = flowValue.Octets,
+                Packets = flowValue.Packets
+            };
+            m_dataset.FlowTable.Insert(flowPoco).Execute();
+            var objectPoco = new AffObject
+            {
+                ObjectName = flowPoco.ObjectName,
+                ObjectType = nameof(PacketFlow)
+            };
 
-                m_dataset.CatalogueTable.Insert(objectPoco).Execute();
-            }
+            m_dataset.CatalogueTable.Insert(objectPoco).Execute();
+
         }
         public void WriteHosts(IEnumerable<Tarzan.Nfx.Model.Host> hosts)
         {
@@ -104,7 +102,7 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        private async Task WriteDns(IDictionary<PacketFlowKey, PacketStream> table)
+        private async Task WriteDns(IDictionary<FlowKey, PacketStream> table)
         {
             var dnsInfos = table.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
             foreach(var dnsInfo in dnsInfos)
@@ -134,7 +132,7 @@ namespace Tarzan.Nfx.Ingest
 
         
 
-        private async Task WriteHttp(IDictionary<PacketFlowKey, PacketStream> table)
+        private async Task WriteHttp(IDictionary<FlowKey, PacketStream> table)
         {
             var httpFlows = table.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
             var httpStreams = TcpStream.Split(httpFlows).ToList();

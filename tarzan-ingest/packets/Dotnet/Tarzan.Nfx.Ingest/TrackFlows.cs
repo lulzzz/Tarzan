@@ -117,12 +117,12 @@ namespace Tarzan.Nfx.Ingest
 
         static void RunAsIgnite(CassandraWriter cassandraWriter, IEnumerable<string> fileList)
         {
-            using (var ignite = Ignition.Start(GlobalIgniteConfiguration.Default))
+            using (var ignite = Ignition.Start(IgniteConfiguration.Default))
             {
-                var flowCache = new FlowCache(ignite);
+                var flowCache = ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
 
                 var compute = ignite.GetCluster().GetCompute();
-                compute.Run(fileList.Select(x => new TrackFlowComputeAction { FileName = x }));
+                compute.Run(fileList.Select(x => new FlowAnalyzer { FileName = x }));
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Count()}");
 
@@ -133,10 +133,9 @@ namespace Tarzan.Nfx.Ingest
                 compute.Broadcast(new WriteFlowsToCassandra(cassandraWriter.Endpoint, cassandraWriter.Keyspace));
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: DONE!");
 
-                // STATISTICS:
-                var stats = new Statistics(flowCache);
+                // STATISTICS - currently computed on a single node!!! See the implementation and find out how to properly use AsCacheQueryable.
+                var stats = new Statistics(ignite);
                 cassandraWriter.WriteHosts(stats.GetHosts());
-
                 cassandraWriter.WriteServices(stats.GetServices());
 
             }
@@ -174,11 +173,13 @@ namespace Tarzan.Nfx.Ingest
             {
                 var sw = new Stopwatch();
                 m_cassandraWriter.Initialize();
-                var cache = new FlowCache(m_ignite);
-                var flows = cache.GetLocalEntries().Select(x => KeyValuePair.Create(x.Key, x.Value));
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing {flows.Count()} flows from local cache.");
+                var cache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing flows from local cache.");
                 sw.Start();
-                m_cassandraWriter.WriteFlows(flows);
+                foreach (var flow in cache.GetLocalEntries())
+                {
+                    m_cassandraWriter.WriteFlow(flow.Key,flow.Value);
+                }
                 sw.Stop();
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}).");
                 m_cassandraWriter.Shutdown();

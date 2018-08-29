@@ -1,27 +1,23 @@
-﻿using Apache.Ignite.Core.Cache;
+﻿using Apache.Ignite.Core;
 using Apache.Ignite.Linq;
-using Netdx.PacketDecoders;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public class Statistics
     {
-        public Statistics(FlowCache flowCache)
-        {
-            FlowCache = flowCache;
-        }
+        private readonly IIgnite m_ignite;
 
-        public FlowCache FlowCache { get; }
+        public Statistics(IIgnite ignite)
+        {
+            m_ignite = ignite;
+        }
 
         public IEnumerable<Host> GetHosts()
         {
-            var queryable = FlowCache.AsCacheQueryable();
+            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache); //.AsCacheQueryable();
 
             var srcHosts = queryable.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });
@@ -39,7 +35,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
         public IEnumerable<Service> GetServices()
         {
-            var queryable = FlowCache.AsCacheQueryable();
+            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache); //.AsCacheQueryable();
             var services = queryable
                             .GroupBy(f => f.Value.ServiceName)
                             .Select(f =>
@@ -57,7 +53,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                                     MaxDuration = f.Max(x => x.Value.LastSeen - x.Value.FirstSeen),
                                     MinDuration = f.Min(x => x.Value.LastSeen - x.Value.FirstSeen),
                                 });
-            return services;
+            return services.ToList();
         }
     }
 }
