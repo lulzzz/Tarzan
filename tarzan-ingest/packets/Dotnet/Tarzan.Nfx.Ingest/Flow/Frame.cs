@@ -1,4 +1,5 @@
-﻿using Netdx.PacketDecoders;
+﻿using Apache.Ignite.Core.Binary;
+using Netdx.PacketDecoders;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Tarzan.Nfx.Ingest
     /// <summary>
     /// Represents a raw captured link layer frame.
     /// </summary>
-    public partial class Frame
+    public partial class Frame : IBinarizable
     {                                     
             /// <value>
             /// The unix timestamp when the packet was created
@@ -39,5 +40,19 @@ namespace Tarzan.Nfx.Ingest
                 this.Timestamp = posixTime.ToUnixTimeMilliseconds();
                 this.Data = bytes;
             }
+
+        public void WriteBinary(IBinaryWriter writer)
+        {
+            writer.WriteInt(nameof(LinkLayer), (int)LinkLayer);
+            writer.WriteLong(nameof(Timestamp), Timestamp);
+            writer.WriteByteArray(nameof(Data), Data);
+        }
+
+        public void ReadBinary(IBinaryReader reader)
+        {
+            LinkLayer = (LinkLayerType)reader.ReadInt(nameof(LinkLayer));
+            Timestamp = reader.ReadLong(nameof(Timestamp));
+            Data = reader.ReadByteArray(nameof(Data));
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void WriteFlows(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
         {
-            Parallel.ForEach(flows,new ParallelOptions { MaxDegreeOfParallelism = 4 }, async flow =>
+            foreach(var flow in flows)
             {
                 var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);
                 var flowPoco = new PacketFlow
@@ -75,15 +75,15 @@ namespace Tarzan.Nfx.Ingest
                     Octets = flow.Value.Octets,
                     Packets = flow.Value.Packets
                 };
-                await m_dataset.FlowTable.Insert(flowPoco).ExecuteAsync();
+                m_dataset.FlowTable.Insert(flowPoco).Execute();
                 var objectPoco = new AffObject
                 {
                     ObjectName = flowPoco.ObjectName,
                     ObjectType = nameof(PacketFlow)
                 };
 
-                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
-            });
+                m_dataset.CatalogueTable.Insert(objectPoco).Execute();
+            }
         }
         public void WriteHosts(IEnumerable<Tarzan.Nfx.Model.Host> hosts)
         {

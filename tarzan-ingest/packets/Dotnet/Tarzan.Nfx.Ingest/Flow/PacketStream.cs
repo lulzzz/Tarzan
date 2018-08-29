@@ -76,17 +76,22 @@ namespace Tarzan.Nfx.Ingest
 
         public void WriteBinary(IBinaryWriter writer)
         {
-            var stream = new MemoryStream();
-            TProtocol tProtocol = new TBinaryProtocol(new TStreamTransport(stream, stream));
-            this.Write(tProtocol);
-            writer.GetRawWriter().WriteByteArray(stream.ToArray());
+            writer.WriteLong(nameof(FirstSeen), this.FirstSeen);
+            writer.WriteLong(nameof(LastSeen), this.LastSeen);
+            writer.WriteLong(nameof(Octets), this.Octets);
+            writer.WriteInt(nameof(Packets), this.Packets);
+            writer.WriteString(nameof(ServiceName), this.ServiceName);
+            writer.WriteArray<Frame>(nameof(FrameList), this.FrameList.ToArray());
         }
 
         public void ReadBinary(IBinaryReader reader)
         {
-            var stream = new MemoryStream(reader.GetRawReader().ReadByteArray());
-            TProtocol tProtocol = new TBinaryProtocol(new TStreamTransport(stream, stream));
-            this.Read(tProtocol);
+            this.FirstSeen = reader.ReadLong(nameof(FirstSeen));
+            this.LastSeen = reader.ReadLong(nameof(LastSeen));
+            this.Octets = reader.ReadLong(nameof(Octets));
+            this.Packets = reader.ReadInt(nameof(Packets));
+            this.ServiceName = reader.ReadString(nameof(ServiceName));
+            this.FrameList = reader.ReadArray<Frame>(nameof(FrameList)).ToList();
         }
     }
 }

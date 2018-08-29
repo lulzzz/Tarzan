@@ -83,7 +83,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            var cache = FlowCache.GetCache(m_ignite);
+            var cache = new FlowCache(m_ignite);
             foreach (var flow in cache.GetLocalEntries())
             {
                 flow.Value.ServiceName = DetectService(flow.Key, flow.Value);

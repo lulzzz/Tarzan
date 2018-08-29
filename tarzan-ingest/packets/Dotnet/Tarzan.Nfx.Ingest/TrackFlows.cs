@@ -124,7 +124,7 @@ namespace Tarzan.Nfx.Ingest
                 var compute = ignite.GetCluster().GetCompute();
                 compute.Run(fileList.Select(x => new TrackFlowComputeAction { FileName = x }));
 
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Cache.Count()}");
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Count()}");
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Detecting services of flows...");
                 compute.Broadcast(new ServiceDetector());
@@ -136,6 +136,8 @@ namespace Tarzan.Nfx.Ingest
                 // STATISTICS:
                 var stats = new Statistics(flowCache);
                 cassandraWriter.WriteHosts(stats.GetHosts());
+
+                cassandraWriter.WriteServices(stats.GetServices());
 
             }
         }
@@ -172,7 +174,7 @@ namespace Tarzan.Nfx.Ingest
             {
                 var sw = new Stopwatch();
                 m_cassandraWriter.Initialize();
-                var cache = FlowCache.GetCache(m_ignite);
+                var cache = new FlowCache(m_ignite);
                 var flows = cache.GetLocalEntries().Select(x => KeyValuePair.Create(x.Key, x.Value));
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing {flows.Count()} flows from local cache.");
                 sw.Start();

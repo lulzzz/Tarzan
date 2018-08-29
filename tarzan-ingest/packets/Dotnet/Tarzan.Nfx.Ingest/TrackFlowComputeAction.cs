@@ -42,7 +42,7 @@ namespace Tarzan.Nfx.Ingest
             var globalFlowTable = new FlowCache(_ignite);
             Parallel.ForEach(flowTracker.FlowTable, flow =>
                 {
-                    globalFlowTable.Update(flow.Key, flow.Value);
+                    globalFlowTable.UpdateStream(flow.Key, flow.Value);
                 });
 
             /* STREAM LOADER CODE:

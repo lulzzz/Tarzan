@@ -27,12 +27,7 @@ namespace Tarzan.Nfx.Ingest
                 SocketTimeout = TimeSpan.FromSeconds(0.3)
             },
             CacheConfiguration = new[] {
-                    new CacheConfiguration
-                    {
-                        Name = nameof(FlowCache),
-                        CacheMode = CacheMode.Partitioned,
-                        Backups = 0
-                    }
+                    FlowCache.DefaultConfiguration
                 }
         };
     }

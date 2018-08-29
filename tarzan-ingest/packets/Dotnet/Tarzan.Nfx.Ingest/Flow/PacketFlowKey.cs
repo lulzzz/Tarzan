@@ -10,6 +10,7 @@ namespace Tarzan.Nfx.Ingest
     /// <summary>
     /// A compact representation of a flow key.
     /// </summary>
+    [Serializable]
     public class PacketFlowKey : IBinarizable
     {
         static class Fields
