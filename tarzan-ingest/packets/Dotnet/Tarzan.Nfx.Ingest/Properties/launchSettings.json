@@ -6,7 +6,7 @@
     },
     "ignite-file": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-32\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create -runAs ignite"
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-256\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create -runAs ignite"
     }
   }
 }

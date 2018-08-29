@@ -12,9 +12,16 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public class Statistics
     {
-        public IEnumerable<Host> GetHosts(FlowCache cache)
+        public Statistics(FlowCache flowCache)
         {
-            var queryable = cache.Cache.AsCacheQueryable();
+            FlowCache = flowCache;
+        }
+
+        public FlowCache FlowCache { get; }
+
+        public IEnumerable<Host> GetHosts()
+        {
+            var queryable = FlowCache.Cache.AsCacheQueryable();
 
             var srcHosts = queryable.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });
@@ -30,9 +37,9 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         }
 
 
-        public IEnumerable<Service> GetServices(FlowCache cache)
+        public IEnumerable<Service> GetServices()
         {
-            var queryable = cache.Cache.AsCacheQueryable();
+            var queryable = FlowCache.Cache.AsCacheQueryable();
             var services = queryable
                             .GroupBy(f => f.Value.ServiceName)
                             .Select(f =>

@@ -1,16 +1,18 @@
-﻿using Netdx.ConversationTracker;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Compute;
+using Apache.Ignite.Core.Resource;
+using Netdx.ConversationTracker;
 using Netdx.PacketDecoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
 {
-
-
-    public class ServiceDetector
+    public class ServiceDetector : IComputeAction
     {
         Dictionary<string, ServiceName> m_serviceDictionary;
         public ServiceDetector()
@@ -74,6 +76,19 @@ namespace Tarzan.Nfx.Ingest
             }
             var serviceName = getServiceName(flowKey.Protocol.ToString(), Math.Min(flowKey.SourcePort, flowKey.DestinationPort));
             return serviceName;
+        }
+
+        [InstanceResource]
+        protected readonly IIgnite m_ignite;
+
+        public void Invoke()
+        {
+            var cache = FlowCache.GetCache(m_ignite);
+            foreach (var flow in cache.GetLocalEntries())
+            {
+                flow.Value.ServiceName = DetectService(flow.Key, flow.Value);
+                cache.Put(flow.Key, flow.Value);
+            }
         }
     }
 }

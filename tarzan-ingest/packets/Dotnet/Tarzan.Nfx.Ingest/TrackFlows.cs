@@ -8,8 +8,10 @@ using Netdx.PacketDecoders;
 using SharpPcap.LibPcap;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
@@ -117,18 +119,24 @@ namespace Tarzan.Nfx.Ingest
         {
             using (var ignite = Ignition.Start(GlobalIgniteConfiguration.Default))
             {
+                var flowCache = new FlowCache(ignite);
+
                 var compute = ignite.GetCluster().GetCompute();
                 compute.Run(fileList.Select(x => new TrackFlowComputeAction { FileName = x }));
 
-                var cache = FlowCache.GetCache(ignite);
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {cache.Count()}");
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Cache.Count()}");
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Detecting services of flows...");
-                compute.Broadcast(new DetectServiceComputeAction());
+                compute.Broadcast(new ServiceDetector());
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Inserting flows into Cassandra...");
                 compute.Broadcast(new WriteFlowsToCassandra(cassandraWriter.Endpoint, cassandraWriter.Keyspace));
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: DONE!");
+
+                // STATISTICS:
+                var stats = new Statistics(flowCache);
+                cassandraWriter.WriteHosts(stats.GetHosts());
+
             }
         }
 
@@ -148,34 +156,6 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        private class DetectServiceComputeAction : IComputeAction
-        {
-            [InstanceResource]
-            protected readonly IIgnite m_ignite;
-
-            public void Invoke()
-            {
-                var serviceDetector = new ServiceDetector();
-                var updateProcessor = new UpdateServiceName();
-                var cache = FlowCache.GetCache(m_ignite);
-                foreach (var flow in cache.GetLocalEntries())
-                {
-                    var serviceName = serviceDetector.DetectService(flow.Key, flow.Value);
-                    flow.Value.ServiceName = serviceName;
-                    cache.Invoke(flow.Key, updateProcessor, serviceName);
-                }
-            }
-
-            class UpdateServiceName : ICacheEntryProcessor<PacketFlowKey, PacketStream, string, PacketStream>
-            {
-                public PacketStream Process(IMutableCacheEntry<PacketFlowKey, PacketStream> entry, string arg)
-                {
-                    entry.Value.ServiceName = arg;
-                    return entry.Value;
-                }
-            }
-        }
-
         private class WriteFlowsToCassandra : IComputeAction
         {
             [InstanceResource]
@@ -190,11 +170,15 @@ namespace Tarzan.Nfx.Ingest
 
             public void Invoke()
             {
+                var sw = new Stopwatch();
                 m_cassandraWriter.Initialize();
                 var cache = FlowCache.GetCache(m_ignite);
                 var flows = cache.GetLocalEntries().Select(x => KeyValuePair.Create(x.Key, x.Value));
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing {flows.Count()} flows from local cache.");
-                m_cassandraWriter.WriteFlows(flows).Wait();
+                sw.Start();
+                m_cassandraWriter.WriteFlows(flows);
+                sw.Stop();
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}).");
                 m_cassandraWriter.Shutdown();
             }
         }

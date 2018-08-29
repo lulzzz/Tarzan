@@ -57,11 +57,11 @@ namespace Tarzan.Nfx.Ingest
             await m_dataset.CaptureTable.Insert(capture).ExecuteAsync();
         }
 
-        public async Task WriteFlows(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
+        public void WriteFlows(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
         {
-            foreach (var flow in flows)
+            Parallel.ForEach(flows,new ParallelOptions { MaxDegreeOfParallelism = 4 }, async flow =>
             {
-                var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);                    
+                var uid = PacketFlow.NewUid(flow.Key.Protocol.ToString(), flow.Key.SourceEndpoint, flow.Key.DestinationEndpoint, flow.Value.FirstSeen);
                 var flowPoco = new PacketFlow
                 {
                     Uid = uid.ToString(),
@@ -81,26 +81,26 @@ namespace Tarzan.Nfx.Ingest
                     ObjectName = flowPoco.ObjectName,
                     ObjectType = nameof(PacketFlow)
                 };
-                
+
                 await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
-            }
+            });
         }
-        async Task WriteHosts(IEnumerable<Tarzan.Nfx.Model.Host> hosts)
+        public void WriteHosts(IEnumerable<Tarzan.Nfx.Model.Host> hosts)
         {
             foreach (var host in hosts)
             {
                 var insert = m_dataset.HostTable.Insert(host);
-                await insert.ExecuteAsync();
+                insert.Execute();
             }
         }
 
        
-        private async Task WriteServices(IEnumerable<Service> services)
+        public void WriteServices(IEnumerable<Service> services)
         {
             foreach(var service in services)
             {
                 var insert = m_dataset.ServiceTable.Insert(service);
-                await insert.ExecuteAsync();
+                insert.Execute();
             }
         }
 

@@ -19,7 +19,8 @@ namespace Netdx.PacketDecoders
         }
         public long ToUnixTimeMilliseconds()
         {
-            return (long)((this.Seconds * 1000) + (this.MicroSeconds / 1000));
+            var ms = (((long)this.Seconds) * 1000) + (((long)this.MicroSeconds) / 1000);
+            return ms;
         }
 
         public static PosixTime FromUnixTimeMilliseconds(long v)
