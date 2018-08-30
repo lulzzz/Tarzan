@@ -7,30 +7,30 @@ using SharpPcap;
 
 namespace Tarzan.Nfx.Ingest
 {
-    class KeyProvider : IKeyProvider<PacketFlowKey, Packet>
+    class PacketKeyProvider : IKeyProvider<FlowKey, Packet>
     {
-        public PacketFlowKey GetKey(Packet packet)
+        public FlowKey GetKey(Packet packet)
         {
-            PacketFlowKey GetUdpFlowKey(UdpPacket udp)
+            FlowKey GetUdpFlowKey(UdpPacket udp)
             {
-                return PacketFlowKey.Create((byte)IPProtocolType.UDP,
+                return FlowKey.Create((byte)IPProtocolType.UDP,
                     (udp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
                     udp.SourcePort,
                     (udp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
                     udp.DestinationPort);
             }
-            PacketFlowKey GetTcpFlowKey(TcpPacket tcp)
+            FlowKey GetTcpFlowKey(TcpPacket tcp)
             {
-                return PacketFlowKey.Create(
+                return FlowKey.Create(
                     (byte)IPProtocolType.TCP,
                     (tcp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
                     tcp.SourcePort,
                     (tcp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
                     tcp.DestinationPort);
             }
-            PacketFlowKey GetIpFlowKey(IpPacket ip)
+            FlowKey GetIpFlowKey(IpPacket ip)
             {
-                return PacketFlowKey.Create(
+                return FlowKey.Create(
                     (byte)(ip.Version == IpVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
                     ip.SourceAddress.GetAddressBytes(), 0,
                     ip.DestinationAddress.GetAddressBytes(), 0
@@ -46,7 +46,7 @@ namespace Tarzan.Nfx.Ingest
                     {
                         case IpPacket ip: return GetIpFlowKey(ip);
                         default:
-                            return PacketFlowKey.Create((byte)IPProtocolType.NONE,
+                            return FlowKey.Create((byte)IPProtocolType.NONE,
                        IPAddress.None.GetAddressBytes(), 0, IPAddress.None.GetAddressBytes(), 0);
 
                     }

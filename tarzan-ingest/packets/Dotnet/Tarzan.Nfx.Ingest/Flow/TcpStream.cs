@@ -12,13 +12,17 @@ namespace Tarzan.Nfx.Ingest
     /// <summary>
     /// Represents TCP stream of packets. 
     /// </summary>
-    public class TcpStream : FlowRecord
+    public class TcpStream
     {
         public long TcpInitialSequenceNumber { get; set; }
 
         public IList<(TcpPacket Packet, PosixTime Timeval)> SegmentList { get; private set; }
 
         public string ServiceName { get; set; }
+        public long FirstSeen { get; private set; }
+        public long LastSeen { get; private set; }
+        public long Octets { get; private set; }
+        public int Packets { get; private set; }
 
         public TcpStream(long firstSeen, long lastSeen, long octets, int packets, List<(TcpPacket, PosixTime)> list)
         {
@@ -59,7 +63,7 @@ namespace Tarzan.Nfx.Ingest
         /// </summary>
         /// <param name="flows">Enumerable collection of source flows to find matching TCP streams.</param>
         /// <returns>A collection of TCP conversations.</returns>
-        public static IEnumerable<TcpConversation> Pair(IEnumerable<KeyValuePair<PacketFlowKey, TcpStream>> flows)
+        public static IEnumerable<TcpConversation> Pair(IEnumerable<KeyValuePair<FlowKey, TcpStream>> flows)
         {
             var downFlows = flows.Where(f => f.Key.DestinationPort < f.Key.SourcePort);
             var upFlows = flows.Where(f => f.Key.DestinationPort > f.Key.SourcePort);
@@ -77,7 +81,7 @@ namespace Tarzan.Nfx.Ingest
         /// the new TCP stream. 
         /// </remarks>
         /// <returns></returns>
-        public static IEnumerable<KeyValuePair<PacketFlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<PacketFlowKey, PacketStream>> flows)
+        public static IEnumerable<KeyValuePair<FlowKey, TcpStream>> Split(IEnumerable<KeyValuePair<FlowKey, PacketStream>> flows)
         {
             foreach (var (flowKey, flowRecord) in flows.Where(f => f.Key.Protocol == ProtocolType.Tcp))
             {
@@ -109,6 +113,18 @@ namespace Tarzan.Nfx.Ingest
             foreach (var (packet, timeval) in stream.SegmentList)
             {
                 yield return (timeval, packet.Syn, packet.Fin, packet.Rst, packet.Ack, packet.Psh, packet.SequenceNumber, packet.AcknowledgmentNumber, packet.PayloadData?.Length ?? 0);
+            }
+        }
+
+        public bool IntersectsWith(TcpStream that)
+        {
+            if (this.FirstSeen <= that.FirstSeen)
+            {
+                return that.FirstSeen <= this.LastSeen;
+            }
+            else
+            {
+                return this.FirstSeen <= that.LastSeen;
             }
         }
 

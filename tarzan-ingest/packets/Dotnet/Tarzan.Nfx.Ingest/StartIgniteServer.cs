@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Ingest
 
         private static int RunIgniteServer()
         {          
-            using (var ignite = Ignition.Start(GlobalIgniteConfiguration.Default))
+            using (var ignite = Ignition.Start(IgniteConfiguration.Default))
             {
                 Console.WriteLine("Ignite server is running, press CTRL+C (or X) to terminate.");
 

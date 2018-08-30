@@ -8,14 +8,14 @@ namespace Tarzan.Nfx.Ingest
 
     public class TcpConversation
     {
-        public KeyValuePair<PacketFlowKey, TcpStream> RequestFlow { get; set; }
-        public KeyValuePair<PacketFlowKey, TcpStream> ResponseFlow { get; set; }
+        public KeyValuePair<FlowKey, TcpStream> RequestFlow { get; set; }
+        public KeyValuePair<FlowKey, TcpStream> ResponseFlow { get; set; }
 
-        internal class Comparer : IEqualityComparer<PacketFlowKey>
+        internal class Comparer : IEqualityComparer<FlowKey>
         {
-            public bool Equals(PacketFlowKey x, PacketFlowKey y)
+            public bool Equals(FlowKey x, FlowKey y)
             {
-                return PacketFlowKey.Equals(x, y) ||
+                return FlowKey.Equals(x, y) ||
                     (x.Protocol == y.Protocol
                      && x.SourcePort == y.DestinationPort
                      && y.SourcePort == x.DestinationPort
@@ -24,7 +24,7 @@ namespace Tarzan.Nfx.Ingest
                     );
             }
 
-            public int GetHashCode(PacketFlowKey obj)
+            public int GetHashCode(FlowKey obj)
             {
                 return obj.GetHashCode();
             }

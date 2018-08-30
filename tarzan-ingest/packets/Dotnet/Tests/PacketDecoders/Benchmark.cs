@@ -42,28 +42,28 @@ namespace PacketDecodersBenchmark
 
 
 
-        public PacketFlowKey GetKey(Packet packet)
+        public FlowKey GetKey(Packet packet)
         {
-            PacketFlowKey GetUdpFlowKey(UdpPacket udp)
+            FlowKey GetUdpFlowKey(UdpPacket udp)
             {
-                return PacketFlowKey.Create((byte)IPProtocolType.UDP,
+                return FlowKey.Create((byte)IPProtocolType.UDP,
                     (udp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
                     udp.SourcePort,
                     (udp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
                     udp.DestinationPort);
             }
-            PacketFlowKey GetTcpFlowKey(TcpPacket tcp)
+            FlowKey GetTcpFlowKey(TcpPacket tcp)
             {
-                return PacketFlowKey.Create(
+                return FlowKey.Create(
                     (byte)IPProtocolType.TCP,
                     (tcp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
                     tcp.SourcePort,
                     (tcp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
                     tcp.DestinationPort);
             }
-            PacketFlowKey GetIpFlowKey(IpPacket ip)
+            FlowKey GetIpFlowKey(IpPacket ip)
             {
-                return PacketFlowKey.Create(
+                return FlowKey.Create(
                     (byte)(ip.Version == IpVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
                     ip.SourceAddress.GetAddressBytes(), 0,
                     ip.DestinationAddress.GetAddressBytes(), 0
@@ -78,7 +78,7 @@ namespace PacketDecodersBenchmark
                     switch ((InternetPacket)packet.Extract(typeof(InternetPacket)))
                     {
                         case IpPacket ip: return GetIpFlowKey(ip);
-                        default: return PacketFlowKey.Create((byte)IPProtocolType.NONE, 
+                        default: return FlowKey.Create((byte)IPProtocolType.NONE, 
                             IPAddress.None.GetAddressBytes(), 0, IPAddress.None.GetAddressBytes(), 0);
 
                     }
@@ -98,21 +98,21 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void LinqFastDecode()
         {
-            var flows = from packet in _packets.Select(p => (Key: PacketFlowKey.GetKey(p.Data), Packet: p))
+            var flows = from packet in _packets.Select(p => (Key: FlowKey.GetKey(p.Data), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
         }
         [Benchmark]
         public void PLinqFastDecode()
         {
-            var result = _packets.AsParallel().Select(p => (Key: PacketFlowKey.GetKey(p.Data), Packet: p)).GroupBy(x => x.Key).ToList();
+            var result = _packets.AsParallel().Select(p => (Key: FlowKey.GetKey(p.Data), Packet: p)).GroupBy(x => x.Key).ToList();
         }
 
 
         [Benchmark]
         public void LinqFastDecodeStringKey()
         {
-            var flows = from packet in _packets.Select(p => (Key: PacketFlowKey.GetKey(p.Data).ToString(), Packet: p))
+            var flows = from packet in _packets.Select(p => (Key: FlowKey.GetKey(p.Data).ToString(), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
         }
@@ -120,7 +120,7 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void DictionaryPacketDotNet()
         {
-            var flows = new Dictionary<PacketFlowKey, List<RawCapture>>();
+            var flows = new Dictionary<FlowKey, List<RawCapture>>();
             foreach(var packet in _packets)
             {
                 var key = GetKey(Packet.ParsePacket(packet.LinkLayerType, packet.Data));
@@ -139,10 +139,10 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void DictionaryFastDecode()
         {
-            var flows = new Dictionary<PacketFlowKey, List<RawCapture>>();
+            var flows = new Dictionary<FlowKey, List<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = PacketFlowKey.GetKey(packet.Data);
+                var key = FlowKey.GetKey(packet.Data);
                 if (flows.TryGetValue(key, out var lst))
                 {
                     lst.Add(packet);
@@ -156,10 +156,10 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void DictionaryFastDecodeLinkedList()
         {
-            var flows = new Dictionary<PacketFlowKey, LinkedList<RawCapture>>();
+            var flows = new Dictionary<FlowKey, LinkedList<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = PacketFlowKey.GetKey(packet.Data);
+                var key = FlowKey.GetKey(packet.Data);
                 if (flows.TryGetValue(key, out var lst))
                 {
                     lst.AddLast(packet);
@@ -176,10 +176,10 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void ConcurrentDictionaryFastDecode()
         {
-            var flows = new ConcurrentDictionary<PacketFlowKey, List<RawCapture>>();
+            var flows = new ConcurrentDictionary<FlowKey, List<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = PacketFlowKey.GetKey(packet.Data);
+                var key = FlowKey.GetKey(packet.Data);
                 flows.AddOrUpdate(key, new List<RawCapture> { packet },
                     (k, lst) =>
                     {
@@ -192,10 +192,10 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void ConcurrentDictionaryParallelFastDecode()
         {
-            var flows = new ConcurrentDictionary<PacketFlowKey, ConcurrentBag<RawCapture>>();
+            var flows = new ConcurrentDictionary<FlowKey, ConcurrentBag<RawCapture>>();
             Parallel.ForEach(_packets, (packet) =>
             {
-                var key = PacketFlowKey.GetKey(packet.Data);
+                var key = FlowKey.GetKey(packet.Data);
                 flows.AddOrUpdate(key, 
                     // add method
                     k =>  new ConcurrentBag<RawCapture> { packet },

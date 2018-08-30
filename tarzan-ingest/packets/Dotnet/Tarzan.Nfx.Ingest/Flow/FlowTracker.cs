@@ -9,64 +9,30 @@ using SharpPcap;
 
 namespace Tarzan.Nfx.Ingest
 {
-    public interface ICaptureProvider
-    {
-        Frame GetNextFrame();
-    }
-
-    class CaptureDeviceProvider : ICaptureProvider
-    {
-
-        ICaptureDevice m_device;
-
-        public CaptureDeviceProvider(ICaptureDevice m_device)
-        {
-            this.m_device = m_device;
-        }
-
-        public Frame GetNextFrame()
-        {
-            var packet = m_device.GetNextPacket();
-            if (packet != null)
-            {
-                return new Frame((LinkLayerType)packet.LinkLayerType, PosixTime.FromUnixTimeMilliseconds(packet.Timeval.ToUnixTimeMilliseconds()), packet.Data);
-            }
-            else return null;
-        }
-    }
-
     class FlowTracker
     {
-        Dictionary<PacketFlowKey, PacketStream> m_flowTable;
-        private ICaptureProvider m_capture;
-        private int m_totalFrameCount;
-        public FlowTracker(ICaptureProvider device)
+        public FlowTracker()
         {
-            this.m_capture = device;
-            m_flowTable = new Dictionary<PacketFlowKey, PacketStream>();
-           
+            FlowTable = new Dictionary<FlowKey, PacketStream>();
         }
-        public Dictionary<PacketFlowKey, PacketStream> FlowTable { get => m_flowTable; set => m_flowTable = value; }
-        public int TotalFrameCount { get => m_totalFrameCount; }
+        public Dictionary<FlowKey, PacketStream> FlowTable { get; private set; }
+        public int TotalFrameCount { get; private set; }
 
         /// <summary>
         /// Captures all packets and tracks flows.
         /// </summary>
-        public void CaptureAll()
-        { 
-            Frame frame = null;
-            while((frame = m_capture.GetNextFrame()) != null)
+        public void ProcessFrame(Frame frame)
+        {
+            if (frame == null) return;
+            TotalFrameCount++;
+            var key = FlowKey.GetKey(frame.Data);
+            if (FlowTable.TryGetValue(key, out var lst))
             {
-                m_totalFrameCount ++;
-                var key = PacketFlowKey.GetKey(frame.Data);
-                if (m_flowTable.TryGetValue(key, out var lst))
-                {
-                    PacketStream.Update(lst, frame);
-                }
-                else
-                {
-                    m_flowTable[key] = PacketStream.From(frame);
-                }
+                PacketStream.Update(lst, frame);
+            }
+            else
+            {
+                FlowTable[key] = PacketStream.From(frame);
             }
         }
     }

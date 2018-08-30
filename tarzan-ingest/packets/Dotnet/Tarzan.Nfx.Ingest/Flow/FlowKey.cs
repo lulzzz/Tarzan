@@ -11,7 +11,7 @@ namespace Tarzan.Nfx.Ingest
     /// A compact representation of a flow key.
     /// </summary>
     [Serializable]
-    public class PacketFlowKey : IBinarizable
+    public class FlowKey : IBinarizable
     {
         static class Fields
         {
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Ingest
 
         public override bool Equals(object obj)
         {
-            var that = (PacketFlowKey)obj;
+            var that = (FlowKey)obj;
             return Compare(this, that);
         }
 
@@ -54,7 +54,7 @@ namespace Tarzan.Nfx.Ingest
 
         public IPAddress DestinationIpAddress => new IPAddress(DestinationAddress.ToArray());
 
-        public PacketFlowKey(byte[] bytes)
+        public FlowKey(byte[] bytes)
         {
 
             if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
@@ -96,7 +96,7 @@ namespace Tarzan.Nfx.Ingest
             this.m_hashCode = reader.ReadInt(nameof(this.m_hashCode));
         }
 
-        public static PacketFlowKey Create(byte protocol, Span<byte> sourceAddres, UInt16 sourcePort, Span<byte> destinationAddress, UInt16 destinationPort)
+        public static FlowKey Create(byte protocol, Span<byte> sourceAddres, UInt16 sourcePort, Span<byte> destinationAddress, UInt16 destinationPort)
         {
             var bytes = new byte[40];
             bytes[Fields.ProtocolPosition] = protocol;
@@ -105,9 +105,9 @@ namespace Tarzan.Nfx.Ingest
             destinationAddress.CopyTo(new Span<byte>(bytes, Fields.DestinationAddressPosition, 16));
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.SourcePortPosition, 2), sourcePort);
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.DestinationPortPosition, 2), destinationPort);
-            return new PacketFlowKey(bytes);
+            return new FlowKey(bytes);
         }
-        public static bool Compare(PacketFlowKey f1, PacketFlowKey f2)
+        public static bool Compare(FlowKey f1, FlowKey f2)
         {
             return f1.m_hashCode == f2.m_hashCode && new Span<byte>(f1.m_bytes).SequenceEqual(f2.m_bytes);
         }
@@ -123,7 +123,7 @@ namespace Tarzan.Nfx.Ingest
                     ^ intPtr[5] ^ intPtr[6] ^ intPtr[7] ^ intPtr[8] ^ intPtr[9];
             }
         }
-        public static PacketFlowKey GetKey(byte[] bytes)
+        public static FlowKey GetKey(byte[] bytes)
         {
             var etherType = EthernetFrame.GetEtherType(bytes);
             var etherPayload = EthernetFrame.GetPayloadBytes(bytes);

@@ -45,7 +45,7 @@ namespace Tarzan.Nfx.Ingest
 
             public PcapPseudoheader Header => m_header;
 
-            public bool Add(PacketFlowKey flowkey)
+            public bool Add(FlowKey flowkey)
             {
                 lock (m_syncObject)
                 {
@@ -61,7 +61,7 @@ namespace Tarzan.Nfx.Ingest
                     }
                 }
             }
-            public bool Contains(PacketFlowKey flowkey)
+            public bool Contains(FlowKey flowkey)
             {
                 return m_filter.Contains(flowkey.ToString());
             }
@@ -103,7 +103,7 @@ namespace Tarzan.Nfx.Ingest
             m_lastBlock = null;
         }
 
-        public void Add(int packetNumber, long packetOffset, PacketFlowKey flowkey)
+        public void Add(int packetNumber, long packetOffset, FlowKey flowkey)
         {
 
             if (m_lastBlock == null)
@@ -124,7 +124,7 @@ namespace Tarzan.Nfx.Ingest
         /// </summary>
         /// <param name="flowKey"></param>
         /// <returns>An enumerable of blocks containg the packets of the given flow key.</returns>
-        public IEnumerable<PcapPseudoheader> Filter(PacketFlowKey flowKey)
+        public IEnumerable<PcapPseudoheader> Filter(FlowKey flowKey)
         {
             return m_filterArray.Where(x => x.Contains(flowKey)).Select(x => x.Header); 
         }
