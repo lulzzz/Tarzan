@@ -13,6 +13,9 @@
 
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <div slot="empty">
+                        No data to view.
+                    </div>
                     <el-table-column prop="name" label="Name" />
                     <el-table-column prop="length" label="length" width="100" />
                     <el-table-column label="Creation Time" width="200">

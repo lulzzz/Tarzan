@@ -1,4 +1,5 @@
 ﻿using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache.Configuration;
 using Netdx.Packets.Base;
 using System;
 using System.Buffers.Binary;
@@ -64,6 +65,7 @@ namespace Tarzan.Nfx.Ingest
 
         public ProtocolType Protocol => (ProtocolType)m_bytes[Fields.ProtocolPosition];
         Span<Byte> ProtocolByte => new Span<byte>(m_bytes,Fields.ProtocolPosition, 1);
+
 
         public ProtocolFamily ProtocolFamily => (ProtocolFamily)m_bytes[Fields.ProtocolFamilyPosition];
         Span<Byte> ProtocolFamilyByte => new Span<byte>(m_bytes,Fields.ProtocolFamilyPosition, 1);

@@ -14,6 +14,7 @@ using Thrift.Collections;
 using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
+using Apache.Ignite.Core.Cache.Configuration;
 
 namespace Tarzan.Nfx.Ingest
 {
@@ -23,14 +24,21 @@ namespace Tarzan.Nfx.Ingest
   #endif
   public partial class PacketStream : TBase
   {
+    
     private long _FirstSeen;
-    private long _LastSeen;
-    private long _Octets;
-    private int _Packets;
-    private string _ServiceName;
-    private List<Frame> _FrameList;
 
-    public long FirstSeen
+        private long _LastSeen;
+
+        private long _Octets;
+
+        private int _Packets;
+
+        private string _ServiceName;
+
+        private List<Frame> _FrameList;
+
+        [QuerySqlField]
+        public long FirstSeen
     {
       get
       {
@@ -42,8 +50,8 @@ namespace Tarzan.Nfx.Ingest
         this._FirstSeen = value;
       }
     }
-
-    public long LastSeen
+        [QuerySqlField]
+        public long LastSeen
     {
       get
       {
@@ -56,7 +64,8 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public long Octets
+        [QuerySqlField]
+        public long Octets
     {
       get
       {
@@ -69,7 +78,8 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public int Packets
+        [QuerySqlField]
+        public int Packets
     {
       get
       {
@@ -82,7 +92,8 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public string ServiceName
+        [QuerySqlField]
+        public string ServiceName
     {
       get
       {
@@ -95,7 +106,8 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public List<Frame> FrameList
+        [QuerySqlField]
+        public List<Frame> FrameList
     {
       get
       {

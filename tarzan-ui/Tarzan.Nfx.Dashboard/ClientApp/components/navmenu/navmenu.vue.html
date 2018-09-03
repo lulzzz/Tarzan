@@ -6,7 +6,7 @@
                 Flows
             </template>
             <el-menu-item index="/flows/flowtable">Flow Table</el-menu-item>
-            <el-menu-item index="/flows/sessions">Sessions</el-menu-item>
+            <el-menu-item index="/flows/sessions" disabled>Sessions</el-menu-item>
         </el-submenu>
         <el-submenu index="/explore">
             <template slot="title">
@@ -16,38 +16,37 @@
             <el-menu-item index="/explore/services">Services</el-menu-item>
             <el-menu-item index="/explore/dns">DNS</el-menu-item>
             <el-menu-item index="/explore/http">HTTP</el-menu-item>
-            <el-menu-item index="/explore/tls">TLS</el-menu-item>
+            <el-menu-item index="/explore/tls" disabled>TLS</el-menu-item>
         </el-submenu>
         <el-menu-item index="/files">Files</el-menu-item>
-        <el-menu-item index="/timeline">Timeline</el-menu-item>
-        <!--
+        <el-menu-item index="/timeline" disabled>Timeline</el-menu-item>
     <el-submenu index="/communication">
         <template slot="title">
             Communications
         </template>
-        <el-menu-item index="/communication/email">Email</el-menu-item>
-        <el-menu-item index="/communication/facebook">Facebook</el-menu-item>
-        <el-menu-item index="/communication/twitter">Twitter</el-menu-item>
+        <el-menu-item index="/communication/email" disabled>Email</el-menu-item>
+        <el-menu-item index="/communication/facebook" disabled>Facebook</el-menu-item>
+        <el-menu-item index="/communication/twitter" disabled>Twitter</el-menu-item>
     </el-submenu>
-        -->
+       
         <el-submenu index="/results">
             <template slot="title">
                 Results
             </template>
-            <el-menu-item index="/results/cleartext">Cleartext</el-menu-item>
-            <el-menu-item index="/results/credentials">Credentials</el-menu-item>
-            <el-menu-item index="/results/keywordsearch">Keyword Search</el-menu-item>
+            <el-menu-item index="/results/cleartext" disabled>Cleartext</el-menu-item>
+            <el-menu-item index="/results/credentials" disabled>Credentials</el-menu-item>
+            <el-menu-item index="/results/keywordsearch" disabled>Keyword Search</el-menu-item>
         </el-submenu>
-        <el-menu-item index="/tags">Tags</el-menu-item>
-        <el-menu-item index="/logs">Logs</el-menu-item>
-        <el-menu-item index="/settings">Settings</el-menu-item>
+        <el-menu-item index="/tags" disabled>Tags</el-menu-item>
+        <el-menu-item index="/logs" disabled>Logs</el-menu-item>
+        <el-menu-item index="/settings" disabled>Settings</el-menu-item>
         <el-submenu index="/user">
             <template slot="title">
                 User
             </template>
-            <el-menu-item index="/user/profile">Profile</el-menu-item>
-            <el-menu-item index="/user/messages">Messages</el-menu-item>
-            <el-menu-item index="/user/logout">Logout</el-menu-item>
+            <el-menu-item index="/user/profile" disabled>Profile</el-menu-item>
+            <el-menu-item index="/user/messages" disabled>Messages</el-menu-item>
+            <el-menu-item index="/user/logout" disabled>Logout</el-menu-item>
         </el-submenu>
     </el-menu>
 </template>

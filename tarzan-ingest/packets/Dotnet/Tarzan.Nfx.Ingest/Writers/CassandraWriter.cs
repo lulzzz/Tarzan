@@ -44,7 +44,7 @@ namespace Tarzan.Nfx.Ingest
             m_dataset.Close();
         }
 
-        public async Task WriteCapture(FileInfo fileinfo)
+        public void WriteCapture(FileInfo fileinfo)
         {
             var capture = new Capture
             {
@@ -54,7 +54,7 @@ namespace Tarzan.Nfx.Ingest
                 Length = fileinfo.Length,
                 Hash = "",
             };
-            await m_dataset.CaptureTable.Insert(capture).ExecuteAsync();
+            m_dataset.CaptureTable.Insert(capture).Execute();
         }
 
         public void WriteFlow(FlowKey flowKey, PacketStream flowValue)
@@ -102,19 +102,18 @@ namespace Tarzan.Nfx.Ingest
             }
         }
 
-        private async Task WriteDns(IDictionary<FlowKey, PacketStream> table)
+        public void WriteDns(IEnumerable<DnsObject> dnsObjects)
         {
-            var dnsInfos = table.Where(f=>f.Value.ServiceName.Equals("domain", StringComparison.InvariantCultureIgnoreCase)).SelectMany(x => DnsAnalyzer.Inspect(x.Key, x.Value));
-            foreach(var dnsInfo in dnsInfos)
+            foreach(var dnsObject in dnsObjects)
             {
-                var insert = m_dataset.DnsTable.Insert(dnsInfo);
-                await insert.ExecuteAsync();
+                var insert = m_dataset.DnsTable.Insert(dnsObject);
+                insert.Execute();
                 var objectPoco = new AffObject
                 {
-                    ObjectName = dnsInfo.ObjectName,
+                    ObjectName = dnsObject.ObjectName,
                     ObjectType = nameof(DnsObject)
                 };
-                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
+                m_dataset.CatalogueTable.Insert(objectPoco).Execute();
             }
         }
 
@@ -130,24 +129,20 @@ namespace Tarzan.Nfx.Ingest
             File.WriteAllText(flowId.ToString() + ".csv", contents);
         }
 
-        
 
-        private async Task WriteHttp(IDictionary<FlowKey, PacketStream> table)
+
+        public void WriteHttp(IEnumerable<HttpObject> httpObjects)
         {
-            var httpFlows = table.Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase));
-            var httpStreams = TcpStream.Split(httpFlows).ToList();
-            //httpStreams.ForEach(x=> DebugSeqnum(PacketFlow.NewUid(x.Key.Protocol.ToString(), x.Key.SourceEndpoint, x.Key.DestinationEndpoint, x.Value.FirstSeen), x.Value));
-            var httpInfos = TcpStream.Pair(httpStreams).SelectMany(c => HttpAnalyzer.Inspect(c));
-            foreach (var httpInfo in httpInfos)
+            foreach (var httpInfo in httpObjects)
             {
                 var insert = m_dataset.HttpTable.Insert(httpInfo);
-                await insert.ExecuteAsync();
+                insert.Execute();
                 var objectPoco = new AffObject
                 {
                     ObjectName = httpInfo.ObjectName,
                     ObjectType = nameof(HttpObject)
                 };
-                await m_dataset.CatalogueTable.Insert(objectPoco).ExecuteAsync();
+                m_dataset.CatalogueTable.Insert(objectPoco).Execute();
             }
         }
     }

@@ -10,6 +10,9 @@
 
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <div slot="empty">
+                        No data to view.
+                    </div>
                     <el-table-column prop="transactionId" label="Id" width="80" />
                     <el-table-column label="Time" width="200">
                         <template slot-scope="props">

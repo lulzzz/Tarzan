@@ -1,4 +1,7 @@
-﻿using Kaitai;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Compute;
+using Apache.Ignite.Core.Resource;
+using Kaitai;
 using Netdx.PacketDecoders;
 using Netdx.Packets.Core;
 using PacketDotNet;
@@ -11,13 +14,12 @@ using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
-    public static class HttpAnalyzer
+    public class HttpAnalyzer : IComputeFunc<IEnumerable<Model.HttpObject>>
     {
         private static HttpPacket ParseHttpPacket(Packet packet)
         {
             try
             {
-
                 var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
                 var stream = new KaitaiStream(tcpPacket.PayloadData ?? new byte[0]);
                 var httpPacket = new HttpPacket(stream);
@@ -120,6 +122,20 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 return (userPasswd.ElementAtOrDefault(0), userPasswd.ElementAtOrDefault(1));
             }
             return (null, null);
+        }
+
+        [InstanceResource]
+        protected readonly IIgnite m_ignite;
+
+        public IEnumerable<HttpObject> Invoke()
+        {
+            var httpFlows = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache).GetLocalEntries()
+                .Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase))
+                .Select(f => KeyValuePair.Create(f.Key, f.Value));
+            var httpStreams = TcpStream.Split(httpFlows).ToList();
+            var httpPairs = TcpStream.Pair(httpStreams);
+            var httpInfos = httpPairs.SelectMany(c => HttpAnalyzer.Inspect(c));
+            return httpInfos;
         }
     }
 }

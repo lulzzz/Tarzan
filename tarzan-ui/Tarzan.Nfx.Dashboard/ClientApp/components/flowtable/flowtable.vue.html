@@ -3,18 +3,21 @@
         <h1>Flow Table</h1>
         <el-container>
             <el-header>
-
-                <el-input v-model="flowFilter">
-                    <template slot="prepend">
-                        Filter:
-                    </template>
-                    <el-button slot="append" icon="el-icon-check"></el-button>
-                    <el-button slot="append" icon="el-icon-close"></el-button>
-                </el-input>
-
+                <!--
+    <el-input v-model="flowFilter">
+        <template slot="prepend">
+            Filter:
+        </template>
+        <el-button slot="append" icon="el-icon-check"></el-button>
+        <el-button slot="append" icon="el-icon-close"></el-button>
+    </el-input>
+    -->
             </el-header>
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%" v-loading="loading" @row-dblclick="selectFlow">
+                    <div slot="empty">
+                        No data to view.
+                    </div>
                     <!--<el-table-column prop="flowId" label="Id" width="80"/>-->
                     <el-table-column prop="protocol" label="Proto" width="80" />
                     <el-table-column label="Source">
@@ -37,7 +40,7 @@
                         <template slot-scope="props">
                             {{ (props.row.lastSeen - props.row.firstSeen) / 1000 }} s
                         </template>
-                    </el-table-column>                  
+                    </el-table-column>
                     <el-table-column prop="packets" label="Packets" width="150" />
                     <el-table-column prop="octets" label="Octets" width="150" />
                 </el-table>

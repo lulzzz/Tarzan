@@ -14,10 +14,17 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         {
             m_ignite = ignite;
         }
+                                            
+        public void LinqExample()
+        {
+            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+            var lst = queryable.Select(x => x.Value.FirstSeen);
+            lst.ToList();
+        }
 
         public IEnumerable<Host> GetHosts()
         {
-            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache); //.AsCacheQueryable();
+            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
 
             var srcHosts = queryable.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
                 new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });

@@ -123,7 +123,10 @@ namespace Tarzan.Nfx.Ingest
 
                 var compute = ignite.GetCluster().GetCompute();
                 compute.Run(fileList.Select(x => new FlowAnalyzer { FileName = x }));
-
+                foreach (var fileInfo in fileList.Select(f => new FileInfo(f)))
+                {
+                    cassandraWriter.WriteCapture(fileInfo);
+                }
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Count()}");
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Detecting services of flows...");
@@ -132,11 +135,19 @@ namespace Tarzan.Nfx.Ingest
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Inserting flows into Cassandra...");
                 compute.Broadcast(new WriteFlowsToCassandra(cassandraWriter.Endpoint, cassandraWriter.Keyspace));
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: DONE!");
-
+                                        
                 // STATISTICS - currently computed on a single node!!! See the implementation and find out how to properly use AsCacheQueryable.
                 var stats = new Statistics(ignite);
+                stats.LinqExample();
+                
                 cassandraWriter.WriteHosts(stats.GetHosts());
                 cassandraWriter.WriteServices(stats.GetServices());
+
+                var dnsObjs = compute.Call(new DnsAnalyzer());
+                cassandraWriter.WriteDns(dnsObjs);
+
+                var httpObjs = compute.Call(new HttpAnalyzer());
+                cassandraWriter.WriteHttp(httpObjs);
 
             }
         }

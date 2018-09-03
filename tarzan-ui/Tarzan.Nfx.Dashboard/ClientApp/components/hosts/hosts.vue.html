@@ -17,6 +17,9 @@
 
             <el-main>
                 <el-table :data="dataSource" border style="width: 100%">
+                    <div slot="empty">
+                        No data to view.
+                    </div>
                     <el-table-column type="expand">
                         <template slot-scope="props">
                             <p>IP: {{ props.row.address }}</p>
@@ -36,7 +39,7 @@
                         <el-table-column prop="downFlows" label="Down" width="60" />
                         <el-table-column label="Sum" width="60">
                             <template slot-scope="scope">
-                                {{ dataSource[scope.$index].upFlows + dataSource[scope.$index].downFlows }} 
+                                {{ dataSource[scope.$index].upFlows + dataSource[scope.$index].downFlows }}
                             </template>
                         </el-table-column>
                     </el-table-column>
@@ -51,8 +54,8 @@
                         </el-table-column>
                     </el-table-column>
                     <el-table-column label="Octets">
-                        <el-table-column prop="octetsSent" label="Sent" width="100"/>
-                        <el-table-column prop="octetsRecv" label="Received" width="100"/>
+                        <el-table-column prop="octetsSent" label="Sent" width="100" />
+                        <el-table-column prop="octetsRecv" label="Received" width="100" />
                         <el-table-column prop="octets" label="Sum" width="100">
                             <template slot-scope="scope">
                                 {{ dataSource[scope.$index].octetsSent + dataSource[scope.$index].octetsRecv }}

@@ -25,7 +25,7 @@ namespace Tarzan.Nfx.Ingest
                 SocketTimeout = TimeSpan.FromSeconds(0.3)
             },
             CacheConfiguration = new[] {
-                                new CacheConfiguration(FlowCache, new QueryEntity(typeof(PacketStream)))
+                                new CacheConfiguration(FlowCache, new QueryEntity(typeof(FlowKey)), new QueryEntity(typeof(PacketStream)))
                                 {
                                     CacheMode = CacheMode.Partitioned,
                                     Backups = 0

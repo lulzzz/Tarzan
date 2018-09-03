@@ -107,7 +107,10 @@
 
 
             <el-main>
-                <el-table :data="dataSource" border style="width: 100%"  v-loading="loading">
+                <el-table :data="dataSource" border style="width: 100%" v-loading="loading">
+                    <div slot="empty">
+                        No data to view.
+                    </div>
                     <el-table-column type="expand" width="50">
                         <template slot-scope="props">
                             <el-row style="margin-bottom:10px">
@@ -145,7 +148,7 @@
                                                 <el-tab-pane label="Hex">Hex View</el-tab-pane>
                                             </el-tabs>
                                             <el-button style="float: right;" slot="reference" icon="el-icon-view" circle size="mini" />
-                                        </el-popover>                                        
+                                        </el-popover>
                                         <el-button style="float: right; margin-right: 5px;" icon="el-icon-download" circle size="mini"
                                                    @click="downloadResponseContent(props.row.flowUid,props.row.objectIndex)" />
 
@@ -160,10 +163,10 @@
                             </el-col>
                         </template>
                     </el-table-column>
-                    <el-table-column label="Time" width="200" >
-                    <template slot-scope="props">
-                       {{ new Date(props.row.timestamp).toString() }}
-                    </template>
+                    <el-table-column label="Time" width="200">
+                        <template slot-scope="props">
+                            {{ new Date(props.row.timestamp).toString() }}
+                        </template>
                     </el-table-column>
                     <el-table-column prop="client" label="Client" width="150" />
                     <el-table-column prop="server" label="Server" width="150" />
@@ -172,7 +175,7 @@
                         <template slot-scope="props">
                             http://{{ props.row.host }}{{ props.row.uri }}
                         </template>
-                    </el-table-column>   
+                    </el-table-column>
                     <el-table-column prop="responseContentType" label="Type" width="200" />
                 </el-table>
             </el-main>

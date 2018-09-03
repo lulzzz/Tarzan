@@ -68,6 +68,7 @@ namespace Tarzan.Nfx.Ingest
             var downFlows = flows.Where(f => f.Key.DestinationPort < f.Key.SourcePort);
             var upFlows = flows.Where(f => f.Key.DestinationPort > f.Key.SourcePort);
             var conversationCandidates = downFlows.Join(upFlows, f => f.Key, f => f.Key, (f1, f2) => new TcpConversation { RequestFlow = f1, ResponseFlow = f2 }, new TcpConversation.Comparer());
+
             return conversationCandidates.Where(c => c.RequestFlow.Value.IntersectsWith(c.ResponseFlow.Value));
         }
 
