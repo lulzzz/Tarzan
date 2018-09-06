@@ -88,10 +88,15 @@ struct Frame {
 }
 
 struct PacketStream {    
-    1: i64 FirstSeen;
-    2: i64 LastSeen;
-    3: i64 Octets;
-    4: i32 Packets;
-    5: string ServiceName;
-	10: list<Frame> FrameList;
+    1: i16 Protocol;
+    2: binary SourceAddress;
+    3: i32 SourcePort;
+    4: binary DestinationAddress;
+    5: i32 DestinationPort;
+    10: i64 FirstSeen;
+    11: i64 LastSeen;
+    12: i64 Octets;
+    13: i32 Packets;
+    14: string ServiceName;
+	20: list<Frame> FrameList;
 }

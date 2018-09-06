@@ -65,57 +65,18 @@ namespace Tarzan.Nfx.Ingest
                         throw new ArgumentException("At least one source file has to be specified.");
                     }
 
-                    // initialize Cassandra datastore:
-                    if (!optionKeyspace.HasValue())
-                    {
-                        throw new ArgumentException("Keyspace is not specified.");
-                    }
-
-                    var cassandraWriter = new CassandraWriter(IPEndPoint.Parse(optionCassandra.Value() ?? "localhost:9042", 9042), optionKeyspace.Value());
-
-                    if (optionCreate.HasValue())
-                    {
-                        Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Deleting keyspace '{optionKeyspace.Value()}'...");
-                        cassandraWriter.DeleteKeyspace();
-                    }
-
-                    Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Initializing keyspace '{optionKeyspace.Value()}'...");
-                    cassandraWriter.Initialize();
-
-                    // run processing pipeline:
-
                     switch (runMode)
                     {
                         case RunMode.Ignite:
-                            RunAsIgnite(cassandraWriter, fileList.Select(x => x.FullName));
-                            break;
-                        case RunMode.Parallel:
-                            RunAsParallel(cassandraWriter, fileList.Select(x => x.FullName));
-                            break;
-                        case RunMode.Sequential:
-                            RunAsSequential(cassandraWriter, fileList.Select(x => x.FullName));
+                            RunAsIgnite(fileList.Select(x => x.FullName));
                             break;
                     }
 
-                    Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: All Done. Closing connection to Cassandra..");
-                    cassandraWriter.Shutdown();
-                    Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Ok.");
                     return 0;
                 });
             };
 
-
-        static void RunAsParallel(CassandraWriter cassandraWriter, IEnumerable<string> fileList)
-        {
-            throw new NotImplementedException();
-        }
-
-        static void RunAsSequential(CassandraWriter cassandraWriter, IEnumerable<string> fileList)
-        {
-            throw new NotImplementedException();
-        }
-
-        static void RunAsIgnite(CassandraWriter cassandraWriter, IEnumerable<string> fileList)
+        static void RunAsIgnite(IEnumerable<string> fileList)
         {
             using (var ignite = Ignition.Start(IgniteConfiguration.Default))
             {
@@ -123,32 +84,17 @@ namespace Tarzan.Nfx.Ingest
 
                 var compute = ignite.GetCluster().GetCompute();
                 compute.Run(fileList.Select(x => new FlowAnalyzer { FileName = x }));
-                foreach (var fileInfo in fileList.Select(f => new FileInfo(f)))
-                {
-                    cassandraWriter.WriteCapture(fileInfo);
-                }
+
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Count()}");
 
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Detecting services of flows...");
                 compute.Broadcast(new ServiceDetector());
-
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Inserting flows into Cassandra...");
-                compute.Broadcast(new WriteFlowsToCassandra(cassandraWriter.Endpoint, cassandraWriter.Keyspace));
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: DONE!");
-                                        
+                
                 // STATISTICS - currently computed on a single node!!! See the implementation and find out how to properly use AsCacheQueryable.
                 var stats = new Statistics(ignite);
-                stats.LinqExample();
-                
-                cassandraWriter.WriteHosts(stats.GetHosts());
-                cassandraWriter.WriteServices(stats.GetServices());
-
-                var dnsObjs = compute.Call(new DnsAnalyzer());
-                cassandraWriter.WriteDns(dnsObjs);
-
-                var httpObjs = compute.Call(new HttpAnalyzer());
-                cassandraWriter.WriteHttp(httpObjs);
-
+                stats.LinqExample();   
+                compute.Broadcast(new DnsAnalyzer());
+                //var httpObjs = compute.Call(new HttpAnalyzer());
             }
         }
 

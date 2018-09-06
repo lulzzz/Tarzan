@@ -7,6 +7,7 @@ using SharpPcap;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
@@ -28,7 +29,7 @@ namespace Tarzan.Nfx.Ingest
             var sw = new Stopwatch();
             sw.Start();
 
-            var flowTracker = new FlowTracker();
+            var flowTracker = new FlowTracker(new FrameKeyProvider());
             RawCapture packet = null;
             while ((packet = device.GetNextPacket())!=null)
             {

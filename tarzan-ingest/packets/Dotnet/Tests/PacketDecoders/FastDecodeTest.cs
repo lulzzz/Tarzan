@@ -8,6 +8,7 @@ using Netdx.Packets.Base;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using Tarzan.Nfx.Ingest;
+using Tarzan.Nfx.Ingest.Flow;
 using Xunit;
 
 namespace PacketDecodersTests
@@ -28,7 +29,7 @@ namespace PacketDecodersTests
         public void LoadAndParsePacket(string filename)
         {
             var packets = LoadPackets(GetFullPath(filename));
-            var flows = from packet in packets.Select(p => (Key: FlowKey.GetKey(p.Data), Packet: p))
+            var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
         }

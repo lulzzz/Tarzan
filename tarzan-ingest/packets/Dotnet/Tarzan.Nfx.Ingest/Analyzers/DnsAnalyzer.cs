@@ -12,7 +12,7 @@ using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
-    public class DnsAnalyzer : IComputeFunc<IEnumerable<Model.DnsObject>>
+    public class DnsAnalyzer : IComputeAction
     {    
         public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream flowRecord)
         {
@@ -78,16 +78,18 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         [InstanceResource]
         protected readonly IIgnite m_ignite;
 
-        public IEnumerable<DnsObject> Invoke()
+        public void Invoke()
         {
-            var cache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+            var flowCache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+            var dnsObjectCache = m_ignite.GetOrCreateCache<string, DnsObject> ("DnsObjectCache");
 
-            foreach (var flow in cache.GetLocalEntries())
+            foreach (var flow in flowCache.GetLocalEntries())
             {
                 foreach (var dns in Inspect(flow.Key, flow.Value))
-                    yield return dns;
-            }
-            
+                {
+                    dnsObjectCache.Put(dns.ObjectName, dns);
+                }
+            }            
         }
     }
 }

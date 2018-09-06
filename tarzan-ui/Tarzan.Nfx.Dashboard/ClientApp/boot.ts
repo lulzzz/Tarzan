@@ -11,7 +11,7 @@ Vue.use(VueRouter);
 Vue.use(ElementUI);
 
 const routes = [
-    { path: '/', component: require('./components/about/about.vue.html') },
+    { path: '/', component: require('./components/flowtable/flowtable.vue.html') },
     { path: '/captures', component: require('./components/captures/captures.vue.html') },
     { path: '/flows/flowtable', component: require('./components/flowtable/flowtable.vue.html') },
     { path: '/flows/details/:id', component: require('./components/flow/flow.vue.html') },

@@ -15,6 +15,7 @@ using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using Tarzan.Nfx.Ingest;
+using Tarzan.Nfx.Ingest.Flow;
 
 namespace PacketDecodersBenchmark
 {
@@ -98,21 +99,21 @@ namespace PacketDecodersBenchmark
         [Benchmark]
         public void LinqFastDecode()
         {
-            var flows = from packet in _packets.Select(p => (Key: FlowKey.GetKey(p.Data), Packet: p))
+            var flows = from packet in _packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
         }
         [Benchmark]
         public void PLinqFastDecode()
         {
-            var result = _packets.AsParallel().Select(p => (Key: FlowKey.GetKey(p.Data), Packet: p)).GroupBy(x => x.Key).ToList();
+            var result = _packets.AsParallel().Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p)).GroupBy(x => x.Key).ToList();
         }
 
 
         [Benchmark]
         public void LinqFastDecodeStringKey()
         {
-            var flows = from packet in _packets.Select(p => (Key: FlowKey.GetKey(p.Data).ToString(), Packet: p))
+            var flows = from packet in _packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data).ToString(), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
         }
@@ -142,7 +143,7 @@ namespace PacketDecodersBenchmark
             var flows = new Dictionary<FlowKey, List<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = FlowKey.GetKey(packet.Data);
+                var key = FrameKeyProvider.GetKey(packet.Data);
                 if (flows.TryGetValue(key, out var lst))
                 {
                     lst.Add(packet);
@@ -159,7 +160,7 @@ namespace PacketDecodersBenchmark
             var flows = new Dictionary<FlowKey, LinkedList<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = FlowKey.GetKey(packet.Data);
+                var key = FrameKeyProvider.GetKey(packet.Data);
                 if (flows.TryGetValue(key, out var lst))
                 {
                     lst.AddLast(packet);
@@ -179,7 +180,7 @@ namespace PacketDecodersBenchmark
             var flows = new ConcurrentDictionary<FlowKey, List<RawCapture>>();
             foreach (var packet in _packets)
             {
-                var key = FlowKey.GetKey(packet.Data);
+                var key = FrameKeyProvider.GetKey(packet.Data);
                 flows.AddOrUpdate(key, new List<RawCapture> { packet },
                     (k, lst) =>
                     {
@@ -195,7 +196,7 @@ namespace PacketDecodersBenchmark
             var flows = new ConcurrentDictionary<FlowKey, ConcurrentBag<RawCapture>>();
             Parallel.ForEach(_packets, (packet) =>
             {
-                var key = FlowKey.GetKey(packet.Data);
+                var key = FrameKeyProvider.GetKey(packet.Data);
                 flows.AddOrUpdate(key, 
                     // add method
                     k =>  new ConcurrentBag<RawCapture> { packet },
