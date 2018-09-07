@@ -2,11 +2,11 @@
   "profiles": {
     "ignite-folder": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -folder D:\\Captures\\ids\\testbed-12jun-32 -cassandra \"localhost\" -namespace testbed -create -runAs ignite"
+      "commandLineArgs": "track-flows -folder D:\\Captures\\ids\\testbed-12jun-32 -cassandra \"localhost\" -namespace testbed -create"
     },
     "ignite-file": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-64\\testbed-12-000.pcap -cassandra \"localhost\" -namespace testbed -create -runAs ignite",
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-64\\testbed-12-000.pcap -cassandra \"localhost\" -namespace testbed -create ",
       "environmentVariables": {
         "Key": "Value",
         "IGNITE_H2_DEBUG_CONSOLE": "true"

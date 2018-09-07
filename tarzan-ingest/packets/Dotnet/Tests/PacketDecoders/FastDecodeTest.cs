@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Attributes;
 using Netdx.PacketDecoders;
 using Netdx.Packets.Base;
 using SharpPcap;
@@ -25,7 +26,7 @@ namespace PacketDecodersTests
 
 
         [Theory]
-        [InlineData(@"Resources\http\http.pcap")]
+        [InlineData(@"Resources\http.cap")]
         public void LoadAndParsePacket(string filename)
         {
             var packets = LoadPackets(GetFullPath(filename));
@@ -48,5 +49,9 @@ namespace PacketDecodersTests
             device.Close();
             return packetList;
         }
+
+
+
+       
     }
 }

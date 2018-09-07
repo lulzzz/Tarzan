@@ -57,34 +57,34 @@ namespace Tarzan.Nfx.Ingest
 
         public FlowKey(byte[] bytes)
         {
-
             if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
             this.m_bytes = bytes;
             this.m_hashCode = GetHashCode(bytes);
         }
 
         public ProtocolType Protocol => (ProtocolType)m_bytes[Fields.ProtocolPosition];
-        Span<Byte> ProtocolByte => new Span<byte>(m_bytes,Fields.ProtocolPosition, 1);
+        internal Span<Byte> ProtocolByte => new Span<byte>(m_bytes,Fields.ProtocolPosition, 1);
 
 
         public ProtocolFamily ProtocolFamily => (ProtocolFamily)m_bytes[Fields.ProtocolFamilyPosition];
-        Span<Byte> ProtocolFamilyByte => new Span<byte>(m_bytes,Fields.ProtocolFamilyPosition, 1);
+         Span<Byte> ProtocolFamilyByte => new Span<byte>(m_bytes,Fields.ProtocolFamilyPosition, 1);
 
         public ReadOnlySpan<byte> SourceAddress => new Span<byte>(m_bytes, Fields.SourceAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
-        Span<Byte> SourceAddressBytes => new Span<byte>(m_bytes, Fields.SourceAddressPosition, 16);
+         Span<byte> SourceAddressBytes => new Span<byte>(m_bytes, Fields.SourceAddressPosition, 16);
 
         public ReadOnlySpan<byte> DestinationAddress => new Span<byte>(m_bytes, Fields.DestinationAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
-        Span<Byte> DestinationAddressBytes => new Span<byte>(m_bytes, Fields.DestinationAddressPosition, 16);
+         Span<Byte> DestinationAddressBytes => new Span<byte>(m_bytes, Fields.DestinationAddressPosition, 16);
 
         public UInt16 SourcePort => BinaryPrimitives.ReadUInt16BigEndian(SourcePortBytes);
-        Span<Byte> SourcePortBytes => new Span<byte>(m_bytes, Fields.SourcePortPosition ,2);
+         Span<Byte> SourcePortBytes => new Span<byte>(m_bytes, Fields.SourcePortPosition ,2);
 
         public UInt16 DestinationPort => BinaryPrimitives.ReadUInt16BigEndian(DestinationPortBytes);
-        Span<Byte> DestinationPortBytes => new Span<byte>(m_bytes, Fields.DestinationPortPosition, 2);
+         Span<Byte> DestinationPortBytes => new Span<byte>(m_bytes, Fields.DestinationPortPosition, 2);
 
         public IPEndPoint SourceEndpoint => new IPEndPoint(new IPAddress(SourceAddress.ToArray()), SourcePort);
         public IPEndPoint DestinationEndpoint => new IPEndPoint(new IPAddress(DestinationAddress.ToArray()), DestinationPort);
 
+        public byte[] Bytes => m_bytes;
 
         public void WriteBinary(IBinaryWriter writer)
         { 
@@ -94,11 +94,16 @@ namespace Tarzan.Nfx.Ingest
 
         public void ReadBinary(IBinaryReader reader)
         {
-            this.m_bytes = reader.ReadByteArray(nameof(this.m_bytes));
-            this.m_hashCode = reader.ReadInt(nameof(this.m_hashCode));
+            m_bytes = reader.ReadByteArray(nameof(m_bytes));
+            if (m_bytes == null || m_bytes.Length != 40)
+            {
+                throw new ArgumentOutOfRangeException($"Invalid size of {nameof(FlowKey.m_bytes)}. Must be exactly 40 bytes.");
+            }
+
+            m_hashCode = reader.ReadInt(nameof(m_hashCode));
         }
 
-        public static FlowKey Create(byte protocol, Span<byte> sourceAddres, UInt16 sourcePort, Span<byte> destinationAddress, UInt16 destinationPort)
+        public static FlowKey Create(byte protocol, Span<byte> sourceAddres, ushort sourcePort, Span<byte> destinationAddress, ushort destinationPort)
         {
             var bytes = new byte[40];
             bytes[Fields.ProtocolPosition] = protocol;
@@ -113,14 +118,11 @@ namespace Tarzan.Nfx.Ingest
         {
             return f1.m_hashCode == f2.m_hashCode && new Span<byte>(f1.m_bytes).SequenceEqual(f2.m_bytes);
         }
-        public static unsafe int GetHashCode(Span<byte> bytes)
+        static unsafe int GetHashCode(Span<byte> bytes)
         {
-            if (bytes == null) throw new ArgumentNullException();
-            if (bytes.Length < 40) throw new ArgumentException("Must be at least 40 bytes.");
             fixed (byte* bytePtr = bytes)
             {
                 var intPtr = (int*)bytePtr;
-
                 return intPtr[0] ^ intPtr[1] ^ intPtr[2] ^ intPtr[3] ^ intPtr[4]
                     ^ intPtr[5] ^ intPtr[6] ^ intPtr[7] ^ intPtr[8] ^ intPtr[9];
             }

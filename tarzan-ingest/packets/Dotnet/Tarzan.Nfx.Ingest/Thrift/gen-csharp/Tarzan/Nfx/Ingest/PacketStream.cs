@@ -24,10 +24,11 @@ namespace Tarzan.Nfx.Ingest
   public partial class PacketStream : TBase
   {
     private short _Protocol;
-    private byte[] _SourceAddress;
+    private byte[] _SourceAddressBytes;
     private int _SourcePort;
-    private byte[] _DestinationAddress;
+    private byte[] _DestinationAddressBytes;
     private int _DestinationPort;
+    private string _FlowUid;
     private long _FirstSeen;
     private long _LastSeen;
     private long _Octets;
@@ -48,16 +49,16 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public byte[] SourceAddress
+    public byte[] SourceAddressBytes
     {
       get
       {
-        return _SourceAddress;
+        return _SourceAddressBytes;
       }
       set
       {
-        __isset.SourceAddress = true;
-        this._SourceAddress = value;
+        __isset.SourceAddressBytes = true;
+        this._SourceAddressBytes = value;
       }
     }
 
@@ -74,16 +75,16 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    public byte[] DestinationAddress
+    public byte[] DestinationAddressBytes
     {
       get
       {
-        return _DestinationAddress;
+        return _DestinationAddressBytes;
       }
       set
       {
-        __isset.DestinationAddress = true;
-        this._DestinationAddress = value;
+        __isset.DestinationAddressBytes = true;
+        this._DestinationAddressBytes = value;
       }
     }
 
@@ -97,6 +98,19 @@ namespace Tarzan.Nfx.Ingest
       {
         __isset.DestinationPort = true;
         this._DestinationPort = value;
+      }
+    }
+
+    public string FlowUid
+    {
+      get
+      {
+        return _FlowUid;
+      }
+      set
+      {
+        __isset.FlowUid = true;
+        this._FlowUid = value;
       }
     }
 
@@ -185,16 +199,20 @@ namespace Tarzan.Nfx.Ingest
     #endif
     public struct Isset {
       public bool Protocol;
-      public bool SourceAddress;
+      public bool SourceAddressBytes;
       public bool SourcePort;
-      public bool DestinationAddress;
+      public bool DestinationAddressBytes;
       public bool DestinationPort;
+      public bool FlowUid;
       public bool FirstSeen;
       public bool LastSeen;
       public bool Octets;
       public bool Packets;
       public bool ServiceName;
       public bool FrameList;
+    }
+
+    public PacketStream() {
     }
 
     public void Read (TProtocol iprot)
@@ -221,7 +239,7 @@ namespace Tarzan.Nfx.Ingest
               break;
             case 2:
               if (field.Type == TType.String) {
-                SourceAddress = iprot.ReadBinary();
+                SourceAddressBytes = iprot.ReadBinary();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -235,7 +253,7 @@ namespace Tarzan.Nfx.Ingest
               break;
             case 4:
               if (field.Type == TType.String) {
-                DestinationAddress = iprot.ReadBinary();
+                DestinationAddressBytes = iprot.ReadBinary();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -243,6 +261,13 @@ namespace Tarzan.Nfx.Ingest
             case 5:
               if (field.Type == TType.I32) {
                 DestinationPort = iprot.ReadI32();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 6:
+              if (field.Type == TType.String) {
+                FlowUid = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -329,12 +354,12 @@ namespace Tarzan.Nfx.Ingest
           oprot.WriteI16(Protocol);
           oprot.WriteFieldEnd();
         }
-        if (SourceAddress != null && __isset.SourceAddress) {
-          field.Name = "SourceAddress";
+        if (SourceAddressBytes != null && __isset.SourceAddressBytes) {
+          field.Name = "SourceAddressBytes";
           field.Type = TType.String;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          oprot.WriteBinary(SourceAddress);
+          oprot.WriteBinary(SourceAddressBytes);
           oprot.WriteFieldEnd();
         }
         if (__isset.SourcePort) {
@@ -345,12 +370,12 @@ namespace Tarzan.Nfx.Ingest
           oprot.WriteI32(SourcePort);
           oprot.WriteFieldEnd();
         }
-        if (DestinationAddress != null && __isset.DestinationAddress) {
-          field.Name = "DestinationAddress";
+        if (DestinationAddressBytes != null && __isset.DestinationAddressBytes) {
+          field.Name = "DestinationAddressBytes";
           field.Type = TType.String;
           field.ID = 4;
           oprot.WriteFieldBegin(field);
-          oprot.WriteBinary(DestinationAddress);
+          oprot.WriteBinary(DestinationAddressBytes);
           oprot.WriteFieldEnd();
         }
         if (__isset.DestinationPort) {
@@ -359,6 +384,14 @@ namespace Tarzan.Nfx.Ingest
           field.ID = 5;
           oprot.WriteFieldBegin(field);
           oprot.WriteI32(DestinationPort);
+          oprot.WriteFieldEnd();
+        }
+        if (FlowUid != null && __isset.FlowUid) {
+          field.Name = "FlowUid";
+          field.Type = TType.String;
+          field.ID = 6;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(FlowUid);
           oprot.WriteFieldEnd();
         }
         if (__isset.FirstSeen) {
@@ -434,11 +467,11 @@ namespace Tarzan.Nfx.Ingest
         __sb.Append("Protocol: ");
         __sb.Append(Protocol);
       }
-      if (SourceAddress != null && __isset.SourceAddress) {
+      if (SourceAddressBytes != null && __isset.SourceAddressBytes) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("SourceAddress: ");
-        __sb.Append(SourceAddress);
+        __sb.Append("SourceAddressBytes: ");
+        __sb.Append(SourceAddressBytes);
       }
       if (__isset.SourcePort) {
         if(!__first) { __sb.Append(", "); }
@@ -446,17 +479,23 @@ namespace Tarzan.Nfx.Ingest
         __sb.Append("SourcePort: ");
         __sb.Append(SourcePort);
       }
-      if (DestinationAddress != null && __isset.DestinationAddress) {
+      if (DestinationAddressBytes != null && __isset.DestinationAddressBytes) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("DestinationAddress: ");
-        __sb.Append(DestinationAddress);
+        __sb.Append("DestinationAddressBytes: ");
+        __sb.Append(DestinationAddressBytes);
       }
       if (__isset.DestinationPort) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
         __sb.Append("DestinationPort: ");
         __sb.Append(DestinationPort);
+      }
+      if (FlowUid != null && __isset.FlowUid) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("FlowUid: ");
+        __sb.Append(FlowUid);
       }
       if (__isset.FirstSeen) {
         if(!__first) { __sb.Append(", "); }

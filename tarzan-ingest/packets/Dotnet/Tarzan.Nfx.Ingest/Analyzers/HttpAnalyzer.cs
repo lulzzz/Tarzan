@@ -10,11 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
-    public class HttpAnalyzer : IComputeFunc<IEnumerable<Model.HttpObject>>
+    public class HttpAnalyzer : IComputeAction
     {
         private static HttpPacket ParseHttpPacket(Packet packet)
         {
@@ -58,10 +60,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
             var transactions = requests.Zip(responses, (request, response) => (Request:request, Response:response)).Select((item,index) => (Transaction: item, TransactionId: index+1));
 
-            var flowUid = PacketFlow.NewUid(conversation.RequestFlow.Key.Protocol.ToString(),
-                    conversation.RequestFlow.Key.SourceEndpoint,
-                    conversation.RequestFlow.Key.DestinationEndpoint,
-                    conversation.RequestFlow.Value.FirstSeen);
+            var flowUid = FlowUid.NewUid(conversation.RequestFlow.Key, conversation.RequestFlow.Value.FirstSeen);
 
             foreach (var (Transaction, TransactionId) in transactions)
             {
@@ -127,15 +126,19 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         [InstanceResource]
         protected readonly IIgnite m_ignite;
 
-        public IEnumerable<HttpObject> Invoke()
+        void IComputeAction.Invoke()
         {
-            var httpFlows = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache).GetLocalEntries()
-                .Where(f => f.Value.ServiceName.Equals("www-http", StringComparison.InvariantCultureIgnoreCase))
+            var httpObjectCache = new HttpObjectTable(m_ignite);
+            var flowCache = new FlowTable(m_ignite);
+            var httpFlows = flowCache.GetCache().GetLocalEntries()
+                .Where(f => String.Equals(f.Value.ServiceName, "www-http", StringComparison.InvariantCultureIgnoreCase))
                 .Select(f => KeyValuePair.Create(f.Key, f.Value));
+
             var httpStreams = TcpStream.Split(httpFlows).ToList();
             var httpPairs = TcpStream.Pair(httpStreams);
-            var httpInfos = httpPairs.SelectMany(c => HttpAnalyzer.Inspect(c));
-            return httpInfos;
+
+            var httpObjects = httpPairs.SelectMany(c => HttpAnalyzer.Inspect(c)).Select(x=> KeyValuePair.Create(x.ObjectName, x));
+            httpObjectCache.GetOrCreateCache().PutAll(httpObjects);
         }
     }
 }

@@ -1,30 +1,22 @@
 ﻿using Apache.Ignite.Core.Binary;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
-using PacketDotNet;
-using PacketDotNet.Ieee80211;
-using SharpPcap;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Thrift.Protocol;
-using Thrift.Transport;
+using Tarzan.Nfx.Ingest.Utils;
 
 namespace Tarzan.Nfx.Ingest
 {
     /// <summary>
     /// Represents a single flow, which consists of the flow key, timestampts and counters, and a stream of packets.
-    /// This object implements <see cref="IBinarizable"/> and thus can be used as the value type of <see cref="Apache.Ignite.Core.Cache.ICache{TK, TV}"/>.
     /// </summary>
-    public partial class PacketStream : IBinarizable
+    public partial class PacketStream
     {
         protected PacketStream(short protocol, ReadOnlySpan<byte> sourceAddress, int sourcePort, ReadOnlySpan<byte> destinationAddress, int destinationPort, long firstSeen, long lastSeen, long octets, int packets, List<Frame> list)
         {
             Protocol = (short)protocol;
-            SourceAddress = sourceAddress.ToArray();
+            SourceAddressBytes = sourceAddress.ToArray();
             SourcePort = sourcePort;
-            DestinationAddress = destinationAddress.ToArray();
+            DestinationAddressBytes = destinationAddress.ToArray();
             DestinationPort = destinationPort;
             FirstSeen = firstSeen;
             LastSeen = lastSeen;
@@ -42,7 +34,30 @@ namespace Tarzan.Nfx.Ingest
         {
             return new PacketStream((short)key.Protocol, key.SourceAddress, key.SourcePort, 
                 key.DestinationAddress, key.DestinationPort, frame.Timestamp, frame.Timestamp, frame.Data.Length, 1, new List<Frame> { frame });
-        }                     
+        }
+        
+        public InternetAddress SourceAddress
+        {
+            get
+            {
+                return new InternetAddress(SourceAddressBytes);
+            }
+            set
+            {
+                SourceAddressBytes = value.GetAddressBytes();
+            }
+        }
+        public InternetAddress DestinationAddress
+        {
+            get
+            {
+                return new InternetAddress(DestinationAddressBytes);
+            }
+            set
+            {
+                DestinationAddressBytes = value.GetAddressBytes();
+            }
+        }
 
         /// <summary>
         /// Updates the flow with the provided packet.
@@ -67,50 +82,29 @@ namespace Tarzan.Nfx.Ingest
         /// <returns></returns>
         public static PacketStream Merge(PacketStream packetStream1, PacketStream packetStream2)
         {
+            
             if (packetStream2 == null) return packetStream1;
-            if (packetStream1 == null) return packetStream2;            
-            return new PacketStream(
-                packetStream1.Protocol, 
-                packetStream1.SourceAddress, 
+            if (packetStream1 == null) return packetStream2;
+            var flowUid = Flow.FlowUid.NewUid((System.Net.Sockets.ProtocolType)packetStream1.Protocol,
+                packetStream1.SourceAddressBytes,
                 packetStream1.SourcePort,
-                packetStream1.DestinationAddress,
+                packetStream1.DestinationAddressBytes,
+                packetStream1.DestinationPort, Math.Min(packetStream1.FirstSeen, packetStream2.FirstSeen));
+
+            return new PacketStream(
+                packetStream1.Protocol,
+                packetStream1.SourceAddressBytes,
+                packetStream1.SourcePort,
+                packetStream1.DestinationAddressBytes,
                 packetStream1.DestinationPort,
                 Math.Min(packetStream1.FirstSeen, packetStream2.FirstSeen),
                 Math.Max(packetStream1.LastSeen, packetStream2.LastSeen),
                 packetStream1.Octets + packetStream2.Octets,
                 packetStream1.Packets + packetStream2.Packets,
-                packetStream1.FrameList.Concat(packetStream2.FrameList).ToList());
-        }
-
-        public void WriteBinary(IBinaryWriter writer)
-        {
-            writer.WriteShort(nameof(Protocol), this.Protocol);
-            writer.WriteByteArray(nameof(SourceAddress), this.SourceAddress);
-            writer.WriteInt(nameof(SourcePort), this.SourcePort);
-            writer.WriteByteArray(nameof(DestinationAddress), this.DestinationAddress);
-            writer.WriteInt(nameof(DestinationPort), this.DestinationPort);
-
-            writer.WriteLong(nameof(FirstSeen), this.FirstSeen);
-            writer.WriteLong(nameof(LastSeen), this.LastSeen);
-            writer.WriteLong(nameof(Octets), this.Octets);
-            writer.WriteInt(nameof(Packets), this.Packets);
-            writer.WriteString(nameof(ServiceName), this.ServiceName);
-            writer.WriteArray(nameof(FrameList), this.FrameList.ToArray());
-        }
-
-        public void ReadBinary(IBinaryReader reader)
-        {
-            this.Protocol = reader.ReadShort(nameof(Protocol));
-            this.SourceAddress = reader.ReadByteArray(nameof(SourceAddress));
-            this.SourcePort = reader.ReadInt(nameof(SourcePort));
-            this.DestinationAddress = reader.ReadByteArray(nameof(DestinationAddress));
-            this.DestinationPort = reader.ReadInt(nameof(DestinationPort));
-            this.FirstSeen = reader.ReadLong(nameof(FirstSeen));
-            this.LastSeen = reader.ReadLong(nameof(LastSeen));
-            this.Octets = reader.ReadLong(nameof(Octets));
-            this.Packets = reader.ReadInt(nameof(Packets));
-            this.ServiceName = reader.ReadString(nameof(ServiceName));
-            this.FrameList = reader.ReadArray<Frame>(nameof(FrameList)).ToList();
+                packetStream1.FrameList.Concat(packetStream2.FrameList).ToList())
+            {
+                FlowUid = flowUid.ToString()
+            };
         }
 
         public bool IntersectsWith(PacketStream that)

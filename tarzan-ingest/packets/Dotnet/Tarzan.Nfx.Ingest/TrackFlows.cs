@@ -31,7 +31,6 @@ namespace Tarzan.Nfx.Ingest
                 var optionCassandra = target.Option("-cassandra", "Specifies address of the Cassandra DB node to store flow records.", CommandOptionType.SingleValue);
                 var optionKeyspace = target.Option("-namespace", "Specifies the keyspace in Cassandra DB.", CommandOptionType.SingleValue);
                 var optionCreate = target.Option("-create", "Creates/initializes the keyspace in Cassandra DB. The existing keyspace will be deleted.", CommandOptionType.NoValue);
-                var optionMode = target.Option("-runAs", "Specifies how the ingestor will run. Possible values are ignite, parallel, sequential. Default is ignite.", CommandOptionType.SingleValue);
 
                 IList<FileInfo> GetFileList()
                 {
@@ -57,45 +56,74 @@ namespace Tarzan.Nfx.Ingest
                 {
 
                     var fileList = GetFileList();
-                    var runMode = RunMode.Ignite;
-                    Enum.TryParse(optionMode.Value(), true, out runMode);
 
                     if (fileList.Count == 0)
                     {
                         throw new ArgumentException("At least one source file has to be specified.");
                     }
 
-                    switch (runMode)
+                    using (var ignite = Ignition.Start(IgniteConfiguration.Default))
                     {
-                        case RunMode.Ignite:
-                            RunAsIgnite(fileList.Select(x => x.FullName));
-                            break;
-                    }
+                        IngestDataFromFiles(ignite, fileList.Select(x => x.FullName));
 
-                    return 0;
+                        Console.WriteLine("Ingestor completed, press CTRL+C (or X) to terminate.");
+
+                        while (true)
+                        {
+                            var key = Console.ReadKey();
+                            if (key.Key == ConsoleKey.X)
+                                break;
+                        }
+
+                        return 0;
+                    }
                 });
             };
 
-        static void RunAsIgnite(IEnumerable<string> fileList)
+
+        static void ExecuteBroadcast(string actionName, ICompute compute, IComputeAction action)
         {
-            using (var ignite = Ignition.Start(IgniteConfiguration.Default))
-            {
-                var flowCache = ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+
+            Console.WriteLine();
+            var sw = new Stopwatch();
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: {actionName}: Starting....");
+            sw.Start();
+            compute.Broadcast(action);
+            sw.Stop();
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: {actionName}: Done, time elapsed: {sw.Elapsed}.");
+        }
+        private static void ExecuteRun(string actionName, ICompute compute, IEnumerable<IComputeAction> enumerable)
+        {
+            Console.WriteLine();
+            var sw = new Stopwatch();
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: {actionName}: Starting....");
+            sw.Start();
+            compute.Run(enumerable);
+            sw.Stop();
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: {actionName}: Done, time elapsed: {sw.Elapsed}.");
+        }
+
+        static void IngestDataFromFiles(IIgnite ignite, IEnumerable<string> fileList)
+        {
+
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Environment is up.");
+
+                var flowCache = new FlowTable(ignite); 
 
                 var compute = ignite.GetCluster().GetCompute();
-                compute.Run(fileList.Select(x => new FlowAnalyzer { FileName = x }));
+                ExecuteRun("Flow Analyzer", compute, fileList.Select(x => new FlowAnalyzer { FileName = x }));
 
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.Count()}");
+                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Total flows {flowCache.GetCache().GetSize()}");
 
-                Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Detecting services of flows...");
-                compute.Broadcast(new ServiceDetector());
+                ExecuteBroadcast("Service Detector", compute, new ServiceDetector());
                 
-                // STATISTICS - currently computed on a single node!!! See the implementation and find out how to properly use AsCacheQueryable.
+                ExecuteBroadcast("Dns Analyzer", compute, new DnsAnalyzer());
+
+                ExecuteBroadcast("Http Analyzer", compute, new HttpAnalyzer());
+
                 var stats = new Statistics(ignite);
-                stats.LinqExample();   
-                compute.Broadcast(new DnsAnalyzer());
-                //var httpObjs = compute.Call(new HttpAnalyzer());
-            }
+                var services = stats.GetServices().ToArray();
+                var hosts = stats.GetHosts().ToArray();
         }
 
         class ConsoleLogger : ILogger
@@ -130,7 +158,7 @@ namespace Tarzan.Nfx.Ingest
             {
                 var sw = new Stopwatch();
                 m_cassandraWriter.Initialize();
-                var cache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+                var cache = new FlowTable(m_ignite).GetCache();
                 Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Writing flows from local cache.");
                 sw.Start();
                 foreach (var flow in cache.GetLocalEntries())

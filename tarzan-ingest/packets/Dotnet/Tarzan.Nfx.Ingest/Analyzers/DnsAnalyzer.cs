@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
@@ -16,10 +17,10 @@ namespace Tarzan.Nfx.Ingest.Analyzers
     {    
         public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream flowRecord)
         {
-            var sourceEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.SourceAddress.ToArray()), flowKey.SourcePort);
-            var destinationEndpoint = new IPEndPoint(new System.Net.IPAddress(flowKey.DestinationAddress.ToArray()), flowKey.DestinationPort);
+            var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
+            var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);
 
-            var flowId = PacketFlow.NewUid(flowKey.Protocol.ToString(), sourceEndpoint, destinationEndpoint, flowRecord.FirstSeen);
+            var flowId = FlowUid.NewUid(flowKey.Protocol, sourceEndpoint, destinationEndpoint, flowRecord.FirstSeen);
 
             // DNS response?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
@@ -80,16 +81,14 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
         public void Invoke()
         {
-            var flowCache = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
-            var dnsObjectCache = m_ignite.GetOrCreateCache<string, DnsObject> ("DnsObjectCache");
+            var flowCache = new FlowTable(m_ignite);
+            var dnsObjectCache = new DnsObjectTable(m_ignite);
 
-            foreach (var flow in flowCache.GetLocalEntries())
-            {
-                foreach (var dns in Inspect(flow.Key, flow.Value))
-                {
-                    dnsObjectCache.Put(dns.ObjectName, dns);
-                }
-            }            
+            var dnsObjects = flowCache.GetCache().GetLocalEntries()
+                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase))
+                .SelectMany(c => Inspect(c.Key, c.Value))
+                .Select(x => KeyValuePair.Create(x.ObjectName, x));
+            dnsObjectCache.GetOrCreateCache().PutAll(dnsObjects);
         }
     }
 }

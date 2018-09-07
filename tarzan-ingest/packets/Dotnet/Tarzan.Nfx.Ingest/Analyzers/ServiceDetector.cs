@@ -6,6 +6,8 @@ using Netdx.PacketDecoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using Tarzan.Nfx.Ingest.Ignite;
@@ -61,7 +63,7 @@ namespace Tarzan.Nfx.Ingest
 
         }
 
-        public string DetectService(FlowKey flowKey, PacketStream FlowValue)
+        public string DetectService(PacketStream FlowValue)
         {
             string getServiceName(string protocol, int port)
             {
@@ -74,7 +76,7 @@ namespace Tarzan.Nfx.Ingest
                     return $"{protocol.ToLowerInvariant()}/{port}";
                 }
             }
-            var serviceName = getServiceName(flowKey.Protocol.ToString(), Math.Min(flowKey.SourcePort, flowKey.DestinationPort));
+            var serviceName = getServiceName(((ProtocolType)FlowValue.Protocol).ToString(), Math.Min(FlowValue.SourcePort, FlowValue.DestinationPort));
             return serviceName;
         }
 
@@ -83,12 +85,20 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            var cache = m_ignite.GetCache<FlowKey,PacketStream>(IgniteConfiguration.FlowCache);
-            foreach (var flow in cache.GetLocalEntries())
+            var flowCache = new FlowTable(m_ignite);
+            var cache = flowCache.GetCache();
+            var localFlows = cache.GetLocalEntries();
+            var localFlowCount = cache.GetLocalSize();
+
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: ServiceDetector: Processing {localFlowCount} local flows.");
+
+            var flows = localFlows.Select(x =>
             {
-                flow.Value.ServiceName = DetectService(flow.Key, flow.Value);
-                cache.Put(flow.Key, flow.Value);
-            }
+                var value = x.Value;
+                value.ServiceName = DetectService(value);
+                return KeyValuePair.Create(x.Key, value);
+            });
+            cache.PutAll(flows);
         }
     }
 }

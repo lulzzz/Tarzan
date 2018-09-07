@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Ingest.Analyzers;
+using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Model.Cassandra;
 
@@ -59,7 +60,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void WriteFlow(FlowKey flowKey, PacketStream flowValue)
         {
-            var uid = PacketFlow.NewUid(flowKey.Protocol.ToString(), flowKey.SourceEndpoint, flowKey.DestinationEndpoint, flowValue.FirstSeen);
+            var uid = FlowUid.NewUid(flowKey, flowValue.FirstSeen);
             var flowPoco = new PacketFlow
             {
                 Uid = uid.ToString(),

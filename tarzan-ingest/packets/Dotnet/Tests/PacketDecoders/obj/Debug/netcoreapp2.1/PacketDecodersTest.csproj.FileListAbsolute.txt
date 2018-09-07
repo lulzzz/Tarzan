@@ -32,3 +32,4 @@ C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Test
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Model.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Ingest.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Model.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Resources\http.cap

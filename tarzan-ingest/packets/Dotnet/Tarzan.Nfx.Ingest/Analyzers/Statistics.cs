@@ -1,7 +1,10 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
@@ -9,44 +12,79 @@ namespace Tarzan.Nfx.Ingest.Analyzers
     public class Statistics
     {
         private readonly IIgnite m_ignite;
+        private readonly FlowTable m_flowCache;
 
         public Statistics(IIgnite ignite)
         {
             m_ignite = ignite;
+            m_flowCache = new FlowTable(ignite);
         }
                                             
-        public void LinqExample()
-        {
-            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
-            var lst = queryable.Select(x => x.Value.FirstSeen);
-            lst.ToList();
-        }
-
         public IEnumerable<Host> GetHosts()
         {
-            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+            var queryable = m_flowCache.GetCache().AsCacheQueryable();
+            var srcHosts = queryable.GroupBy(x => x.Value.SourceAddress).Select(group =>
+                new
+                {
+                    Address = group.Key,
+                    UpFlows = group.Count(),
+                    PacketsSent = group.Sum(p => p.Value.Packets),
+                    OctetsSent = group.Sum(p => p.Value.Octets)
+                });
 
-            var srcHosts = queryable.GroupBy(x => x.Key.SourceEndpoint.Address).Select(t =>
-                new Model.Host { Address = t.Key.ToString(), UpFlows = t.Count(), PacketsSent = t.Sum(p => p.Value.Packets), OctetsSent = t.Sum(p => p.Value.Octets) });
+            
+            var dstHosts = queryable.GroupBy(x => x.Value.DestinationAddress).Select(group =>
+                new
+                {
+                    Address = group.Key,
+                    DownFlows = group.Count(),
+                    PacketsRecv = group.Sum(p => p.Value.Packets),
+                    OctetsRecv = group.Sum(p => p.Value.Octets)
+                });
 
-            var dstHosts = queryable.GroupBy(x => x.Key.DestinationEndpoint.Address).Select(t =>
-                new Model.Host { Address = t.Key.ToString(), DownFlows = t.Count(), PacketsRecv = t.Sum(p => p.Value.Packets), OctetsRecv = t.Sum(p => p.Value.Octets) });
+            return srcHosts.ToList().Join(inner: dstHosts.ToList(),
+                outerKeySelector: x => x.Address.ToString(),
+                innerKeySelector: y => y.Address.ToString(),
+                resultSelector: (x, y) =>
+                      new Model.Host
+                      {
+                          Address = x.Address.ToString(),
+                          UpFlows = x.UpFlows,
+                          PacketsSent = x.PacketsSent,
+                          OctetsSent = x.OctetsSent,
+                          DownFlows = y.DownFlows,
+                          PacketsRecv = y.PacketsRecv,
+                          OctetsRecv = y.OctetsRecv
+                      }
+                );
+        }
 
-            var hosts = srcHosts.Join(dstHosts, x => x.Address, x => x.Address, (x, y) =>
-                      new Model.Host { Address = x.Address, UpFlows = x.UpFlows, PacketsSent = x.PacketsSent, OctetsSent = x.OctetsSent,
-                          DownFlows = y.DownFlows, PacketsRecv = y.PacketsRecv, OctetsRecv = y.OctetsRecv });
-
-            return hosts.ToList();
+        class ByteArrayComparer : IEqualityComparer<byte[]>
+        {
+            public bool Equals(byte[] left, byte[] right)
+            {
+                if (left == null || right == null)
+                {
+                    return left == right;
+                }
+                return left.SequenceEqual(right);
+            }
+            public int GetHashCode(byte[] key)
+            {
+                if (key == null)
+                    throw new ArgumentNullException("key");
+                return key.Sum(b => b);
+            }
         }
 
 
         public IEnumerable<Service> GetServices()
         {
-            var queryable = m_ignite.GetCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache); //.AsCacheQueryable();
+            var queryable = m_flowCache.GetCache().AsCacheQueryable();
             var services = queryable
                             .GroupBy(f => f.Value.ServiceName)
                             .Select(f =>
-                                new Model.Service
+                                new 
                                 {
                                     ServiceName = f.Key,
                                     Flows = f.Count(),
@@ -60,7 +98,21 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                                     MaxDuration = f.Max(x => x.Value.LastSeen - x.Value.FirstSeen),
                                     MinDuration = f.Min(x => x.Value.LastSeen - x.Value.FirstSeen),
                                 });
-            return services.ToList();
+            // nned to do this in this way as creating and initializing Service type is not directly supported :(
+            return services.ToList().Select(x=> new Service
+            {
+                ServiceName = x.ServiceName,
+                Flows = x.Flows,
+                Packets = x.Packets,
+                MaxPackets = x.MaxPackets,
+                MinPackets = x.MinPackets,
+                Octets = x.Octets,
+                MaxOctets = x.MaxOctets,
+                MinOctets = x.MinOctets,
+                AvgDuration = x.AvgDuration,
+                MaxDuration = x.MaxDuration,
+                MinDuration = x.MinDuration
+            });
         }
     }
 }

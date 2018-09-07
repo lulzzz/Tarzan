@@ -87,12 +87,13 @@ struct Frame {
 	3: binary Data;
 }
 
-struct PacketStream {    
+struct PacketStream {  
     1: i16 Protocol;
-    2: binary SourceAddress;
+    2: binary SourceAddressBytes;
     3: i32 SourcePort;
-    4: binary DestinationAddress;
+    4: binary DestinationAddressBytes;
     5: i32 DestinationPort;
+    6: string FlowUid;
     10: i64 FirstSeen;
     11: i64 LastSeen;
     12: i64 Octets;

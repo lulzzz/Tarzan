@@ -28,31 +28,5 @@ namespace Tarzan.Nfx.Model
         public IPAddress SourceIpAddress => IPAddress.Parse(this.SourceAddress);
         [JsonIgnore]
         public IPAddress DestinationIpAddress => IPAddress.Parse(this.DestinationAddress);
-
-
-        // The requirements for these types of UUIDs are as follows:
-        //
-        // The UUIDs generated at different times from the same name in the
-        // same namespace MUST be equal.
-        // The UUIDs generated from two different names in the same namespace
-        // should be different(with very high probability).
-        // The UUIDs generated from the same name in two different namespaces
-        // should be different with(very high probability).
-        // If two UUIDs that were generated from names are equal, then they
-        // were generated from the same name in the same namespace (with very
-        // high probability).
-        public static Guid NewUid(string protocol, IPEndPoint sourceEndpoint, IPEndPoint destinationEndpoint, long firstSeen)
-        {
-            var protoHash = protocol.ToUpperInvariant().GetHashCode();
-            var dstHash = BitConverter.GetBytes(destinationEndpoint.GetHashCode() ^ protoHash);
-            var srcHash = BitConverter.GetBytes(sourceEndpoint.GetHashCode() ^ protoHash);
-            var timeHash = BitConverter.GetBytes(firstSeen);
-            var buffer = new byte[16];
-            timeHash.CopyTo(buffer, 0);
-            srcHash.CopyTo(buffer, 8);
-            dstHash.CopyTo(buffer, 12);
-            var guid = new Guid(buffer);
-            return guid;
-        }
     }
 }

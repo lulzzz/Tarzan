@@ -9,7 +9,7 @@ namespace Tarzan.Nfx.Ingest
 {
     class PacketKeyProvider : IKeyProvider<FlowKey, Packet>
     {
-        public FlowKey GetKey(Packet packet)
+        public static FlowKey GetKeyFromPacket(Packet packet)
         {
             FlowKey GetUdpFlowKey(UdpPacket udp)
             {
@@ -51,6 +51,11 @@ namespace Tarzan.Nfx.Ingest
 
                     }
             }
+        }
+
+        public FlowKey GetKey(Packet packet)
+        {
+            return GetKeyFromPacket(packet);
         }
     }
 }

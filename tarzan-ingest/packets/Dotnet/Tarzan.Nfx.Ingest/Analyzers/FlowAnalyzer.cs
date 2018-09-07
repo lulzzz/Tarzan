@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Start processing file '{FileName}'...");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Start processing file '{FileName}'...");
 
             var device = new FastPcapFileReaderDevice(FileName);
             device.Open();
@@ -39,20 +39,22 @@ namespace Tarzan.Nfx.Ingest
             
             device.Close();
            
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
 
             sw.Restart();
 
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Streaming to global FLOW CACHE...");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Streaming to global FLOW CACHE...");
 
-            var globalFlowTable = m_ignite.GetOrCreateCache<FlowKey, PacketStream>(IgniteConfiguration.FlowCache);
+            var globalFlowTable = new FlowTable(m_ignite);
+            var flowCache = globalFlowTable.GetOrCreateCache();
             var updateProcessor = new MergePacketStreamProcessor();
             Parallel.ForEach(flowTracker.FlowTable, flow =>
                 {
-                    globalFlowTable.Invoke(flow.Key, updateProcessor, flow.Value);
+                    flow.Value.FlowUid = FlowUid.NewUid(flow.Key, flow.Value.FirstSeen).ToString();
+                    flowCache.Invoke(flow.Key, updateProcessor, flow.Value);
                 });
 
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] INGEST: Done ({sw.Elapsed}).");
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}).");
             sw.Stop();
         }
     }
