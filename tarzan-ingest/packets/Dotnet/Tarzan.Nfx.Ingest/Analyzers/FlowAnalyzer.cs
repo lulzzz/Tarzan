@@ -48,11 +48,11 @@ namespace Tarzan.Nfx.Ingest
             var globalFlowTable = new FlowTable(m_ignite);
             var flowCache = globalFlowTable.GetOrCreateCache();
             var updateProcessor = new MergePacketStreamProcessor();
-            Parallel.ForEach(flowTracker.FlowTable, flow =>
-                {
-                    flow.Value.FlowUid = FlowUid.NewUid(flow.Key, flow.Value.FirstSeen).ToString();
-                    flowCache.Invoke(flow.Key, updateProcessor, flow.Value);
-                });
+            foreach(var flow in flowTracker.FlowTable)
+            {
+                flow.Value.FlowUid = FlowUid.NewUid(flow.Key, flow.Value.FirstSeen).ToString();
+                flowCache.Invoke(flow.Key, updateProcessor, flow.Value);
+            }
 
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}).");
             sw.Stop();

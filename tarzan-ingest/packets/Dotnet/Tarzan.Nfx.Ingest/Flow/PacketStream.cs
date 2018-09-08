@@ -82,14 +82,8 @@ namespace Tarzan.Nfx.Ingest
         /// <returns></returns>
         public static PacketStream Merge(PacketStream packetStream1, PacketStream packetStream2)
         {
-            
-            if (packetStream2 == null) return packetStream1;
-            if (packetStream1 == null) return packetStream2;
-            var flowUid = Flow.FlowUid.NewUid((System.Net.Sockets.ProtocolType)packetStream1.Protocol,
-                packetStream1.SourceAddressBytes,
-                packetStream1.SourcePort,
-                packetStream1.DestinationAddressBytes,
-                packetStream1.DestinationPort, Math.Min(packetStream1.FirstSeen, packetStream2.FirstSeen));
+            if (packetStream1 == null) throw new ArgumentNullException(nameof(packetStream1));
+            if (packetStream2 == null) throw new ArgumentNullException(nameof(packetStream2));
 
             return new PacketStream(
                 packetStream1.Protocol,
@@ -103,7 +97,7 @@ namespace Tarzan.Nfx.Ingest
                 packetStream1.Packets + packetStream2.Packets,
                 packetStream1.FrameList.Concat(packetStream2.FrameList).ToList())
             {
-                FlowUid = flowUid.ToString()
+                FlowUid = packetStream1.FirstSeen < packetStream2.FirstSeen ? packetStream1.FlowUid : packetStream2.FlowUid
             };
         }
 

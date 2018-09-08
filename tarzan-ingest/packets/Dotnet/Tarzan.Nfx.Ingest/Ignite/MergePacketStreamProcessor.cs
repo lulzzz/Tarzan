@@ -6,8 +6,15 @@ namespace Tarzan.Nfx.Ingest.Ignite
     {
         public PacketStream Process(IMutableCacheEntry<FlowKey, PacketStream> entry, PacketStream arg)
         {
-            entry.Value = PacketStream.Merge(entry.Value, arg);
-            return entry.Value;
+            if (entry.Exists)
+            {
+                entry.Value = PacketStream.Merge(entry.Value, arg);
+            }
+            else
+            {
+                entry.Value = arg;
+            }
+            return null;
         }
     }
 

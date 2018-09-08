@@ -11,6 +11,14 @@
         "Key": "Value",
         "IGNITE_H2_DEBUG_CONSOLE": "true"
       }
+    },
+    "ignite-bigfile": {
+      "commandName": "Project",
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-512\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create "
+    },
+    "ignite-hugefile": {
+      "commandName": "Project",
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun.pcap -cassandra \"localhost\" -namespace testbed -create "
     }
   }
 }
