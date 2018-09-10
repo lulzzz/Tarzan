@@ -34,7 +34,7 @@ struct Capture {
 // Object namespace: urn:aff4:flows/
 // Object name: UID.Generate[FirstSeen, Protocol, SourceAddress, SourcePort, DestinationAddress, DestinationPort]
 struct PacketFlow { 
-    1: string Uid;
+    1: string FlowUid;
     2: string Protocol;
     3: string SourceAddress;
     4: i32 SourcePort;
@@ -44,6 +44,7 @@ struct PacketFlow {
     8: i64 LastSeen;
     9: i32 Packets;
     10: i64 Octets;
+    14: string ServiceName;
 }
 
 // Object namespace:  urn:aff4:hosts/

@@ -1,16 +1,15 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Compute;
-using Apache.Ignite.Core.Datastream;
 using Apache.Ignite.Core.Resource;
 using Netdx.PacketDecoders;
 using SharpPcap;
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Ignite;
+using Tarzan.Nfx.Ingest.Utils;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Analyzers
 {
     class FlowAnalyzer : IComputeAction
     {
@@ -23,39 +22,60 @@ namespace Tarzan.Nfx.Ingest
         {
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Start processing file '{FileName}'...");
 
-            var device = new FastPcapFileReaderDevice(FileName);
-            device.Open();
+            var flowTracker = TrackFlows();
 
+            PopulateFlowTable(flowTracker);
+        }
+
+        private FlowTracker TrackFlows()
+        {
             var sw = new Stopwatch();
             sw.Start();
 
             var flowTracker = new FlowTracker(new FrameKeyProvider());
-            RawCapture packet = null;
-            while ((packet = device.GetNextPacket())!=null)
+            using (var device = new FastPcapFileReaderDevice(FileName))
             {
-                var frame = new Frame((LinkLayerType)packet.LinkLayerType, PosixTime.FromUnixTimeMilliseconds(packet.Timeval.ToUnixTimeMilliseconds()), packet.Data);
-                flowTracker.ProcessFrame(frame);
+                device.Open();
+
+                RawCapture packet = null;
+                while ((packet = device.GetNextPacket()) != null)
+                {
+                    try
+                    {
+                        var frame = new Frame((LinkLayerType)packet.LinkLayerType, PosixTime.FromUnixTimeMilliseconds(packet.Timeval.ToUnixTimeMilliseconds()), packet.Data);
+                        flowTracker.ProcessFrame(frame);
+                    }
+                    catch(Exception e)
+                    {
+                        // TODO: Log any error occured here.
+                    }
+                }
+
+                device.Close();
             }
-            
-            device.Close();
-           
+            sw.Stop();
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}), packets={flowTracker.TotalFrameCount}, flows={flowTracker.FlowTable.Count}.");
 
-            sw.Restart();
+            return flowTracker;
+        }
 
+        private void PopulateFlowTable(FlowTracker flowTracker)
+        {
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Streaming to global FLOW CACHE...");
-
-            var globalFlowTable = new FlowTable(m_ignite);
+            var sw = new Stopwatch();
+            sw.Start();
+           
+            var globalFlowTable = new PacketFlowTable(m_ignite);
             var flowCache = globalFlowTable.GetOrCreateCache();
             var updateProcessor = new MergePacketStreamProcessor();
-            foreach(var flow in flowTracker.FlowTable)
+
+            foreach (var flow in flowTracker.FlowTable)
             {
-                flow.Value.FlowUid = FlowUid.NewUid(flow.Key, flow.Value.FirstSeen).ToString();
-                flowCache.Invoke(flow.Key, updateProcessor, flow.Value);
+                flowCache.Invoke(flow.Key, updateProcessor, flow.Value.flow);
             }
 
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}).");
             sw.Stop();
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Done ({sw.Elapsed}).");
         }
     }
 }

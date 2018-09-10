@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
-using PacketDotNet;
-using SharpPcap;
+﻿using System.Collections.Generic;
+using Tarzan.Nfx.Ingest.Ignite;
+using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
     /// <summary>
     /// This class implementes a simple algorithm that groups packet into flows. 
@@ -18,7 +13,7 @@ namespace Tarzan.Nfx.Ingest
         /// <summary>
         /// Gets the dictionary of all existing flows.
         /// </summary>
-        public Dictionary<FlowKey, PacketStream> FlowTable { get; private set; }
+        public Dictionary<FlowKey, (PacketFlow flow, PacketStream stream)> FlowTable { get; private set; }
 
         IKeyProvider<FlowKey, Frame> m_keyProvider;
         /// <summary>
@@ -28,7 +23,7 @@ namespace Tarzan.Nfx.Ingest
 
         public FlowTracker(IKeyProvider<FlowKey, Frame> keyProvider)
         {
-            FlowTable = new Dictionary<FlowKey, PacketStream>();
+            FlowTable = new Dictionary<FlowKey, (PacketFlow, PacketStream)>();
             m_keyProvider = keyProvider;
         }
 
@@ -43,11 +38,13 @@ namespace Tarzan.Nfx.Ingest
             var key = m_keyProvider.GetKey(frame);
             if (FlowTable.TryGetValue(key, out var value))
             {
-                PacketStream.Update(value, frame);
+                PacketFlowFactory.Update(value.flow, frame);
+                PacketStreamFactory.Update(value.stream, frame);
             }
             else
             {
-                FlowTable[key] = PacketStream.From(key, frame);
+                var flowUid = FlowUidGenerator.NewUid(key, frame.Timestamp).ToString();
+                FlowTable[key] = (PacketFlowFactory.From(key,frame, flowUid), PacketStreamFactory.From(key, frame, flowUid));
             }
         }
 

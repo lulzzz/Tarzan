@@ -3,7 +3,6 @@ using Apache.Ignite.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
@@ -12,12 +11,12 @@ namespace Tarzan.Nfx.Ingest.Analyzers
     public class Statistics
     {
         private readonly IIgnite m_ignite;
-        private readonly FlowTable m_flowCache;
+        private readonly PacketFlowTable m_flowCache;
 
         public Statistics(IIgnite ignite)
         {
             m_ignite = ignite;
-            m_flowCache = new FlowTable(ignite);
+            m_flowCache = new PacketFlowTable(ignite);
         }
                                             
         public IEnumerable<Host> GetHosts()

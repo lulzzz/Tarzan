@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Netdx.ConversationTracker
+namespace Tarzan.Nfx.Ingest.Flow
 {
 
     /// <summary>

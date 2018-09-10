@@ -1,5 +1,5 @@
 ﻿// By Mikhail Shilkov (https://github.com/mikhailshilkov)
-namespace Tarzan.Nfx.Functional
+namespace Tarzan.Nfx.Ingest.Utils
 {
     using System;
 

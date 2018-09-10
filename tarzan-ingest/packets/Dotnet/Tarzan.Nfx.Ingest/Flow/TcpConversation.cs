@@ -1,9 +1,7 @@
-﻿using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
 
     public class TcpConversation

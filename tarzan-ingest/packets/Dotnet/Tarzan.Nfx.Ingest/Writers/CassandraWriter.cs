@@ -9,21 +9,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.Ingest.Utils;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Model.Cassandra;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Writers
 {
     partial class CassandraWriter
     {
-        private IPEndPoint m_endpoint;
+        private InternetEndPoint m_endpoint;
         private string m_keyspace;
         private AffDataset m_dataset;
 
-        public IPEndPoint Endpoint => m_endpoint;
+        public InternetEndPoint Endpoint => m_endpoint;
         public string Keyspace => m_keyspace;
 
-        public CassandraWriter(IPEndPoint endpoint, string keyspace)
+        public CassandraWriter(InternetEndPoint endpoint, string keyspace)
         {
             this.m_endpoint = endpoint;
             this.m_keyspace = keyspace;
@@ -58,12 +59,12 @@ namespace Tarzan.Nfx.Ingest
             m_dataset.CaptureTable.Insert(capture).Execute();
         }
 
-        public void WriteFlow(FlowKey flowKey, PacketStream flowValue)
+        public void WriteFlow(FlowKey flowKey, PacketFlow flowValue)
         {
-            var uid = FlowUid.NewUid(flowKey, flowValue.FirstSeen);
+            var uid = FlowUidGenerator.NewUid(flowKey, flowValue.FirstSeen);
             var flowPoco = new PacketFlow
             {
-                Uid = uid.ToString(),
+                FlowUid = uid.ToString(),
                 Protocol = flowKey.Protocol.ToString(),
                 SourceAddress = flowKey.SourceEndpoint.Address.ToString(),
                 SourcePort = flowKey.SourceEndpoint.Port,

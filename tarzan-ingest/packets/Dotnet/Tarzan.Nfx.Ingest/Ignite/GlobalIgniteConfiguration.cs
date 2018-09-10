@@ -1,60 +1,51 @@
-﻿using Apache.Ignite.Core.Binary;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache.Configuration;
-using Apache.Ignite.Core.Communication;
 using Apache.Ignite.Core.Communication.Tcp;
 using Apache.Ignite.Core.Discovery.Tcp;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
 using System;
-using Tarzan.Nfx.Ingest.Ignite;
-using Tarzan.Nfx.Model;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Ignite
 {
-
-
-    class IgniteConfiguration
+    public static class GlobalIgniteConfiguration
     {
-        public static readonly Apache.Ignite.Core.IgniteConfiguration Default =
-            new Apache.Ignite.Core.IgniteConfiguration()
+        public static IgniteConfiguration GetDefaultIgniteConfiguration()
+        {
+
+            var providers = GetConfigurationProviders();
+
+            var config = new IgniteConfiguration();
+            config.JvmOptions = new[] { "-Xms2g", "-Xmx2g", "-XX:+AlwaysPreTouch", "-XX:+UseG1GC", "-XX:+ScavengeBeforeFullGC", "-XX:+DisableExplicitGC", "-XX:MaxDirectMemorySize=256m" };
+            config.DiscoverySpi = new TcpDiscoverySpi
             {
-                JvmOptions = new [] { "-Xms2g", "-Xmx2g", "-XX:+AlwaysPreTouch", "-XX:+UseG1GC", "-XX:+ScavengeBeforeFullGC", "-XX:+DisableExplicitGC", "-XX:MaxDirectMemorySize=256m" },
-                DiscoverySpi = new TcpDiscoverySpi
+                IpFinder = new TcpDiscoveryStaticIpFinder
                 {
-                    IpFinder = new TcpDiscoveryStaticIpFinder
-                    {
-                        Endpoints = new[] { "127.0.0.1:47500..47520" }
-                    },
-                    SocketTimeout = TimeSpan.FromSeconds(0.3)
+                    Endpoints = new[] { "127.0.0.1:47500..47520" }
                 },
-                CommunicationSpi = new TcpCommunicationSpi
-                {
-                    MessageQueueLimit = 1024,
-                },
-                BinaryConfiguration = new BinaryConfiguration()
-                {
-                    TypeConfigurations = new[]
-                    {
-                        new BinaryTypeConfiguration(typeof(PacketStream))
-                        {
-                            Serializer = FlowTable.m_serializer
-                        },
-                        new BinaryTypeConfiguration(typeof(DnsObject))
-                        {
-                            Serializer = DnsObjectTable.m_serializer,
-                        },
-                        new BinaryTypeConfiguration(typeof(HttpObject))
-                        {
-                            Serializer = HttpObjectTable.m_serializer
-                        }
-                    }
-                },
-                CacheConfiguration = new[]
-                {
-                    FlowTable.m_cacheConfiguration,
-                    DnsObjectTable.m_cacheConfiguration,
-                    HttpObjectTable.m_cacheConfiguration
-                }
+                SocketTimeout = TimeSpan.FromSeconds(0.3)
             };
-        
+            config.CommunicationSpi = new TcpCommunicationSpi
+            {
+                MessageQueueLimit = 1024,
+            };
+            config.BinaryConfiguration = new BinaryConfiguration()
+            {
+                TypeConfigurations = providers.Select(p => p.TypeConfiguration).ToArray()
+            };
+
+            config.CacheConfiguration = providers.Select(p => p.CacheConfiguration).ToArray();
+            return config;
+        }
+        private static IEnumerable<ITableConfigurationProvider> GetConfigurationProviders()
+        {
+            var configProviders = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                           .Where(x => typeof(ITableConfigurationProvider).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                           .Select(x => x.GetConstructor(new Type[] { }).Invoke(null) as ITableConfigurationProvider);
+            return configProviders.ToList();
+        }       
     }
 }

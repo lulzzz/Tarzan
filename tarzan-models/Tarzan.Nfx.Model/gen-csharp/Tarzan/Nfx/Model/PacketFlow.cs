@@ -23,7 +23,7 @@ namespace Tarzan.Nfx.Model
   #endif
   public partial class PacketFlow : TBase
   {
-    private string _Uid;
+    private string _FlowUid;
     private string _Protocol;
     private string _SourceAddress;
     private int _SourcePort;
@@ -33,17 +33,18 @@ namespace Tarzan.Nfx.Model
     private long _LastSeen;
     private int _Packets;
     private long _Octets;
+    private string _ServiceName;
 
-    public string Uid
+    public string FlowUid
     {
       get
       {
-        return _Uid;
+        return _FlowUid;
       }
       set
       {
-        __isset.Uid = true;
-        this._Uid = value;
+        __isset.FlowUid = true;
+        this._FlowUid = value;
       }
     }
 
@@ -164,13 +165,26 @@ namespace Tarzan.Nfx.Model
       }
     }
 
+    public string ServiceName
+    {
+      get
+      {
+        return _ServiceName;
+      }
+      set
+      {
+        __isset.ServiceName = true;
+        this._ServiceName = value;
+      }
+    }
+
 
     public Isset __isset;
     #if !SILVERLIGHT
     [Serializable]
     #endif
     public struct Isset {
-      public bool Uid;
+      public bool FlowUid;
       public bool Protocol;
       public bool SourceAddress;
       public bool SourcePort;
@@ -180,6 +194,7 @@ namespace Tarzan.Nfx.Model
       public bool LastSeen;
       public bool Packets;
       public bool Octets;
+      public bool ServiceName;
     }
 
     public PacketFlow() {
@@ -202,7 +217,7 @@ namespace Tarzan.Nfx.Model
           {
             case 1:
               if (field.Type == TType.String) {
-                Uid = iprot.ReadString();
+                FlowUid = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -270,6 +285,13 @@ namespace Tarzan.Nfx.Model
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
+            case 14:
+              if (field.Type == TType.String) {
+                ServiceName = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
             default: 
               TProtocolUtil.Skip(iprot, field.Type);
               break;
@@ -291,12 +313,12 @@ namespace Tarzan.Nfx.Model
         TStruct struc = new TStruct("PacketFlow");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (Uid != null && __isset.Uid) {
-          field.Name = "Uid";
+        if (FlowUid != null && __isset.FlowUid) {
+          field.Name = "FlowUid";
           field.Type = TType.String;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(Uid);
+          oprot.WriteString(FlowUid);
           oprot.WriteFieldEnd();
         }
         if (Protocol != null && __isset.Protocol) {
@@ -371,6 +393,14 @@ namespace Tarzan.Nfx.Model
           oprot.WriteI64(Octets);
           oprot.WriteFieldEnd();
         }
+        if (ServiceName != null && __isset.ServiceName) {
+          field.Name = "ServiceName";
+          field.Type = TType.String;
+          field.ID = 14;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(ServiceName);
+          oprot.WriteFieldEnd();
+        }
         oprot.WriteFieldStop();
         oprot.WriteStructEnd();
       }
@@ -383,11 +413,11 @@ namespace Tarzan.Nfx.Model
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("PacketFlow(");
       bool __first = true;
-      if (Uid != null && __isset.Uid) {
+      if (FlowUid != null && __isset.FlowUid) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Uid: ");
-        __sb.Append(Uid);
+        __sb.Append("FlowUid: ");
+        __sb.Append(FlowUid);
       }
       if (Protocol != null && __isset.Protocol) {
         if(!__first) { __sb.Append(", "); }
@@ -442,6 +472,12 @@ namespace Tarzan.Nfx.Model
         __first = false;
         __sb.Append("Octets: ");
         __sb.Append(Octets);
+      }
+      if (ServiceName != null && __isset.ServiceName) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("ServiceName: ");
+        __sb.Append(ServiceName);
       }
       __sb.Append(")");
       return __sb.ToString();

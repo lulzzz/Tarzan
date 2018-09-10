@@ -13,7 +13,7 @@ namespace Tarzan.Nfx.Model
         public static Map<PacketFlow> Mapping =>
             new Map<PacketFlow>()
                 .TableName(Pluralizer.Pluralize(nameof(PacketFlow)))
-                .PartitionKey(x => x.Uid)
+                .PartitionKey(x => x.FlowUid)
                 .Column(f => f.SourceIpAddress, cc => cc.Ignore())
                 .Column(f => f.DestinationIpAddress, cc => cc.Ignore())
                 .Column(f => f.__isset, cc => cc.Ignore())
@@ -23,10 +23,13 @@ namespace Tarzan.Nfx.Model
                 .Column(f => f.DestinationAddress, cc => cc.WithSecondaryIndex())
                 .Column(f => f.DestinationPort, cc => cc.WithSecondaryIndex());
 
-        public string ObjectName => $"urn:aff4:flow/{this.Uid}";
+        public string ObjectName => $"urn:aff4:flow/{this.FlowUid}";
         [JsonIgnore]
         public IPAddress SourceIpAddress => IPAddress.Parse(this.SourceAddress);
         [JsonIgnore]
         public IPAddress DestinationIpAddress => IPAddress.Parse(this.DestinationAddress);
+
+
+
     }
 }

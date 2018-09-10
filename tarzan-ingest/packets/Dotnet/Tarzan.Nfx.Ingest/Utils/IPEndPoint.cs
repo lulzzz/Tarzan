@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Utils
 {
-    public class IPEndPoint : System.Net.IPEndPoint
+    public class InternetEndPoint : IPEndPoint
     {
-        public IPEndPoint(IPAddress address, int port) : base(address, port)
+        public InternetEndPoint(IPAddress address, int port) : base(address, port)
         {
         }
 
-        public static IPEndPoint Parse(string endpointstring)
+        public static InternetEndPoint Parse(string endpointstring)
         {
             return Parse(endpointstring, -1);
         }
 
-        public static IPEndPoint Parse(string endpointstring, int defaultport)
+        public static InternetEndPoint Parse(string endpointstring, int defaultport)
         {
             if (string.IsNullOrEmpty(endpointstring)
                 || endpointstring.Trim().Length == 0)
@@ -26,8 +24,8 @@ namespace Tarzan.Nfx.Ingest
             }
 
             if (defaultport != -1 &&
-                (defaultport < IPEndPoint.MinPort
-                || defaultport > IPEndPoint.MaxPort))
+                (defaultport < InternetEndPoint.MinPort
+                || defaultport > InternetEndPoint.MaxPort))
             {
                 throw new ArgumentException(string.Format("Invalid default port '{0}'", defaultport));
             }
@@ -72,7 +70,7 @@ namespace Tarzan.Nfx.Ingest
             if (port == -1)
                 throw new ArgumentException(string.Format("No port specified: '{0}'", endpointstring));
 
-            return new IPEndPoint(ipaddy, port);
+            return new InternetEndPoint(ipaddy, port);
         }
 
         private static int GetPort(string p)
@@ -80,8 +78,8 @@ namespace Tarzan.Nfx.Ingest
             int port;
 
             if (!int.TryParse(p, out port)
-             || port < IPEndPoint.MinPort
-             || port > IPEndPoint.MaxPort)
+             || port < InternetEndPoint.MinPort
+             || port > InternetEndPoint.MaxPort)
             {
                 throw new FormatException(string.Format("Invalid end point port '{0}'", p));
             }

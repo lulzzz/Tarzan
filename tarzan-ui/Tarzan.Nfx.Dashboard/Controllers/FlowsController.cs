@@ -39,7 +39,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         [HttpGet("item/{uid}")]
         public PacketFlow FetchRecordById(string uid)
         {
-            return m_dataset.FlowTable.Where(x => x.Uid == uid).FirstOrDefault().Execute();
+            return m_dataset.FlowTable.Where(x => x.FlowUid == uid).FirstOrDefault().Execute();
         }
     }
 }

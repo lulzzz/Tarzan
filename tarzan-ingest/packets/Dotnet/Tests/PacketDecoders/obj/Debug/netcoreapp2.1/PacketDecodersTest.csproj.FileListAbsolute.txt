@@ -26,10 +26,10 @@ C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Test
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.csproj.CopyComplete
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\obj\Debug\netcoreapp2.1\PacketDecodersTest.pdb
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\service-names-port-numbers.csv
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\run_ignite_cluster.cmd
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Ingest.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Model.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Ingest.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Tarzan.Nfx.Model.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Resources\http.cap
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\bin\Debug\netcoreapp2.1\Analyzers\Resources\service-names-port-numbers.csv

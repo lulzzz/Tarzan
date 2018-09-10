@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using PacketDotNet;
+using SharpPcap;
+using System;
 using System.IO;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using Apache.Ignite.Core;
-using Apache.Ignite.Core.Cache;
-using Netdx.ConversationTracker;
-using PacketDotNet;
-using SharpPcap;
-using SharpPcap.LibPcap;
-using Tarzan.Nfx.Ingest.Ignite;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
-    class FastPcapFileReaderDevice : ICaptureDevice
+    class FastPcapFileReaderDevice : ICaptureDevice, IDisposable
     {
         readonly string m_filename;
         private BinaryReader m_reader;
@@ -160,5 +151,41 @@ namespace Tarzan.Nfx.Ingest
             var snaplen = m_reader.ReadUInt32();
             m_network = (LinkLayers)m_reader.ReadUInt32();
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this.Close();
+                    m_reader.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~FastPcapFileReaderDevice() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

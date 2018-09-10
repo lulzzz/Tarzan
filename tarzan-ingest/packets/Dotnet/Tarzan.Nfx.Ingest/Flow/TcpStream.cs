@@ -1,13 +1,11 @@
-﻿using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
+﻿using Netdx.PacketDecoders;
 using PacketDotNet;
-using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-
-namespace Tarzan.Nfx.Ingest
+using Tarzan.Nfx.Ingest.Utils;
+namespace Tarzan.Nfx.Ingest.Flow
 {
     /// <summary>
     /// Represents TCP stream of packets. 

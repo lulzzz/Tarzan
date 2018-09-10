@@ -5,7 +5,6 @@ using Kaitai;
 using Netdx.PacketDecoders;
 using Netdx.Packets.Core;
 using PacketDotNet;
-using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +59,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
             var transactions = requests.Zip(responses, (request, response) => (Request:request, Response:response)).Select((item,index) => (Transaction: item, TransactionId: index+1));
 
-            var flowUid = FlowUid.NewUid(conversation.RequestFlow.Key, conversation.RequestFlow.Value.FirstSeen);
+            var flowUid = FlowUidGenerator.NewUid(conversation.RequestFlow.Key, conversation.RequestFlow.Value.FirstSeen);
 
             foreach (var (Transaction, TransactionId) in transactions)
             {
@@ -129,16 +128,25 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         void IComputeAction.Invoke()
         {
             var httpObjectCache = new HttpObjectTable(m_ignite);
-            var flowCache = new FlowTable(m_ignite);
-            var httpFlows = flowCache.GetCache().GetLocalEntries()
-                .Where(f => String.Equals(f.Value.ServiceName, "www-http", StringComparison.InvariantCultureIgnoreCase))
-                .Select(f => KeyValuePair.Create(f.Key, f.Value));
+            var flowCache = new PacketFlowTable(m_ignite).GetCache();
+            var frameCache = new PacketStreamTable(m_ignite).GetCache();
 
+            var httpFlows = flowCache.GetLocalEntries()
+                .Where(f => String.Equals(f.Value.ServiceName, "www-http", StringComparison.InvariantCultureIgnoreCase))
+                .Select(f => f.Value);
+
+            foreach(var httpFlow in httpFlows)
+            {
+                var packets = frameCache.Get(httpFlow.FlowUid);
+
+            }
+            /*
             var httpStreams = TcpStream.Split(httpFlows).ToList();
             var httpPairs = TcpStream.Pair(httpStreams);
 
             var httpObjects = httpPairs.SelectMany(c => HttpAnalyzer.Inspect(c)).Select(x=> KeyValuePair.Create(x.ObjectName, x));
             httpObjectCache.GetOrCreateCache().PutAll(httpObjects);
+            */
         }
     }
 }

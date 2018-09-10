@@ -6,6 +6,7 @@ using PacketDotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Ignite;
@@ -15,31 +16,31 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public class DnsAnalyzer : IComputeAction
     {    
-        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream flowRecord)
+        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream packetStream)
         {
             var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
             var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);
 
-            var flowId = FlowUid.NewUid(flowKey.Protocol, sourceEndpoint, destinationEndpoint, flowRecord.FirstSeen);
+            var flowId = packetStream.FlowUid;
 
             // DNS response?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
             {
-                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, flowRecord.FrameList);
+                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, packetStream.FrameList);
                 return dns;
             }
 
             // DNS request?
             if (flowKey.Protocol == ProtocolType.Udp && destinationEndpoint.Port == 53)
             {
-                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, flowRecord.FrameList);
+                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, packetStream.FrameList);
                 return dns;
             }
             return Array.Empty<Model.DnsObject>();
         }
 
 
-        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, Guid flowId, IEnumerable<Frame> packetList)
+        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<Frame> packetList)
         {
             var result = new List<DnsObject>(); 
             foreach (var frame in packetList)
@@ -81,14 +82,17 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
         public void Invoke()
         {
-            var flowCache = new FlowTable(m_ignite);
+            var flowCache = new PacketFlowTable(m_ignite).GetCache();
+            var packetCache = new PacketStreamTable(m_ignite).GetCache();
             var dnsObjectCache = new DnsObjectTable(m_ignite);
 
-            var dnsObjects = flowCache.GetCache().GetLocalEntries()
-                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase))
-                .SelectMany(c => Inspect(c.Key, c.Value))
-                .Select(x => KeyValuePair.Create(x.ObjectName, x));
-            dnsObjectCache.GetOrCreateCache().PutAll(dnsObjects);
+            foreach(var dnsObject in flowCache.GetLocalEntries()
+                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var packetStream = packetCache.Get(dnsObject.Value.FlowUid);
+                var dnsObjects = Inspect(dnsObject.Key, packetStream).Select(x => KeyValuePair.Create(x.ObjectName, x));
+                dnsObjectCache.GetOrCreateCache().PutAll(dnsObjects);
+            }
         }
     }
 }

@@ -1,14 +1,18 @@
 ﻿using Apache.Ignite.Core.Cache;
+using System;
+using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Ignite
 {
-    public class MergePacketStreamProcessor : ICacheEntryProcessor<FlowKey, PacketStream, PacketStream, PacketStream>
+    public class MergePacketStreamProcessor : ICacheEntryProcessor<FlowKey, PacketFlow, PacketFlow, PacketFlow>
     {
-        public PacketStream Process(IMutableCacheEntry<FlowKey, PacketStream> entry, PacketStream arg)
+        public PacketFlow Process(IMutableCacheEntry<FlowKey, PacketFlow> entry, PacketFlow arg)
         {
             if (entry.Exists)
             {
-                entry.Value = PacketStream.Merge(entry.Value, arg);
+                var flowUid = FlowUidGenerator.NewUid(entry.Key, Math.Min(entry.Value.FirstSeen, arg.FirstSeen));
+                entry.Value = PacketFlowFactory.Merge(entry.Value, arg, flowUid.ToString());
             }
             else
             {

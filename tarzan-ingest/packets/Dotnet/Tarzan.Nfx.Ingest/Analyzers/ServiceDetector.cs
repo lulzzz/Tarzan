@@ -1,18 +1,15 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Resource;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
 using Tarzan.Nfx.Ingest.Ignite;
+using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public class ServiceDetector : IComputeAction
     {
@@ -33,7 +30,7 @@ namespace Tarzan.Nfx.Ingest
         private void LoadServiceNames()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resource = assembly.GetManifestResourceStream("Tarzan.Nfx.Ingest.service-names-port-numbers.csv");
+            var resource = assembly.GetManifestResourceStream("Tarzan.Nfx.Ingest.Analyzers.Resources.service-names-port-numbers.csv");
             var dictionary = new Dictionary<string, ServiceName>();
             using (var tr = new StreamReader(resource))
             {
@@ -59,11 +56,9 @@ namespace Tarzan.Nfx.Ingest
                 }
                 m_serviceDictionary = dictionary;
             }
-            // load CSV file:
-
         }
 
-        public string DetectService(PacketStream FlowValue)
+        public string DetectService(PacketFlow packetFlow)
         {
             string getServiceName(string protocol, int port)
             {
@@ -76,7 +71,7 @@ namespace Tarzan.Nfx.Ingest
                     return $"{protocol.ToLowerInvariant()}/{port}";
                 }
             }
-            var serviceName = getServiceName(((ProtocolType)FlowValue.Protocol).ToString(), Math.Min(FlowValue.SourcePort, FlowValue.DestinationPort));
+            var serviceName = getServiceName(packetFlow.Protocol, Math.Min(packetFlow.SourcePort, packetFlow.DestinationPort));
             return serviceName;
         }
 
@@ -85,7 +80,7 @@ namespace Tarzan.Nfx.Ingest
 
         public void Invoke()
         {
-            var flowCache = new FlowTable(m_ignite);
+            var flowCache = new PacketFlowTable(m_ignite);
             var cache = flowCache.GetCache();
             var localFlows = cache.GetLocalEntries();
             var localFlowCount = cache.GetLocalSize();

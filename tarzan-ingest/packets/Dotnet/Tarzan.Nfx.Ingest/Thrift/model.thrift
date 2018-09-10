@@ -81,23 +81,48 @@ enum LinkLayerType {
     PerPacketInformation = 192,
 }
 
+
+/// <summary>
+/// A single frame reference. 
+/// </summary>
+struct FrameRef {
+    1: i64 Timestamp;
+    2: i64 Index;
+}
+
+/// <summary>
+/// A block of frame references. It is used to assign packets to a flow. 
+/// </summary>
+struct FrameRefBlock {
+    /// <summary>
+    /// Objectname of the source of frames referenced by this block. 
+    /// </summary>
+    1: string SourceRef;
+    /// <summary>
+    /// A collection of frames within the block object.
+    /// </summary>
+    2: list<FrameRef> FrameList;
+}
+
+/// <summary>
+/// Data and intristic information about a single frame. 
+/// </summary>
 struct Frame {
 	1: i64 Timestamp;
 	2: LinkLayerType LinkLayer
 	3: binary Data;
 }
 
+/// <summary>
+/// A collection of frames that can be associated with the flow. 
+/// </summary>
 struct PacketStream {  
-    1: i16 Protocol;
-    2: binary SourceAddressBytes;
-    3: i32 SourcePort;
-    4: binary DestinationAddressBytes;
-    5: i32 DestinationPort;
+    /// <summary>
+    /// An identification of flow to which this stream is associated.  
+    /// </summary>
     6: string FlowUid;
-    10: i64 FirstSeen;
-    11: i64 LastSeen;
-    12: i64 Octets;
-    13: i32 Packets;
-    14: string ServiceName;
+    /// <summary>
+    /// A collection of frames. 
+    /// </summary>
 	20: list<Frame> FrameList;
 }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using Netdx.ConversationTracker;
-using PacketDotNet;
-using SharpPcap.LibPcap;
+﻿using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SharpPcap;
-using System.Linq;
-using System.Threading;
-using Cassandra;
-using Microsoft.Extensions.CommandLineUtils;
+using System;
+using Tarzan.Nfx.Ingest.Ignite;
 
 namespace Tarzan.Nfx.Ingest
 {
@@ -20,10 +15,20 @@ namespace Tarzan.Nfx.Ingest
     {
         static void Main(string[] args)
         {
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+
+            var trackFlowsCmd = new TrackFlows(serviceProvider);
+            var startIgniteServerCmd = new StartIgniteServer(serviceProvider);
             var commandLineApplication = new CommandLineApplication(true);
-            commandLineApplication.Command(TrackFlows.Name, TrackFlows.Configuration);
-            commandLineApplication.Command(PrintInterfaces.Name, PrintInterfaces.Configuration);
-            commandLineApplication.Command(StartIgniteServer.Name, StartIgniteServer.Configuration);
+
+
+            commandLineApplication.Command(trackFlowsCmd.Name, trackFlowsCmd.Configuration);
+            commandLineApplication.Command(PrintInterfaces.Name, PrintInterfaces.Configuration);           
+            commandLineApplication.Command(startIgniteServerCmd.Name, startIgniteServerCmd.Configuration);
+
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.Name = typeof(Program).Assembly.GetName().Name;
             commandLineApplication.FullName = $"Tarzan.Nfx Packet Traces Ingestor ({typeof(Program).Assembly.GetName().Version})";
@@ -50,6 +55,15 @@ namespace Tarzan.Nfx.Ingest
             {
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
             }
-        }            
+        }
+
+        private static void ConfigureServices(IServiceCollection serviceCollection)
+        {
+            ILoggerFactory loggerFactory = new LoggerFactory();
+            serviceCollection.AddSingleton(loggerFactory);
+
+            var igniteConfiguration = GlobalIgniteConfiguration.GetDefaultIgniteConfiguration();
+            serviceCollection.AddSingleton(igniteConfiguration);
+        }
     }
 }

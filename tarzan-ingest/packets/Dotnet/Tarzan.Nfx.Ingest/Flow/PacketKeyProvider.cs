@@ -1,11 +1,7 @@
-﻿using System;
+﻿using PacketDotNet;
 using System.Net;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
-using PacketDotNet;
-using SharpPcap;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
     class PacketKeyProvider : IKeyProvider<FlowKey, Packet>
     {

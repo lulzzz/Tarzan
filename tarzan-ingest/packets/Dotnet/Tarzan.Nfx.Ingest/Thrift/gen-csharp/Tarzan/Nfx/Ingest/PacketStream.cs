@@ -23,83 +23,8 @@ namespace Tarzan.Nfx.Ingest
   #endif
   public partial class PacketStream : TBase
   {
-    private short _Protocol;
-    private byte[] _SourceAddressBytes;
-    private int _SourcePort;
-    private byte[] _DestinationAddressBytes;
-    private int _DestinationPort;
     private string _FlowUid;
-    private long _FirstSeen;
-    private long _LastSeen;
-    private long _Octets;
-    private int _Packets;
-    private string _ServiceName;
     private List<Frame> _FrameList;
-
-    public short Protocol
-    {
-      get
-      {
-        return _Protocol;
-      }
-      set
-      {
-        __isset.Protocol = true;
-        this._Protocol = value;
-      }
-    }
-
-    public byte[] SourceAddressBytes
-    {
-      get
-      {
-        return _SourceAddressBytes;
-      }
-      set
-      {
-        __isset.SourceAddressBytes = true;
-        this._SourceAddressBytes = value;
-      }
-    }
-
-    public int SourcePort
-    {
-      get
-      {
-        return _SourcePort;
-      }
-      set
-      {
-        __isset.SourcePort = true;
-        this._SourcePort = value;
-      }
-    }
-
-    public byte[] DestinationAddressBytes
-    {
-      get
-      {
-        return _DestinationAddressBytes;
-      }
-      set
-      {
-        __isset.DestinationAddressBytes = true;
-        this._DestinationAddressBytes = value;
-      }
-    }
-
-    public int DestinationPort
-    {
-      get
-      {
-        return _DestinationPort;
-      }
-      set
-      {
-        __isset.DestinationPort = true;
-        this._DestinationPort = value;
-      }
-    }
 
     public string FlowUid
     {
@@ -111,71 +36,6 @@ namespace Tarzan.Nfx.Ingest
       {
         __isset.FlowUid = true;
         this._FlowUid = value;
-      }
-    }
-
-    public long FirstSeen
-    {
-      get
-      {
-        return _FirstSeen;
-      }
-      set
-      {
-        __isset.FirstSeen = true;
-        this._FirstSeen = value;
-      }
-    }
-
-    public long LastSeen
-    {
-      get
-      {
-        return _LastSeen;
-      }
-      set
-      {
-        __isset.LastSeen = true;
-        this._LastSeen = value;
-      }
-    }
-
-    public long Octets
-    {
-      get
-      {
-        return _Octets;
-      }
-      set
-      {
-        __isset.Octets = true;
-        this._Octets = value;
-      }
-    }
-
-    public int Packets
-    {
-      get
-      {
-        return _Packets;
-      }
-      set
-      {
-        __isset.Packets = true;
-        this._Packets = value;
-      }
-    }
-
-    public string ServiceName
-    {
-      get
-      {
-        return _ServiceName;
-      }
-      set
-      {
-        __isset.ServiceName = true;
-        this._ServiceName = value;
       }
     }
 
@@ -198,17 +58,7 @@ namespace Tarzan.Nfx.Ingest
     [Serializable]
     #endif
     public struct Isset {
-      public bool Protocol;
-      public bool SourceAddressBytes;
-      public bool SourcePort;
-      public bool DestinationAddressBytes;
-      public bool DestinationPort;
       public bool FlowUid;
-      public bool FirstSeen;
-      public bool LastSeen;
-      public bool Octets;
-      public bool Packets;
-      public bool ServiceName;
       public bool FrameList;
     }
 
@@ -230,79 +80,9 @@ namespace Tarzan.Nfx.Ingest
           }
           switch (field.ID)
           {
-            case 1:
-              if (field.Type == TType.I16) {
-                Protocol = iprot.ReadI16();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 2:
-              if (field.Type == TType.String) {
-                SourceAddressBytes = iprot.ReadBinary();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 3:
-              if (field.Type == TType.I32) {
-                SourcePort = iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 4:
-              if (field.Type == TType.String) {
-                DestinationAddressBytes = iprot.ReadBinary();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 5:
-              if (field.Type == TType.I32) {
-                DestinationPort = iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
             case 6:
               if (field.Type == TType.String) {
                 FlowUid = iprot.ReadString();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 10:
-              if (field.Type == TType.I64) {
-                FirstSeen = iprot.ReadI64();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 11:
-              if (field.Type == TType.I64) {
-                LastSeen = iprot.ReadI64();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 12:
-              if (field.Type == TType.I64) {
-                Octets = iprot.ReadI64();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 13:
-              if (field.Type == TType.I32) {
-                Packets = iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 14:
-              if (field.Type == TType.String) {
-                ServiceName = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -311,13 +91,13 @@ namespace Tarzan.Nfx.Ingest
               if (field.Type == TType.List) {
                 {
                   FrameList = new List<Frame>();
-                  TList _list0 = iprot.ReadListBegin();
-                  for( int _i1 = 0; _i1 < _list0.Count; ++_i1)
+                  TList _list4 = iprot.ReadListBegin();
+                  for( int _i5 = 0; _i5 < _list4.Count; ++_i5)
                   {
-                    Frame _elem2;
-                    _elem2 = new Frame();
-                    _elem2.Read(iprot);
-                    FrameList.Add(_elem2);
+                    Frame _elem6;
+                    _elem6 = new Frame();
+                    _elem6.Read(iprot);
+                    FrameList.Add(_elem6);
                   }
                   iprot.ReadListEnd();
                 }
@@ -346,92 +126,12 @@ namespace Tarzan.Nfx.Ingest
         TStruct struc = new TStruct("PacketStream");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (__isset.Protocol) {
-          field.Name = "Protocol";
-          field.Type = TType.I16;
-          field.ID = 1;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI16(Protocol);
-          oprot.WriteFieldEnd();
-        }
-        if (SourceAddressBytes != null && __isset.SourceAddressBytes) {
-          field.Name = "SourceAddressBytes";
-          field.Type = TType.String;
-          field.ID = 2;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteBinary(SourceAddressBytes);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.SourcePort) {
-          field.Name = "SourcePort";
-          field.Type = TType.I32;
-          field.ID = 3;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(SourcePort);
-          oprot.WriteFieldEnd();
-        }
-        if (DestinationAddressBytes != null && __isset.DestinationAddressBytes) {
-          field.Name = "DestinationAddressBytes";
-          field.Type = TType.String;
-          field.ID = 4;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteBinary(DestinationAddressBytes);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.DestinationPort) {
-          field.Name = "DestinationPort";
-          field.Type = TType.I32;
-          field.ID = 5;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(DestinationPort);
-          oprot.WriteFieldEnd();
-        }
         if (FlowUid != null && __isset.FlowUid) {
           field.Name = "FlowUid";
           field.Type = TType.String;
           field.ID = 6;
           oprot.WriteFieldBegin(field);
           oprot.WriteString(FlowUid);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.FirstSeen) {
-          field.Name = "FirstSeen";
-          field.Type = TType.I64;
-          field.ID = 10;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(FirstSeen);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.LastSeen) {
-          field.Name = "LastSeen";
-          field.Type = TType.I64;
-          field.ID = 11;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(LastSeen);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.Octets) {
-          field.Name = "Octets";
-          field.Type = TType.I64;
-          field.ID = 12;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI64(Octets);
-          oprot.WriteFieldEnd();
-        }
-        if (__isset.Packets) {
-          field.Name = "Packets";
-          field.Type = TType.I32;
-          field.ID = 13;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Packets);
-          oprot.WriteFieldEnd();
-        }
-        if (ServiceName != null && __isset.ServiceName) {
-          field.Name = "ServiceName";
-          field.Type = TType.String;
-          field.ID = 14;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteString(ServiceName);
           oprot.WriteFieldEnd();
         }
         if (FrameList != null && __isset.FrameList) {
@@ -441,9 +141,9 @@ namespace Tarzan.Nfx.Ingest
           oprot.WriteFieldBegin(field);
           {
             oprot.WriteListBegin(new TList(TType.Struct, FrameList.Count));
-            foreach (Frame _iter3 in FrameList)
+            foreach (Frame _iter7 in FrameList)
             {
-              _iter3.Write(oprot);
+              _iter7.Write(oprot);
             }
             oprot.WriteListEnd();
           }
@@ -461,71 +161,11 @@ namespace Tarzan.Nfx.Ingest
     public override string ToString() {
       StringBuilder __sb = new StringBuilder("PacketStream(");
       bool __first = true;
-      if (__isset.Protocol) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("Protocol: ");
-        __sb.Append(Protocol);
-      }
-      if (SourceAddressBytes != null && __isset.SourceAddressBytes) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("SourceAddressBytes: ");
-        __sb.Append(SourceAddressBytes);
-      }
-      if (__isset.SourcePort) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("SourcePort: ");
-        __sb.Append(SourcePort);
-      }
-      if (DestinationAddressBytes != null && __isset.DestinationAddressBytes) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("DestinationAddressBytes: ");
-        __sb.Append(DestinationAddressBytes);
-      }
-      if (__isset.DestinationPort) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("DestinationPort: ");
-        __sb.Append(DestinationPort);
-      }
       if (FlowUid != null && __isset.FlowUid) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
         __sb.Append("FlowUid: ");
         __sb.Append(FlowUid);
-      }
-      if (__isset.FirstSeen) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("FirstSeen: ");
-        __sb.Append(FirstSeen);
-      }
-      if (__isset.LastSeen) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("LastSeen: ");
-        __sb.Append(LastSeen);
-      }
-      if (__isset.Octets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("Octets: ");
-        __sb.Append(Octets);
-      }
-      if (__isset.Packets) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("Packets: ");
-        __sb.Append(Packets);
-      }
-      if (ServiceName != null && __isset.ServiceName) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("ServiceName: ");
-        __sb.Append(ServiceName);
       }
       if (FrameList != null && __isset.FrameList) {
         if(!__first) { __sb.Append(", "); }

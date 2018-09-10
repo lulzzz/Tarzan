@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Netdx.ConversationTracker;
-using Netdx.PacketDecoders;
+using Tarzan.Nfx.Ingest.Utils;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
     /// <summary>
     /// A flow index based on bloom filters. Packets are organized into blocks. For each block 

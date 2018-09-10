@@ -6,7 +6,7 @@ using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.Ingest.Flow
 {
     /// <summary>
     /// A compact representation of a flow key.

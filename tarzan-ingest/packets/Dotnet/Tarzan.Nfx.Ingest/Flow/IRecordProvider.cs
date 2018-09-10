@@ -1,4 +1,4 @@
-﻿namespace Netdx.ConversationTracker
+﻿namespace Tarzan.Nfx.Ingest.Flow
 {
     public interface IRecordProvider<TPacket, TFlowRecord>
     {

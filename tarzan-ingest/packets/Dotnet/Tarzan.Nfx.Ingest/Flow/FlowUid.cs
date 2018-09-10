@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Tarzan.Nfx.Ingest.Flow
 {
-    public class FlowUid
+    public class FlowUidGenerator
     {
         // The requirements for these types of UUIDs are as follows:
         //
