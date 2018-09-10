@@ -1,8 +1,5 @@
 ﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache;
-using Apache.Ignite.Core.Cache.Configuration;
-using System;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Model;
 

@@ -19,7 +19,7 @@ namespace Tarzan.Nfx.Ingest.Ignite
             var providers = GetConfigurationProviders();
 
             var config = new IgniteConfiguration();
-            config.JvmOptions = new[] { "-Xms2g", "-Xmx2g", "-XX:+AlwaysPreTouch", "-XX:+UseG1GC", "-XX:+ScavengeBeforeFullGC", "-XX:+DisableExplicitGC", "-XX:MaxDirectMemorySize=256m" };
+            config.JvmOptions = new[] { "-Xms512m", "-Xmx1g", "-XX:+AlwaysPreTouch", "-XX:+UseG1GC", "-XX:+ScavengeBeforeFullGC", "-XX:+DisableExplicitGC", "-XX:MaxDirectMemorySize=256m" };
             config.DiscoverySpi = new TcpDiscoverySpi
             {
                 IpFinder = new TcpDiscoveryStaticIpFinder
@@ -40,6 +40,7 @@ namespace Tarzan.Nfx.Ingest.Ignite
             config.CacheConfiguration = providers.Select(p => p.CacheConfiguration).ToArray();
             return config;
         }
+
         private static IEnumerable<ITableConfigurationProvider> GetConfigurationProviders()
         {
             var configProviders = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())

@@ -8,6 +8,10 @@ namespace Tarzan.Nfx.Ingest.Flow
     /// This class implementes a simple algorithm that groups packet into flows. 
     /// Flows are stored in the dictionary.
     /// </summary>
+    /// <remarks>
+    /// As a further optimization we may consider the method used by DPDK:
+    /// https://dpdk.readthedocs.io/en/v16.04/prog_guide/hash_lib.html#hash-api-overview.
+    /// </remarks>
     class FlowTracker
     {
         /// <summary>

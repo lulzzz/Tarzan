@@ -3080,6 +3080,7 @@
           "Microsoft.Extensions.DependencyInjection": "2.1.1",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "2.2.0-preview1-35029",
           "Microsoft.NETCore.App": "2.0.0",
+          "MurmurHash.NETStandard": "1.0.0",
           "Netdx.PacketDecoders": "1.0.0",
           "Newtonsoft.Json": "11.0.2",
           "PacketDotNet.Standard": "0.16.0",

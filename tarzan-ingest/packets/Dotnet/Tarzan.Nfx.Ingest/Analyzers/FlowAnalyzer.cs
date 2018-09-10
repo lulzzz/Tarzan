@@ -67,7 +67,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
            
             var globalFlowTable = new PacketFlowTable(m_ignite);
             var flowCache = globalFlowTable.GetOrCreateCache();
-            var updateProcessor = new MergePacketStreamProcessor();
+            var updateProcessor = new MergePacketFlowProcessor();
 
             foreach (var flow in flowTracker.FlowTable)
             {

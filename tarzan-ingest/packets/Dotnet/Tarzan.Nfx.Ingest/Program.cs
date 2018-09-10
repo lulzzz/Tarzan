@@ -25,9 +25,8 @@ namespace Tarzan.Nfx.Ingest
             var commandLineApplication = new CommandLineApplication(true);
 
 
-            commandLineApplication.Command(trackFlowsCmd.Name, trackFlowsCmd.Configuration);
-            commandLineApplication.Command(PrintInterfaces.Name, PrintInterfaces.Configuration);           
-            commandLineApplication.Command(startIgniteServerCmd.Name, startIgniteServerCmd.Configuration);
+            commandLineApplication.Command(trackFlowsCmd.Name, trackFlowsCmd.ExecuteCommand);    
+            commandLineApplication.Command(startIgniteServerCmd.Name, startIgniteServerCmd.ExecuteCommand);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.Name = typeof(Program).Assembly.GetName().Name;

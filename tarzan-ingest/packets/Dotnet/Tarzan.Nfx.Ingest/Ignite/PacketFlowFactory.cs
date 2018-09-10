@@ -75,14 +75,15 @@ namespace Tarzan.Nfx.Ingest.Ignite
             {
                 CacheMode = CacheMode.Partitioned,
                 Backups = 0,
+                
                 QueryEntities = new[]
                 {
-                    new QueryEntity(typeof(PacketStream))
+                    new QueryEntity(typeof(PacketFlow))
                     {
                         Fields = new []
                         {
                             new QueryField(nameof(PacketFlow.FlowUid), typeof(string)),
-                            new QueryField(nameof(PacketFlow.Protocol), typeof(short)),
+                            new QueryField(nameof(PacketFlow.Protocol), typeof(string)),
                             new QueryField(nameof(PacketFlow.SourceAddress), typeof(string)),
                             new QueryField(nameof(PacketFlow.SourcePort), typeof(int)),
                             new QueryField(nameof(PacketFlow.DestinationAddress), typeof(string)),
@@ -97,10 +98,11 @@ namespace Tarzan.Nfx.Ingest.Ignite
                 }
             };
 
-        public BinaryTypeConfiguration TypeConfiguration => new BinaryTypeConfiguration()
+        public BinaryTypeConfiguration TypeConfiguration => new BinaryTypeConfiguration(typeof(PacketFlow))
         {
-            TypeName = nameof(PacketFlow),
             Serializer = new PacketFlowTableSerializer()
         };
+
+        public Type ObjectType => typeof(PacketFlow);
     }
 }

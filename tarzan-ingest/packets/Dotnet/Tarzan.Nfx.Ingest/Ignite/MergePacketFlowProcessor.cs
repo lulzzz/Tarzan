@@ -5,7 +5,7 @@ using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Ingest.Ignite
 {
-    public class MergePacketStreamProcessor : ICacheEntryProcessor<FlowKey, PacketFlow, PacketFlow, PacketFlow>
+    public class MergePacketFlowProcessor : ICacheEntryProcessor<FlowKey, PacketFlow, PacketFlow, PacketFlow>
     {
         public PacketFlow Process(IMutableCacheEntry<FlowKey, PacketFlow> entry, PacketFlow arg)
         {

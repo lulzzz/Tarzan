@@ -32,6 +32,7 @@
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0-preview1-35029" />
+    <PackageReference Include="MurmurHash.NETStandard" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />

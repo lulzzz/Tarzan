@@ -14,7 +14,10 @@
     },
     "ignite-file64": {
       "commandName": "Project",
-      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-64\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create "
+      "commandLineArgs": "track-flows -file D:\\Captures\\ids\\testbed-12jun-64\\testbed-12jun-000.pcap -cassandra \"localhost\" -namespace testbed -create ",
+      "environmentVariables": {
+        "IGNITE_H2_DEBUG_CONSOLE": "true"
+      }
     },
     "ignite-file1024": {
       "commandName": "Project",

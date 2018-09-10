@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache.Configuration;
@@ -34,9 +35,8 @@ namespace Tarzan.Nfx.Ingest.Ignite
 
 
         public BinaryTypeConfiguration TypeConfiguration =>
-            new BinaryTypeConfiguration()
+            new BinaryTypeConfiguration(typeof(PacketStream))
             {
-                TypeName = nameof(PacketStream),
                 Serializer = new PacketStreamSerializer()
             };
 
@@ -56,5 +56,7 @@ namespace Tarzan.Nfx.Ingest.Ignite
                         }
                 }
          };
+
+        public Type ObjectType => typeof(PacketStream);
     }
 }

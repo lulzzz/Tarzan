@@ -16,12 +16,13 @@ namespace Tarzan.Nfx.Ingest
         }
 
         public string Name => "start-ignite";
-        public Action<CommandLineApplication> Configuration =>
-            (CommandLineApplication target) =>
-            {
-                target.Description = "Start ignite server and waits for jobs from ignite clients.";
-                target.OnExecute(() => RunIgniteServer());                
-            };
+
+        public void ExecuteCommand(CommandLineApplication target)
+        {
+            target.Description = "Start ignite server and waits for jobs from ignite clients.";
+            target.OnExecute(() => RunIgniteServer());
+        }
+
         class ServerLifecycleHandler : ILifecycleHandler
         {
             public void OnLifecycleEvent(LifecycleEventType evt)
