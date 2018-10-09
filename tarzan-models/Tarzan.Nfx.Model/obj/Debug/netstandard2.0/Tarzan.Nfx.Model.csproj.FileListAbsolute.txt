@@ -1,11 +1,3 @@
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.deps.json
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.csproj.CoreCompileInputs.cache
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.AssemblyInfoInputs.cache
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.AssemblyInfo.cs
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
-C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.deps.json
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb
@@ -15,4 +7,12 @@ C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.AssemblyInfo.cs
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
 C:\Users\rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.deps.json
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\bin\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.csprojAssemblyReference.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.csproj.CoreCompileInputs.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.AssemblyInfoInputs.cache
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.AssemblyInfo.cs
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-models\Tarzan.Nfx.Model\obj\Debug\netstandard2.0\Tarzan.Nfx.Model.pdb

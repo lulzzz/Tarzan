@@ -24,32 +24,6 @@ namespace Tarzan.Nfx.Ingest.Ignite
 
     public class PacketFlowFactory : ITableConfigurationProvider
     {
-        public static PacketFlow From(FlowKey flowKey, Frame frame, string flowUid)
-        {
-            return new PacketFlow()
-            {
-                FlowUid = flowUid,
-                Protocol = flowKey.Protocol.ToString(),
-                SourceAddress = flowKey.SourceIpAddress.ToString(),
-                SourcePort = flowKey.SourcePort,
-                DestinationAddress = flowKey.DestinationIpAddress.ToString(),
-                DestinationPort = flowKey.DestinationPort,
-                FirstSeen = frame.Timestamp,
-                LastSeen = frame.Timestamp,
-                Octets = frame.Data.Length,
-                Packets = 1
-            };
-        }
-
-        public static PacketFlow Update(PacketFlow packetFlow, Frame frame)
-        {
-            packetFlow.FirstSeen = Math.Min(packetFlow.FirstSeen, frame.Timestamp);
-            packetFlow.LastSeen = Math.Max(packetFlow.LastSeen, frame.Timestamp);
-            packetFlow.Octets += frame.Data.Length;
-            packetFlow.Packets++;
-            return packetFlow;
-        }
-
         public static PacketFlow Merge(PacketFlow flow1, PacketFlow flow2, string flowUid)
         {
             if (flow1 == null) throw new ArgumentNullException(nameof(flow1));

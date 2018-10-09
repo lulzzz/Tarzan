@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Model;
 
@@ -16,7 +16,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public class DnsAnalyzer : IComputeAction
     {    
-        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketStream packetStream)
+        public static IEnumerable<Model.DnsObject> Inspect(Tarzan.Nfx.FlowTracker.FlowKey flowKey, PacketStream packetStream)
         {
             var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
             var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);

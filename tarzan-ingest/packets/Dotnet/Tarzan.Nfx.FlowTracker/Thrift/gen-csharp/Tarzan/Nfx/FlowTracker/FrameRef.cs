@@ -15,17 +15,16 @@ using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.FlowTracker
 {
 
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class Frame : TBase
+  public partial class FrameRef : TBase
   {
     private long _Timestamp;
-    private LinkLayerType _LinkLayer;
-    private byte[] _Data;
+    private long _Index;
 
     public long Timestamp
     {
@@ -40,33 +39,16 @@ namespace Tarzan.Nfx.Ingest
       }
     }
 
-    /// <summary>
-    /// 
-    /// <seealso cref="LinkLayerType"/>
-    /// </summary>
-    public LinkLayerType LinkLayer
+    public long Index
     {
       get
       {
-        return _LinkLayer;
+        return _Index;
       }
       set
       {
-        __isset.LinkLayer = true;
-        this._LinkLayer = value;
-      }
-    }
-
-    public byte[] Data
-    {
-      get
-      {
-        return _Data;
-      }
-      set
-      {
-        __isset.Data = true;
-        this._Data = value;
+        __isset.Index = true;
+        this._Index = value;
       }
     }
 
@@ -77,11 +59,10 @@ namespace Tarzan.Nfx.Ingest
     #endif
     public struct Isset {
       public bool Timestamp;
-      public bool LinkLayer;
-      public bool Data;
+      public bool Index;
     }
 
-    public Frame() {
+    public FrameRef() {
     }
 
     public void Read (TProtocol iprot)
@@ -107,15 +88,8 @@ namespace Tarzan.Nfx.Ingest
               }
               break;
             case 2:
-              if (field.Type == TType.I32) {
-                LinkLayer = (LinkLayerType)iprot.ReadI32();
-              } else { 
-                TProtocolUtil.Skip(iprot, field.Type);
-              }
-              break;
-            case 3:
-              if (field.Type == TType.String) {
-                Data = iprot.ReadBinary();
+              if (field.Type == TType.I64) {
+                Index = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -138,7 +112,7 @@ namespace Tarzan.Nfx.Ingest
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("Frame");
+        TStruct struc = new TStruct("FrameRef");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
         if (__isset.Timestamp) {
@@ -149,20 +123,12 @@ namespace Tarzan.Nfx.Ingest
           oprot.WriteI64(Timestamp);
           oprot.WriteFieldEnd();
         }
-        if (__isset.LinkLayer) {
-          field.Name = "LinkLayer";
-          field.Type = TType.I32;
+        if (__isset.Index) {
+          field.Name = "Index";
+          field.Type = TType.I64;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32((int)LinkLayer);
-          oprot.WriteFieldEnd();
-        }
-        if (Data != null && __isset.Data) {
-          field.Name = "Data";
-          field.Type = TType.String;
-          field.ID = 3;
-          oprot.WriteFieldBegin(field);
-          oprot.WriteBinary(Data);
+          oprot.WriteI64(Index);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -175,7 +141,7 @@ namespace Tarzan.Nfx.Ingest
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("Frame(");
+      StringBuilder __sb = new StringBuilder("FrameRef(");
       bool __first = true;
       if (__isset.Timestamp) {
         if(!__first) { __sb.Append(", "); }
@@ -183,17 +149,11 @@ namespace Tarzan.Nfx.Ingest
         __sb.Append("Timestamp: ");
         __sb.Append(Timestamp);
       }
-      if (__isset.LinkLayer) {
+      if (__isset.Index) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("LinkLayer: ");
-        __sb.Append(LinkLayer);
-      }
-      if (Data != null && __isset.Data) {
-        if(!__first) { __sb.Append(", "); }
-        __first = false;
-        __sb.Append("Data: ");
-        __sb.Append(Data);
+        __sb.Append("Index: ");
+        __sb.Append(Index);
       }
       __sb.Append(")");
       return __sb.ToString();

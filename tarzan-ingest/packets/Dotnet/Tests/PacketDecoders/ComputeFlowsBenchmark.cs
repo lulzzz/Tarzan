@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest;
 using Tarzan.Nfx.Ingest.Flow;
 

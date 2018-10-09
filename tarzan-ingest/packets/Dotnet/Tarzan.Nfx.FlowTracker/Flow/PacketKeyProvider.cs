@@ -1,7 +1,7 @@
 ﻿using PacketDotNet;
 using System.Net;
 
-namespace Tarzan.Nfx.Ingest.Flow
+namespace Tarzan.Nfx.FlowTracker
 {
     class PacketKeyProvider : IKeyProvider<FlowKey, Packet>
     {

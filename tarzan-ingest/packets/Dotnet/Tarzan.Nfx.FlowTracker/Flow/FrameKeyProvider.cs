@@ -1,8 +1,14 @@
 ﻿using Netdx.Packets.Base;
 using System;
+using Tarzan.Nfx.FlowTracker;
 
-namespace Tarzan.Nfx.Ingest.Flow
+namespace Tarzan.Nfx.FlowTracker
 {
+    /// <summary>
+    /// Provides a flow key from the given frame. This class provides optimized 
+    /// fast method for getting flow key from Ethernet frames only.
+    /// For general method to get flow key from any other link type use <see cref="PacketKeyProvider"/> class.
+    /// </summary>
     public class FrameKeyProvider : IKeyProvider<FlowKey, Frame>
     {                    
         /// <summary>

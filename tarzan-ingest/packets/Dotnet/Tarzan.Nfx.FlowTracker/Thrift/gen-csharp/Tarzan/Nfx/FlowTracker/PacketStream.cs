@@ -15,40 +15,40 @@ using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.FlowTracker
 {
 
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class FrameRef : TBase
+  public partial class PacketStream : TBase
   {
-    private long _Timestamp;
-    private long _Index;
+    private string _FlowUid;
+    private List<Frame> _FrameList;
 
-    public long Timestamp
+    public string FlowUid
     {
       get
       {
-        return _Timestamp;
+        return _FlowUid;
       }
       set
       {
-        __isset.Timestamp = true;
-        this._Timestamp = value;
+        __isset.FlowUid = true;
+        this._FlowUid = value;
       }
     }
 
-    public long Index
+    public List<Frame> FrameList
     {
       get
       {
-        return _Index;
+        return _FrameList;
       }
       set
       {
-        __isset.Index = true;
-        this._Index = value;
+        __isset.FrameList = true;
+        this._FrameList = value;
       }
     }
 
@@ -58,11 +58,11 @@ namespace Tarzan.Nfx.Ingest
     [Serializable]
     #endif
     public struct Isset {
-      public bool Timestamp;
-      public bool Index;
+      public bool FlowUid;
+      public bool FrameList;
     }
 
-    public FrameRef() {
+    public PacketStream() {
     }
 
     public void Read (TProtocol iprot)
@@ -80,16 +80,27 @@ namespace Tarzan.Nfx.Ingest
           }
           switch (field.ID)
           {
-            case 1:
-              if (field.Type == TType.I64) {
-                Timestamp = iprot.ReadI64();
+            case 6:
+              if (field.Type == TType.String) {
+                FlowUid = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
-            case 2:
-              if (field.Type == TType.I64) {
-                Index = iprot.ReadI64();
+            case 20:
+              if (field.Type == TType.List) {
+                {
+                  FrameList = new List<Frame>();
+                  TList _list4 = iprot.ReadListBegin();
+                  for( int _i5 = 0; _i5 < _list4.Count; ++_i5)
+                  {
+                    Frame _elem6;
+                    _elem6 = new Frame();
+                    _elem6.Read(iprot);
+                    FrameList.Add(_elem6);
+                  }
+                  iprot.ReadListEnd();
+                }
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -112,23 +123,30 @@ namespace Tarzan.Nfx.Ingest
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("FrameRef");
+        TStruct struc = new TStruct("PacketStream");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (__isset.Timestamp) {
-          field.Name = "Timestamp";
-          field.Type = TType.I64;
-          field.ID = 1;
+        if (FlowUid != null && __isset.FlowUid) {
+          field.Name = "FlowUid";
+          field.Type = TType.String;
+          field.ID = 6;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI64(Timestamp);
+          oprot.WriteString(FlowUid);
           oprot.WriteFieldEnd();
         }
-        if (__isset.Index) {
-          field.Name = "Index";
-          field.Type = TType.I64;
-          field.ID = 2;
+        if (FrameList != null && __isset.FrameList) {
+          field.Name = "FrameList";
+          field.Type = TType.List;
+          field.ID = 20;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI64(Index);
+          {
+            oprot.WriteListBegin(new TList(TType.Struct, FrameList.Count));
+            foreach (Frame _iter7 in FrameList)
+            {
+              _iter7.Write(oprot);
+            }
+            oprot.WriteListEnd();
+          }
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -141,19 +159,19 @@ namespace Tarzan.Nfx.Ingest
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("FrameRef(");
+      StringBuilder __sb = new StringBuilder("PacketStream(");
       bool __first = true;
-      if (__isset.Timestamp) {
+      if (FlowUid != null && __isset.FlowUid) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Timestamp: ");
-        __sb.Append(Timestamp);
+        __sb.Append("FlowUid: ");
+        __sb.Append(FlowUid);
       }
-      if (__isset.Index) {
+      if (FrameList != null && __isset.FrameList) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("Index: ");
-        __sb.Append(Index);
+        __sb.Append("FrameList: ");
+        __sb.Append(FrameList);
       }
       __sb.Append(")");
       return __sb.ToString();

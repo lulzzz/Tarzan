@@ -1,5 +1,6 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Cache;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Model;
 

@@ -15,40 +15,58 @@ using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.FlowTracker
 {
 
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class FrameRefBlock : TBase
+  public partial class Frame : TBase
   {
-    private string _SourceRef;
-    private List<FrameRef> _FrameList;
+    private long _Timestamp;
+    private LinkLayerType _LinkLayer;
+    private byte[] _Data;
 
-    public string SourceRef
+    public long Timestamp
     {
       get
       {
-        return _SourceRef;
+        return _Timestamp;
       }
       set
       {
-        __isset.SourceRef = true;
-        this._SourceRef = value;
+        __isset.Timestamp = true;
+        this._Timestamp = value;
       }
     }
 
-    public List<FrameRef> FrameList
+    /// <summary>
+    /// 
+    /// <seealso cref="LinkLayerType"/>
+    /// </summary>
+    public LinkLayerType LinkLayer
     {
       get
       {
-        return _FrameList;
+        return _LinkLayer;
       }
       set
       {
-        __isset.FrameList = true;
-        this._FrameList = value;
+        __isset.LinkLayer = true;
+        this._LinkLayer = value;
+      }
+    }
+
+    public byte[] Data
+    {
+      get
+      {
+        return _Data;
+      }
+      set
+      {
+        __isset.Data = true;
+        this._Data = value;
       }
     }
 
@@ -58,11 +76,12 @@ namespace Tarzan.Nfx.Ingest
     [Serializable]
     #endif
     public struct Isset {
-      public bool SourceRef;
-      public bool FrameList;
+      public bool Timestamp;
+      public bool LinkLayer;
+      public bool Data;
     }
 
-    public FrameRefBlock() {
+    public Frame() {
     }
 
     public void Read (TProtocol iprot)
@@ -81,26 +100,22 @@ namespace Tarzan.Nfx.Ingest
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.String) {
-                SourceRef = iprot.ReadString();
+              if (field.Type == TType.I64) {
+                Timestamp = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
             case 2:
-              if (field.Type == TType.List) {
-                {
-                  FrameList = new List<FrameRef>();
-                  TList _list0 = iprot.ReadListBegin();
-                  for( int _i1 = 0; _i1 < _list0.Count; ++_i1)
-                  {
-                    FrameRef _elem2;
-                    _elem2 = new FrameRef();
-                    _elem2.Read(iprot);
-                    FrameList.Add(_elem2);
-                  }
-                  iprot.ReadListEnd();
-                }
+              if (field.Type == TType.I32) {
+                LinkLayer = (LinkLayerType)iprot.ReadI32();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            case 3:
+              if (field.Type == TType.String) {
+                Data = iprot.ReadBinary();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -123,30 +138,31 @@ namespace Tarzan.Nfx.Ingest
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("FrameRefBlock");
+        TStruct struc = new TStruct("Frame");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (SourceRef != null && __isset.SourceRef) {
-          field.Name = "SourceRef";
-          field.Type = TType.String;
+        if (__isset.Timestamp) {
+          field.Name = "Timestamp";
+          field.Type = TType.I64;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(SourceRef);
+          oprot.WriteI64(Timestamp);
           oprot.WriteFieldEnd();
         }
-        if (FrameList != null && __isset.FrameList) {
-          field.Name = "FrameList";
-          field.Type = TType.List;
+        if (__isset.LinkLayer) {
+          field.Name = "LinkLayer";
+          field.Type = TType.I32;
           field.ID = 2;
           oprot.WriteFieldBegin(field);
-          {
-            oprot.WriteListBegin(new TList(TType.Struct, FrameList.Count));
-            foreach (FrameRef _iter3 in FrameList)
-            {
-              _iter3.Write(oprot);
-            }
-            oprot.WriteListEnd();
-          }
+          oprot.WriteI32((int)LinkLayer);
+          oprot.WriteFieldEnd();
+        }
+        if (Data != null && __isset.Data) {
+          field.Name = "Data";
+          field.Type = TType.String;
+          field.ID = 3;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteBinary(Data);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -159,19 +175,25 @@ namespace Tarzan.Nfx.Ingest
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("FrameRefBlock(");
+      StringBuilder __sb = new StringBuilder("Frame(");
       bool __first = true;
-      if (SourceRef != null && __isset.SourceRef) {
+      if (__isset.Timestamp) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("SourceRef: ");
-        __sb.Append(SourceRef);
+        __sb.Append("Timestamp: ");
+        __sb.Append(Timestamp);
       }
-      if (FrameList != null && __isset.FrameList) {
+      if (__isset.LinkLayer) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("FrameList: ");
-        __sb.Append(FrameList);
+        __sb.Append("LinkLayer: ");
+        __sb.Append(LinkLayer);
+      }
+      if (Data != null && __isset.Data) {
+        if(!__first) { __sb.Append(", "); }
+        __first = false;
+        __sb.Append("Data: ");
+        __sb.Append(Data);
       }
       __sb.Append(")");
       return __sb.ToString();

@@ -5,7 +5,7 @@
  *  @generated
  */
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.FlowTracker
 {
   public enum LinkLayerType
   {

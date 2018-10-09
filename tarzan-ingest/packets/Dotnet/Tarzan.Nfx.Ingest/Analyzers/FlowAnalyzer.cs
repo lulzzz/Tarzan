@@ -5,6 +5,7 @@ using Netdx.PacketDecoders;
 using SharpPcap;
 using System;
 using System.Diagnostics;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Ignite;
 using Tarzan.Nfx.Ingest.Utils;
@@ -27,12 +28,12 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             PopulateFlowTable(flowTracker);
         }
 
-        private FlowTracker TrackFlows()
+        private IFlowTracker<FlowRecord> TrackFlows()
         {
             var sw = new Stopwatch();
             sw.Start();
 
-            var flowTracker = new FlowTracker(new FrameKeyProvider());
+            var flowTracker = new FlowWithContentTracker(new FrameKeyProvider());
             using (var device = new FastPcapFileReaderDevice(FileName))
             {
                 device.Open();
@@ -42,7 +43,12 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 {
                     try
                     {
-                        var frame = new Frame((LinkLayerType)packet.LinkLayerType, PosixTime.FromUnixTimeMilliseconds(packet.Timeval.ToUnixTimeMilliseconds()), packet.Data);
+                        var frame = new Frame
+                        {
+                            LinkLayer = (LinkLayerType)packet.LinkLayerType,
+                            Timestamp = packet.Timeval.ToUnixTimeMilliseconds(),
+                            Data = packet.Data
+                        };
                         flowTracker.ProcessFrame(frame);
                     }
                     catch(Exception e)
@@ -59,7 +65,11 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             return flowTracker;
         }
 
-        private void PopulateFlowTable(FlowTracker flowTracker)
+        /// <summary>
+        /// Loads a local flow cache to the global flow table.
+        /// </summary>
+        /// <param name="flowTracker">A flow tracker object that contains a local flow cache.</param>
+        private void PopulateFlowTable(IFlowTracker<FlowRecord> flowTracker)
         {
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: FlowAnalyzer: Streaming to global FLOW CACHE...");
             var sw = new Stopwatch();
@@ -71,7 +81,8 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
             foreach (var flow in flowTracker.FlowTable)
             {
-                flowCache.Invoke(flow.Key, updateProcessor, flow.Value.flow);
+                flow.Value.Flow.FlowUid = FlowUidGenerator.NewUid(flow.Key, flow.Value.Flow.FirstSeen);
+                flowCache.Invoke(flow.Key, updateProcessor, flow.Value.Flow);
             }
 
             sw.Stop();

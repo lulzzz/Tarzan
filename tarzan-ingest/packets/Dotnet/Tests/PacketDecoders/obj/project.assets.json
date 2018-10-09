@@ -3069,6 +3069,23 @@
           "bin/placeholder/Netdx.PacketDecoders.dll": {}
         }
       },
+      "Tarzan.Nfx.FlowTracker/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.0",
+        "dependencies": {
+          "Microsoft.NETCore.App": "2.0.0",
+          "Netdx.PacketDecoders": "1.0.0",
+          "PacketDotNet.Standard": "0.16.0",
+          "Tarzan.Nfx.Model": "1.0.0",
+          "Tnidea.Thrift": "0.9.3"
+        },
+        "compile": {
+          "bin/placeholder/Tarzan.Nfx.FlowTracker.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tarzan.Nfx.FlowTracker.dll": {}
+        }
+      },
       "Tarzan.Nfx.Ingest/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
@@ -3086,6 +3103,7 @@
           "PacketDotNet.Standard": "0.16.0",
           "SharpPcap.Standard": "4.4.0",
           "System.Configuration.ConfigurationManager": "4.5.0",
+          "Tarzan.Nfx.FlowTracker": "1.0.0",
           "Tarzan.Nfx.Model": "1.0.0"
         },
         "compile": {
@@ -8944,6 +8962,11 @@
       "type": "project",
       "path": "../../Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj",
       "msbuildProject": "../../Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj"
+    },
+    "Tarzan.Nfx.FlowTracker/1.0.0": {
+      "type": "project",
+      "path": "../../Tarzan.Nfx.FlowTracker/Tarzan.Nfx.FlowTracker.csproj",
+      "msbuildProject": "../../Tarzan.Nfx.FlowTracker/Tarzan.Nfx.FlowTracker.csproj"
     },
     "Tarzan.Nfx.Ingest/1.0.0": {
       "type": "project",

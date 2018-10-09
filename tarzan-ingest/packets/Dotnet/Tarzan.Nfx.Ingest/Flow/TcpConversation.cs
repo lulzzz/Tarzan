@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tarzan.Nfx.FlowTracker;
 
 namespace Tarzan.Nfx.Ingest.Flow
 {

@@ -34,7 +34,7 @@ namespace Tarzan.Nfx.Ingest.Ignite
             };
             config.BinaryConfiguration = new BinaryConfiguration()
             {
-                TypeConfigurations = providers.Select(p => p.TypeConfiguration).ToArray()
+                TypeConfigurations = providers.Select(p => p.TypeConfiguration).ToArray()  // fixed ones
             };
 
             config.CacheConfiguration = providers.Select(p => p.CacheConfiguration).ToArray();

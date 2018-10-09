@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Tarzan.Nfx.ProtocolClassifiers": {
+      "commandName": "Project",
+      "commandLineArgs": "train"
+    },
+    "Train": {
+      "commandName": "Project",
+      "commandLineArgs": "train-classifier -folder TestTrainingData"
+    }
+  }
+}

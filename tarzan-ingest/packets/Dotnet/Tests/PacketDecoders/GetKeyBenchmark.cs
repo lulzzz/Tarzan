@@ -4,6 +4,7 @@ using SharpPcap.LibPcap;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest;
 using Tarzan.Nfx.Ingest.Flow;
 

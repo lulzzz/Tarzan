@@ -8,6 +8,7 @@ using Netdx.PacketDecoders;
 using Netdx.Packets.Base;
 using SharpPcap;
 using SharpPcap.LibPcap;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest;
 using Tarzan.Nfx.Ingest.Flow;
 using Xunit;

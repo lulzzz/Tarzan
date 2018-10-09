@@ -15,31 +15,31 @@ using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Tarzan.Nfx.Ingest
+namespace Tarzan.Nfx.FlowTracker
 {
 
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class PacketStream : TBase
+  public partial class FrameRefBlock : TBase
   {
-    private string _FlowUid;
-    private List<Frame> _FrameList;
+    private string _SourceRef;
+    private List<FrameRef> _FrameList;
 
-    public string FlowUid
+    public string SourceRef
     {
       get
       {
-        return _FlowUid;
+        return _SourceRef;
       }
       set
       {
-        __isset.FlowUid = true;
-        this._FlowUid = value;
+        __isset.SourceRef = true;
+        this._SourceRef = value;
       }
     }
 
-    public List<Frame> FrameList
+    public List<FrameRef> FrameList
     {
       get
       {
@@ -58,11 +58,11 @@ namespace Tarzan.Nfx.Ingest
     [Serializable]
     #endif
     public struct Isset {
-      public bool FlowUid;
+      public bool SourceRef;
       public bool FrameList;
     }
 
-    public PacketStream() {
+    public FrameRefBlock() {
     }
 
     public void Read (TProtocol iprot)
@@ -80,24 +80,24 @@ namespace Tarzan.Nfx.Ingest
           }
           switch (field.ID)
           {
-            case 6:
+            case 1:
               if (field.Type == TType.String) {
-                FlowUid = iprot.ReadString();
+                SourceRef = iprot.ReadString();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
-            case 20:
+            case 2:
               if (field.Type == TType.List) {
                 {
-                  FrameList = new List<Frame>();
-                  TList _list4 = iprot.ReadListBegin();
-                  for( int _i5 = 0; _i5 < _list4.Count; ++_i5)
+                  FrameList = new List<FrameRef>();
+                  TList _list0 = iprot.ReadListBegin();
+                  for( int _i1 = 0; _i1 < _list0.Count; ++_i1)
                   {
-                    Frame _elem6;
-                    _elem6 = new Frame();
-                    _elem6.Read(iprot);
-                    FrameList.Add(_elem6);
+                    FrameRef _elem2;
+                    _elem2 = new FrameRef();
+                    _elem2.Read(iprot);
+                    FrameList.Add(_elem2);
                   }
                   iprot.ReadListEnd();
                 }
@@ -123,27 +123,27 @@ namespace Tarzan.Nfx.Ingest
       oprot.IncrementRecursionDepth();
       try
       {
-        TStruct struc = new TStruct("PacketStream");
+        TStruct struc = new TStruct("FrameRefBlock");
         oprot.WriteStructBegin(struc);
         TField field = new TField();
-        if (FlowUid != null && __isset.FlowUid) {
-          field.Name = "FlowUid";
+        if (SourceRef != null && __isset.SourceRef) {
+          field.Name = "SourceRef";
           field.Type = TType.String;
-          field.ID = 6;
+          field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteString(FlowUid);
+          oprot.WriteString(SourceRef);
           oprot.WriteFieldEnd();
         }
         if (FrameList != null && __isset.FrameList) {
           field.Name = "FrameList";
           field.Type = TType.List;
-          field.ID = 20;
+          field.ID = 2;
           oprot.WriteFieldBegin(field);
           {
             oprot.WriteListBegin(new TList(TType.Struct, FrameList.Count));
-            foreach (Frame _iter7 in FrameList)
+            foreach (FrameRef _iter3 in FrameList)
             {
-              _iter7.Write(oprot);
+              _iter3.Write(oprot);
             }
             oprot.WriteListEnd();
           }
@@ -159,13 +159,13 @@ namespace Tarzan.Nfx.Ingest
     }
 
     public override string ToString() {
-      StringBuilder __sb = new StringBuilder("PacketStream(");
+      StringBuilder __sb = new StringBuilder("FrameRefBlock(");
       bool __first = true;
-      if (FlowUid != null && __isset.FlowUid) {
+      if (SourceRef != null && __isset.SourceRef) {
         if(!__first) { __sb.Append(", "); }
         __first = false;
-        __sb.Append("FlowUid: ");
-        __sb.Append(FlowUid);
+        __sb.Append("SourceRef: ");
+        __sb.Append(SourceRef);
       }
       if (FrameList != null && __isset.FrameList) {
         if(!__first) { __sb.Append(", "); }

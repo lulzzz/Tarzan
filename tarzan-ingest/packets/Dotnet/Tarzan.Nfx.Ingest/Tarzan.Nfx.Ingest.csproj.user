@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>ignite-file64</ActiveDebugProfile>
+    <ActiveDebugProfile>ignite-file512</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

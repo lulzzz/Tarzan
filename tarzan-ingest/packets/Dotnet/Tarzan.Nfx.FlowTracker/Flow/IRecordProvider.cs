@@ -1,4 +1,4 @@
-﻿namespace Tarzan.Nfx.Ingest.Flow
+﻿namespace Tarzan.Nfx.FlowTracker
 {
     public interface IRecordProvider<TPacket, TFlowRecord>
     {

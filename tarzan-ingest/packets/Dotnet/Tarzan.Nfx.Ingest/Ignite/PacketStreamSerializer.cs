@@ -1,5 +1,6 @@
 ﻿using Apache.Ignite.Core.Binary;
 using System.Linq;
+using Tarzan.Nfx.FlowTracker;
 
 namespace Tarzan.Nfx.Ingest.Ignite
 {

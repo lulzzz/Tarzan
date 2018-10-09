@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Utils;
 namespace Tarzan.Nfx.Ingest.Flow
 {
@@ -95,12 +96,12 @@ namespace Tarzan.Nfx.Ingest.Flow
                     if (tcp.Syn || currentFlowRecord == null)
                     {
                         if (currentFlowRecord != null) yield return KeyValuePair.Create(flowKey, currentFlowRecord);
-                        currentFlowRecord = From((tcp, frame.UnixTimestamp));
+                        currentFlowRecord = From((tcp, PosixTime.FromUnixTimeMilliseconds(frame.Timestamp)));
                         currentFlowRecord.TcpInitialSequenceNumber = tcp.SequenceNumber;
                     }
                     else
                     {
-                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((tcp, frame.UnixTimestamp)));
+                        currentFlowRecord = Merge(currentFlowRecord, TcpStream.From((tcp, PosixTime.FromUnixTimeMilliseconds(frame.Timestamp))));
                     }
                 }
                 if (currentFlowRecord != null) yield return KeyValuePair.Create(flowKey, currentFlowRecord);

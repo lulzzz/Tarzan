@@ -1,7 +1,5 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Compute;
-using Apache.Ignite.Core.Log;
-using Apache.Ignite.Core.Resource;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using SharpPcap.LibPcap;
@@ -12,7 +10,6 @@ using System.IO;
 using System.Linq;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Ingest.Ignite;
-using Tarzan.Nfx.Ingest.Utils;
 
 namespace Tarzan.Nfx.Ingest
 {

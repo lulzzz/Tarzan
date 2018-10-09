@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Analyzers;
 using Tarzan.Nfx.Ingest.Flow;
 using Tarzan.Nfx.Ingest.Utils;

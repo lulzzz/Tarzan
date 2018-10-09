@@ -1,6 +1,6 @@
 ﻿// compile with:
 // thrift --gen csharp model.thrift 
-namespace csharp Tarzan.Nfx.Ingest
+namespace csharp Tarzan.Nfx.FlowTracker
 
 enum LinkLayerType {
     /// <summary> no link-layer encapsulation </summary>

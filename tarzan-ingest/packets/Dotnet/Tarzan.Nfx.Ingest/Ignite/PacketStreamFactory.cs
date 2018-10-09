@@ -3,27 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache.Configuration;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Ingest.Flow;
 
 namespace Tarzan.Nfx.Ingest.Ignite
 {
     public class PacketStreamFactory : ITableConfigurationProvider
     {
-        public static PacketStream From(FlowKey flowKey, Frame frame, string flowUid)
-        {
-            return new PacketStream()
-            {
-                FlowUid = flowUid,
-                FrameList = new List<Frame> { frame }
-            };
-        }
-
-        public static PacketStream Update(PacketStream packetStream, Frame frame)
-        {
-            packetStream.FrameList.Add(frame);
-            return packetStream;
-        }
-
         public static PacketStream Merge(PacketStream stream1, PacketStream stream2, string flowUid)
         {
             return new PacketStream()

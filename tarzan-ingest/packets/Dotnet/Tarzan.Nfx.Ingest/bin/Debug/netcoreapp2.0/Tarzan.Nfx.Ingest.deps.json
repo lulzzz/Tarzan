@@ -20,6 +20,7 @@
           "PacketDotNet.Standard": "0.16.0",
           "SharpPcap.Standard": "4.4.0",
           "System.Configuration.ConfigurationManager": "4.5.0",
+          "Tarzan.Nfx.FlowTracker": "1.0.0",
           "Tarzan.Nfx.Model": "1.0.0"
         },
         "runtime": {
@@ -1278,6 +1279,17 @@
           "Netdx.PacketDecoders.dll": {}
         }
       },
+      "Tarzan.Nfx.FlowTracker/1.0.0": {
+        "dependencies": {
+          "Netdx.PacketDecoders": "1.0.0",
+          "PacketDotNet.Standard": "0.16.0",
+          "Tarzan.Nfx.Model": "1.0.0",
+          "Tnidea.Thrift": "0.9.3"
+        },
+        "runtime": {
+          "Tarzan.Nfx.FlowTracker.dll": {}
+        }
+      },
       "Tarzan.Nfx.Model/1.0.0": {
         "dependencies": {
           "CassandraCSharpDriver": "3.6.0",
@@ -1955,6 +1967,11 @@
       "hashPath": "tnidea.thrift.0.9.3.nupkg.sha512"
     },
     "Netdx.PacketDecoders/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Tarzan.Nfx.FlowTracker/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
