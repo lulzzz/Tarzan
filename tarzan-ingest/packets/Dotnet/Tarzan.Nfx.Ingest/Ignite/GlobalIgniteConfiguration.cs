@@ -2,6 +2,7 @@
 using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache.Configuration;
 using Apache.Ignite.Core.Communication.Tcp;
+using Apache.Ignite.Core.Configuration;
 using Apache.Ignite.Core.Discovery.Tcp;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
 using System;
@@ -24,9 +25,8 @@ namespace Tarzan.Nfx.Ingest.Ignite
             {
                 IpFinder = new TcpDiscoveryStaticIpFinder
                 {
-                    Endpoints = new[] { "127.0.0.1:47500..47520" }
+                    Endpoints = new[] { "127.0.0.1:47100" }
                 },
-                SocketTimeout = TimeSpan.FromSeconds(0.3)
             };
             config.CommunicationSpi = new TcpCommunicationSpi
             {
@@ -38,6 +38,19 @@ namespace Tarzan.Nfx.Ingest.Ignite
             };
 
             config.CacheConfiguration = providers.Select(p => p.CacheConfiguration).ToArray();
+            
+            /*
+            config.DataStorageConfiguration = new Apache.Ignite.Core.Configuration.DataStorageConfiguration
+            {
+                DataRegionConfigurations = new[]
+                {
+                    new DataRegionConfiguration
+                    {
+                        PersistenceEnabled = true
+                    }
+                }
+            };
+            */
             return config;
         }
 

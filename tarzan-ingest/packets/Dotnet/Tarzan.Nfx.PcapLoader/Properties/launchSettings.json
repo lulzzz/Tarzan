@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Tarzan.Nfx.PcapLoader": {
+      "commandName": "Project"
+    },
+    "load-file-512": {
+      "commandName": "Project",
+      "commandLineArgs": "--cluster 127.0.0.1 --file D:\\Captures\\ids\\testbed-12jun-512\\testbed-12jun-000.pcap"
+    }
+  }
+}

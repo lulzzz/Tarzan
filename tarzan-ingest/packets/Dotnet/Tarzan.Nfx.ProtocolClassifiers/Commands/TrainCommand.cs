@@ -76,7 +76,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
                     // TRAIN CLASSIFIERS FOR THE RECOGNIZED CONVERSATIONS:
                     foreach (var conversation in conversations)
                     {   
-                        // use port based classifier to get rought information on the flow in the pcap:
+                        // use port based classifier to get rough information on the flow in the pcap:
                         var protocol = portClassifier.Match(conversation.Value);
                         Console.WriteLine($"{conversation.Value.ConversationKey.ToString()} | {protocol.ProtocolName} ({protocol.Similarity})");
 

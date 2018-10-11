@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
+    <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.FlowTracker.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="test.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

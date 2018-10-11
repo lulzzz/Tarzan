@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "cmd"
+		},
+		{
+			"path": "tarzan-ingest\\packets\\Dotnet"
 		}
 	],
 	"settings": {

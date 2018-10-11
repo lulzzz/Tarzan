@@ -1,0 +1,22 @@
+# Run this with docker-compose up --scale ignite_node=4
+version: "2"
+
+services:
+  # IGNITE
+  ignite_head:
+    image: apacheignite/ignite
+    hostname: ignite
+    ports:
+      - "10800:10800" # For Ignite client mode connections (ODBC?)
+#      - "11211:11211" 
+      - "47100:47100" # SpiCommunication
+      - "47500:47500" # TcpSpiDiscovery
+#      - "49112:49112"
+  ignite_node:
+    image: apacheignite/ignite
+    hostname: ignite
+#  ignite_web_console:
+#    image: apacheignite/web-console-standalone
+#    ports:
+#      - "47800:80"
+  

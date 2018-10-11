@@ -15,9 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C2276483
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PacketDecodersTest", "tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\PacketDecodersTest.csproj", "{BBA8F935-1EB8-4666-BB50-8B3AAD118247}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.ProtocolClassifiers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifiers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.FlowTracker", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.FlowTracker.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.FlowTracker", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.FlowTracker.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.PcapLoader", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Utils", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,14 @@ Global
 		{415D3F97-0E70-462E-BE79-7896091B040C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{415D3F97-0E70-462E-BE79-7896091B040C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{415D3F97-0E70-462E-BE79-7896091B040C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,7 +30,7 @@ namespace Tarzan.Nfx.Ingest.Ignite
             new CacheConfiguration(nameof(PacketStreamTable))
             {
                 CacheMode = CacheMode.Partitioned,
-                Backups = 0,
+                Backups = 0,                
                 QueryEntities = new[]
                 {
                         new QueryEntity(typeof(PacketStream))
