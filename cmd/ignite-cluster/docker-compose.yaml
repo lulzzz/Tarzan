@@ -4,7 +4,7 @@ version: "2"
 services:
   # IGNITE
   ignite_head:
-    image: apacheignite/ignite
+    image: tarzan/ignite-server
     hostname: ignite
     ports:
       - "10800:10800" # For Ignite client mode connections (ODBC?)
@@ -13,7 +13,7 @@ services:
       - "47500:47500" # TcpSpiDiscovery
 #      - "49112:49112"
   ignite_node:
-    image: apacheignite/ignite
+    image: tarzan/ignite-server
     hostname: ignite
 #  ignite_web_console:
 #    image: apacheignite/web-console-standalone

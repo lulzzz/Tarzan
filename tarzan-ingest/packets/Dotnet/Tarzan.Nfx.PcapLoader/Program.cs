@@ -76,6 +76,8 @@ namespace Tarzan.Nfx.PcapLoader
                 }
             }
 
+
+            var flowKeyProvider = new FrameKeyProvider();
             const int CACHE_SIZE = 1000;
             using (var client = Ignition.StartClient(cfg))
             {
@@ -86,24 +88,33 @@ namespace Tarzan.Nfx.PcapLoader
 
                     using (var device = new FastPcapFileReaderDevice(fileInfo.FullName))
                     {
-                        var packetCache = client.GetOrCreateCache<int, RawCapture>(fileInfo.FullName);
+                        var packetCache = client.GetOrCreateCache<int, Frame>(fileInfo.FullName);
                         Console.WriteLine($"Packets already in cache {packetCache.GetSize()}.");
                         sw.Start();
                         device.Open();
                         
                         int frameIndex = 0;
-                        var frameArray = new KeyValuePair<int, RawCapture>[CACHE_SIZE];
+                        var frameArray = new KeyValuePair<int, Frame>[CACHE_SIZE];
                         var putCapturesToCacheTask = Task.CompletedTask;
 
                         RawCapture rawCapture = null;
                         while ((rawCapture = device.GetNextPacket()) != null)
                         {
-                            frameArray[frameIndex % CACHE_SIZE] = KeyValuePair.Create(frameIndex, rawCapture);
+                            var frame = new Frame
+                            {
+                                LinkLayer = (LinkLayerType)rawCapture.LinkLayerType,
+                                Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
+                                Data = rawCapture.Data
+                            };
+                            var key = flowKeyProvider.GetKey(frame);
+                            var frameHashCode = key.HashCode;
+
+                            frameArray[frameIndex % CACHE_SIZE] = KeyValuePair.Create(frameIndex, frame);
                             if (frameIndex % CACHE_SIZE == CACHE_SIZE-1)
                             {
                                 
                                 var cacheToStore = frameArray;
-                                frameArray = new KeyValuePair<int, RawCapture>[CACHE_SIZE];
+                                frameArray = new KeyValuePair<int, Frame>[CACHE_SIZE];
                                 putCapturesToCacheTask = putCapturesToCacheTask.ContinueWith((_) => { Console.Write("s"); return packetCache.PutAllAsync(cacheToStore); });
                                 Console.Write("p");
                             }

@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.PcapLoader", "ta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Utils", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.IgniteServer", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj", "{4AF54723-603F-4183-AFA1-D44B575CB0A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1917234A-541A-4C51-B8FB-57F70E9D6711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
