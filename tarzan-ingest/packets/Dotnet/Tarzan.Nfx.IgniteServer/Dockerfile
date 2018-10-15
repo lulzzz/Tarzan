@@ -50,4 +50,5 @@ ENTRYPOINT ["dotnet", "Tarzan.Nfx.IgniteServer.dll"]
 EXPOSE 10800 47100 47500 49112
 
 LABEL image="tarzan/ignite-server" \
-      maintainer="rysavy@fit.vutbr.cz"
+      maintainer="rysavy@fit.vutbr.cz" \
+      version="1.0"
