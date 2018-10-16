@@ -5,9 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
     <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Tnidea.Thrift" Version="0.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
   </ItemGroup>
 
 </Project>

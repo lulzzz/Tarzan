@@ -19,11 +19,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.FlowTracker", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.FlowTracker.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.PcapLoader", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PcapLoader", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Utils", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Utils", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.IgniteServer", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj", "{4AF54723-603F-4183-AFA1-D44B575CB0A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.IgniteServer", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj", "{4AF54723-603F-4183-AFA1-D44B575CB0A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{F53B5D59-66A2-41B4-B468-B0CF42B32E4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devnotes", "Devnotes", "{00CEB506-D543-41AC-B778-04FACC266316}"
+	ProjectSection(SolutionItems) = preProject
+		Ignite.md = Ignite.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +84,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BBA8F935-1EB8-4666-BB50-8B3AAD118247} = {C2276483-C4A8-4F0D-A988-9DB081C10199}
+		{00CEB506-D543-41AC-B778-04FACC266316} = {F53B5D59-66A2-41B4-B468-B0CF42B32E4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {43FA7675-4C85-4595-AA1D-085E54AC590E}

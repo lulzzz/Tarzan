@@ -38,9 +38,11 @@ C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarz
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Netdx.PacketDecoders.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.FlowTracker.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.Model.dll
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.Utils.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.Model.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.FlowTracker.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Netdx.PacketDecoders.pdb
+C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\bin\Debug\netcoreapp2.0\Tarzan.Nfx.Utils.pdb
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\obj\Debug\netcoreapp2.0\Tarzan.Nfx.Ingest.csproj.CopyComplete
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\obj\Debug\netcoreapp2.0\Tarzan.Nfx.Ingest.dll
 C:\Users\Ondrej Rysavy\Documents\GitHub\Tarzan\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\obj\Debug\netcoreapp2.0\Tarzan.Nfx.Ingest.pdb

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Tarzan.Nfx.IgniteServer": {
+      "commandName": "Project",
+      "commandLineArgs": "--onheap 1024 --offheap 4024"
+    }
+  }
+}

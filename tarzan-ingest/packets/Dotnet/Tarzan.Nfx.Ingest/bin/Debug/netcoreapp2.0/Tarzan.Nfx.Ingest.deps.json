@@ -1292,12 +1292,22 @@
       },
       "Tarzan.Nfx.Model/1.0.0": {
         "dependencies": {
+          "Apache.Ignite": "2.6.0",
           "CassandraCSharpDriver": "3.6.0",
           "Newtonsoft.Json": "11.0.2",
+          "Tarzan.Nfx.Utils": "1.0.0",
           "Tnidea.Thrift": "0.9.3"
         },
         "runtime": {
           "Tarzan.Nfx.Model.dll": {}
+        }
+      },
+      "Tarzan.Nfx.Utils/1.0.0": {
+        "dependencies": {
+          "SharpPcap.Standard": "4.4.0"
+        },
+        "runtime": {
+          "Tarzan.Nfx.Utils.dll": {}
         }
       }
     }
@@ -1977,6 +1987,11 @@
       "sha512": ""
     },
     "Tarzan.Nfx.Model/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Tarzan.Nfx.Utils/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

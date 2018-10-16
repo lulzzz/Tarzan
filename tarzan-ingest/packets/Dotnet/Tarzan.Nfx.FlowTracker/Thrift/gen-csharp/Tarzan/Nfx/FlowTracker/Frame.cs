@@ -14,10 +14,10 @@ using Thrift.Collections;
 using System.Runtime.Serialization;
 using Thrift.Protocol;
 using Thrift.Transport;
+using Apache.Ignite.Core.Binary;
 
 namespace Tarzan.Nfx.FlowTracker
 {
-
   #if !SILVERLIGHT
   [Serializable]
   #endif

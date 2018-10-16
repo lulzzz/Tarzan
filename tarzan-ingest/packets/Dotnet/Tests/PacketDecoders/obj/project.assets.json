@@ -3117,8 +3117,10 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
+          "Apache.Ignite": "2.6.0",
           "CassandraCSharpDriver": "3.6.0",
           "Newtonsoft.Json": "11.0.2",
+          "Tarzan.Nfx.Utils": "1.0.0",
           "Tnidea.Thrift": "0.9.3"
         },
         "compile": {
@@ -3126,6 +3128,19 @@
         },
         "runtime": {
           "bin/placeholder/Tarzan.Nfx.Model.dll": {}
+        }
+      },
+      "Tarzan.Nfx.Utils/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "SharpPcap.Standard": "4.4.0"
+        },
+        "compile": {
+          "bin/placeholder/Tarzan.Nfx.Utils.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tarzan.Nfx.Utils.dll": {}
         }
       }
     }
@@ -8977,6 +8992,11 @@
       "type": "project",
       "path": "../../../../../tarzan-models/Tarzan.Nfx.Model/Tarzan.Nfx.Model.csproj",
       "msbuildProject": "../../../../../tarzan-models/Tarzan.Nfx.Model/Tarzan.Nfx.Model.csproj"
+    },
+    "Tarzan.Nfx.Utils/1.0.0": {
+      "type": "project",
+      "path": "../../Tarzan.Nfx.Utils/Tarzan.Nfx.Utils.csproj",
+      "msbuildProject": "../../Tarzan.Nfx.Utils/Tarzan.Nfx.Utils.csproj"
     }
   },
   "projectFileDependencyGroups": {
