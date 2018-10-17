@@ -40,7 +40,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         }
 
 
-        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<Tarzan.Nfx.FlowTracker.Frame> packetList)
+        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<Frame> packetList)
         {
             var result = new List<DnsObject>(); 
             foreach (var frame in packetList)

@@ -1,6 +1,7 @@
 ﻿using Netdx.Packets.Base;
 using System;
 using Tarzan.Nfx.FlowTracker;
+using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.FlowTracker
 {
@@ -26,6 +27,12 @@ namespace Tarzan.Nfx.FlowTracker
             {
                 return GetKey(frame.LinkLayer, frame.Data);
             }
+        }
+
+        public int GetKeyHash(Frame frame)
+        {
+            var frameKey = GetKey(frame);
+            return frameKey.HashCode;
         }
 
         /// <summary>

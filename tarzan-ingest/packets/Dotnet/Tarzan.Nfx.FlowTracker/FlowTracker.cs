@@ -14,7 +14,7 @@ namespace Tarzan.Nfx.FlowTracker
     /// As a further optimization we may consider the method used by DPDK:
     /// https://dpdk.readthedocs.io/en/v16.04/prog_guide/hash_lib.html#hash-api-overview.
     /// </remarks>
-    public partial class FlowWithContentTracker : IFlowTracker<FlowRecord>
+    public partial class FlowTracker : IFlowTracker<FlowRecord>
     {
         /// <summary>
         /// Gets the dictionary of all existing flows.
@@ -29,7 +29,7 @@ namespace Tarzan.Nfx.FlowTracker
 
         IDictionary<FlowKey, FlowRecord> IFlowTracker<FlowRecord>.FlowTable => FlowTable;
 
-        public FlowWithContentTracker(IKeyProvider<FlowKey, Frame> keyProvider)
+        public FlowTracker(IKeyProvider<FlowKey, Frame> keyProvider)
         {
             FlowTable = new Dictionary<FlowKey, FlowRecord>();
             m_keyProvider = keyProvider;

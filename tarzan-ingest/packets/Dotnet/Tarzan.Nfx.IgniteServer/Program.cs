@@ -14,8 +14,8 @@ namespace Tarzan.Nfx.IgniteServer
 {
     class Program
     {
-        const int DefaultOffHeapMemory = 1024;
-        const int DefaultOnHeapMemory = 1024;
+        const int DefaultOffHeapMemory = 4096;
+        const int DefaultOnHeapMemory = 4096;
 
         enum EventIds : int { EVT_METRICS, EVT_IGNITE_STATUS };
 

@@ -32,6 +32,7 @@ namespace Tarzan.Nfx.PcapLoader
         public event FileCompletedHandler OnFileCompleted;
         public event ChunkCompletedHandler OnChunkLoaded;
         public event ChunkCompletedHandler OnChunkStored;
+        public event ErrorFrameHandler OnErrorFrame;
 
         public async Task Invoke()
         {

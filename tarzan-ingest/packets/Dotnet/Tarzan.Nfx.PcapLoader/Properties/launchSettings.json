@@ -14,6 +14,10 @@
     "stream-folder-512": {
       "commandName": "Project",
       "commandLineArgs": "--mode stream --cluster 127.0.0.1 --folder D:\\Captures\\ids\\testbed-12jun-512"
+    },
+    "verify-folder-512": {
+      "commandName": "Project",
+      "commandLineArgs": "--mode verify --cluster 127.0.0.1 --folder D:\\Captures\\ids\\testbed-12jun-512"
     }
   }
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using Tarzan.Nfx.FlowTracker;
+using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.Commands
 {
@@ -46,7 +47,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
                     // read pcap, compute flows, merge to biflows, and train the classifier:
                     var device = new CaptureFileReaderDevice(capFile);
                     // Open the device for capturing
-                    var flowTracker = new FlowWithContentTracker(new FrameKeyProvider());
+                    var flowTracker = new FlowTrackerWithContent(new FrameKeyProvider());
                     device.Open();
 
                     RawCapture packet = null;

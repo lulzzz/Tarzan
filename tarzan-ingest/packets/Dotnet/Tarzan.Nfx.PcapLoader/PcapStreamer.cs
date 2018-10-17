@@ -13,17 +13,16 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.PcapLoader
 {
-    public delegate void FileOpenHandler(object sender, FileInfo fileInfo);
-    public delegate void FileCompletedHandler(object sender, FileInfo fileInfo);
-    public delegate void ChunkCompletedHandler(object sender, int chunkNumber, int chunkBytes);
-
     public class PcapStreamer : IPcapProcessor
     {
+        const int maxOnHeap = 1024;
+        const int maxOffHeap = 1024;
         public const int DEFAULT_PORT = 47500;
         public const int CHUNK_SIZE = 100;
         readonly ConsoleLogger m_logger = new ConsoleLogger("Loader", (s, ll) => true, true);
@@ -38,11 +37,22 @@ namespace Tarzan.Nfx.PcapLoader
         public event FileCompletedHandler OnFileCompleted;
         public event ChunkCompletedHandler OnChunkLoaded;
         public event ChunkCompletedHandler OnChunkStored;
+        public event ErrorFrameHandler OnErrorFrame;
+
+
 
         public async Task Invoke()
         {
+            
             var cfg = new IgniteConfiguration
             {
+                JvmOptions = new[] { //"-Xms256m",
+                                     $"-Xmx{maxOnHeap}m",
+                                     "-XX:+AlwaysPreTouch",
+                                     "-XX:+UseG1GC",
+                                     "-XX:+ScavengeBeforeFullGC",
+                                     "-XX:+DisableExplicitGC",
+                                     $"-XX:MaxDirectMemorySize={maxOffHeap}m" },
                 DiscoverySpi = new Apache.Ignite.Core.Discovery.Tcp.TcpDiscoverySpi
                 {
                     
@@ -70,62 +80,60 @@ namespace Tarzan.Nfx.PcapLoader
         private async Task ProcessFile(IIgnite client, FileInfo fileInfo, FastPcapFileReaderDevice device)
         {
             device.Open();
-
-            var cahce = client.GetOrCreateCache<int, Frame>(fileInfo.Name);
-            var dataStreamer = client.GetDataStreamer<int, Frame>(fileInfo.Name);
-            //dataStreamer.PerNodeBufferSize = 8192;
-            //dataStreamer.PerNodeParallelOperations = 4;
-            var frameIndex = 0;
-            var frameArray = new KeyValuePair<int, Frame>[ChunkSize];
-            var cacheStoreTask = Task.CompletedTask;
-
-            var currentChunkBytes = 0;
-            var currentChunkNumber = 0;
-            RawCapture rawCapture = null;
-            while ((rawCapture = device.GetNextPacket()) != null)
+            var cache = client.GetOrCreateCache<int, Frame>(fileInfo.Name);
+            using (var dataStreamer = client.GetDataStreamer<int, Frame>(fileInfo.Name))
             {
-                currentChunkBytes += rawCapture.Data.Length + 4 * sizeof(int);
+                var frameIndex = 0;
+                var frameArray = new KeyValuePair<int, Frame>[ChunkSize];
+                var cacheStoreTask = Task.CompletedTask;
 
-                var frame = new Frame
+                var currentChunkBytes = 0;
+                var currentChunkNumber = 0;
+                RawCapture rawCapture = null;
+                while ((rawCapture = device.GetNextPacket()) != null)
                 {
-                    LinkLayer = (LinkLayerType)rawCapture.LinkLayerType,
-                    Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
-                    Data = rawCapture.Data
-                };
+                    currentChunkBytes += rawCapture.Data.Length + 4 * sizeof(int);
 
-                frameArray[frameIndex % ChunkSize] = KeyValuePair.Create(frameIndex, frame);
+                    var frame = new Frame
+                    {
+                        LinkLayer = (LinkLayerType)rawCapture.LinkLayerType,
+                        Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
+                        Data = rawCapture.Data
+                    };
 
-                // Is CHUNK full?
-                if (frameIndex % ChunkSize == ChunkSize - 1)
-                {
-                    OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
-                    cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
-                    frameArray = new KeyValuePair<int, Frame>[ChunkSize];
-                    currentChunkNumber++;
-                    currentChunkBytes = 0;
+                    frameArray[frameIndex % ChunkSize] = KeyValuePair.Create(frameIndex, frame);
+
+                    // Is CHUNK full?
+                    if (frameIndex % ChunkSize == ChunkSize - 1)
+                    {
+                        OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+                        cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
+                        frameArray = new KeyValuePair<int, Frame>[ChunkSize];
+                        currentChunkNumber++;
+                        currentChunkBytes = 0;
+                    }
+                    frameIndex++;
                 }
-                frameIndex++;
+
+                OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+
+                cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, frameIndex % ChunkSize, currentChunkNumber, currentChunkBytes));
+
+                await cacheStoreTask;
+                dataStreamer.Flush();
+                //dataStreamer.Close(false);   // HACK: causes Exception in JVM.DLL
             }
-
-            OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
-            cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, frameIndex % ChunkSize, currentChunkNumber, currentChunkBytes));
-
-            await cacheStoreTask;
             device.Close();
         }
 
-        private Action<Task> CreateStoreAction(IDataStreamer<int, Frame> dataStreamer, KeyValuePair<int, Frame>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private Action<Task> CreateStoreAction(IDataStreamer<int, Frame> dataStreamer, ICollection<KeyValuePair<int, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
-            return (t) => StoreChunk(dataStreamer, frameArray, count, currentChunkNumber, currentChunkBytes);
+            return async (t) => await StoreChunk(dataStreamer, frameArray, count, currentChunkNumber, currentChunkBytes);
         }
 
-        private void StoreChunk(IDataStreamer<int, Frame> dataStreamer, KeyValuePair<int, Frame>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private async Task StoreChunk(IDataStreamer<int, Frame> dataStreamer, ICollection<KeyValuePair<int, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
-            for(int i=0;i<count;i++)
-            {
-                dataStreamer.AddData(frameArray[i]);
-            }
-
+            await dataStreamer.AddData(frameArray);
             OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);
         }
     }

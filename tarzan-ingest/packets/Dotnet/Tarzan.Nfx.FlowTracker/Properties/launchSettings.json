@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Tarzan.Nfx.FlowTracker": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache testbed-12jun-000.pcap"
+    }
+  }
+}

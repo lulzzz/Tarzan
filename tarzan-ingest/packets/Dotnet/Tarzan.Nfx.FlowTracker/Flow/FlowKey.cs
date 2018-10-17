@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Apache.Ignite.Core.Binary;
+using System;
 using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
@@ -9,7 +10,7 @@ namespace Tarzan.Nfx.FlowTracker
     /// A compact representation of a flow key.
     /// </summary>
     [Serializable]
-    public class FlowKey 
+    public class FlowKey : IBinarizable
     {
         static class Fields
         {
@@ -110,6 +111,21 @@ namespace Tarzan.Nfx.FlowTracker
         public FlowKey SwapEndpoints()
         {
             return FlowKey.Create((byte)this.Protocol, this.DestinationAddress, this.DestinationPort, this.SourceAddress, this.SourcePort);
+        }
+
+        public void WriteBinary(IBinaryWriter writer)
+        {
+            writer.WriteByteArray(nameof(FlowKey.Bytes), this.Bytes);
+        }
+
+        public void ReadBinary(IBinaryReader reader)
+        {
+            var bytes = reader.ReadByteArray(nameof(FlowKey.Bytes));
+            if (bytes == null || bytes.Length != 40)
+            {
+                throw new ArgumentOutOfRangeException($"Invalid size of {nameof(FlowKey.Bytes)}. Must be exactly 40 bytes.");
+            }
+            this.Reload(bytes);
         }
     }
 }
