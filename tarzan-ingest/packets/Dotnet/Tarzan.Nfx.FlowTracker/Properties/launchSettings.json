@@ -2,7 +2,10 @@
   "profiles": {
     "Tarzan.Nfx.FlowTracker": {
       "commandName": "Project",
-      "commandLineArgs": "--cache testbed-12jun-000.pcap"
+      "commandLineArgs": "--cache testbed-12jun-000.pcap --load D:\\Captures\\ids\\testbed-12jun-32\\testbed-12jun-000.pcap --trace"
+    },
+    "exec-mini": {
+      "commandName": "Executable"
     }
   }
 }

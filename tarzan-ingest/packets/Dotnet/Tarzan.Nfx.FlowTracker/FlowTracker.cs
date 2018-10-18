@@ -14,12 +14,12 @@ namespace Tarzan.Nfx.FlowTracker
     /// As a further optimization we may consider the method used by DPDK:
     /// https://dpdk.readthedocs.io/en/v16.04/prog_guide/hash_lib.html#hash-api-overview.
     /// </remarks>
-    public partial class FlowTracker : IFlowTracker<FlowRecord>
+    public partial class FlowTracker : IFlowTracker<PacketFlow>
     {
         /// <summary>
         /// Gets the dictionary of all existing flows.
         /// </summary>
-        public Dictionary<FlowKey, FlowRecord> FlowTable { get; private set; }
+        public Dictionary<FlowKey, PacketFlow> FlowTable { get; private set; }
 
         IKeyProvider<FlowKey, Frame> m_keyProvider;
         /// <summary>
@@ -27,11 +27,11 @@ namespace Tarzan.Nfx.FlowTracker
         /// </summary>
         public int TotalFrameCount { get; private set; }
 
-        IDictionary<FlowKey, FlowRecord> IFlowTracker<FlowRecord>.FlowTable => FlowTable;
+        IDictionary<FlowKey, PacketFlow> IFlowTracker<PacketFlow>.FlowTable => FlowTable;
 
         public FlowTracker(IKeyProvider<FlowKey, Frame> keyProvider)
         {
-            FlowTable = new Dictionary<FlowKey, FlowRecord>();
+            FlowTable = new Dictionary<FlowKey, PacketFlow>();
             m_keyProvider = keyProvider;
         }
 
@@ -46,23 +46,13 @@ namespace Tarzan.Nfx.FlowTracker
             var key = m_keyProvider.GetKey(frame);
             if (FlowTable.TryGetValue(key, out var value))
             {
-                PacketFlowUpdate(value.Flow, frame);
-                PacketStreamUpdate(value.Stream, frame);
+                PacketFlowUpdate(value, frame);
             }
             else
             {
-                var flowUid = string.Empty; // FlowUidGenerator.NewUid(key, frame.Timestamp).ToString();
-                FlowTable[key] = new FlowRecord { Flow = PacketFlowFrom(key, frame, flowUid), Stream = PacketStreamFrom(key, frame, flowUid) };
+                var flowUid = string.Empty; 
+                FlowTable[key] = PacketFlowFrom(key, frame, flowUid);
             }
-        }
-
-        private PacketStream PacketStreamFrom(FlowKey key, Frame frame, string flowUid)
-        {
-            return new PacketStream()
-            {
-                FlowUid = flowUid,
-                FrameList = new List<Frame> { frame }
-            };
         }
 
         private PacketFlow PacketFlowFrom(FlowKey flowKey, Frame frame, string flowUid)
@@ -81,13 +71,6 @@ namespace Tarzan.Nfx.FlowTracker
                 Packets = 1
             };
         }
-
-        private PacketStream PacketStreamUpdate(PacketStream packetStream, Frame frame)
-        {
-            packetStream.FrameList.Add(frame);
-            return packetStream;
-        }
-
         private PacketFlow PacketFlowUpdate(PacketFlow packetFlow, Frame frame)
         {
             packetFlow.FirstSeen = Math.Min(packetFlow.FirstSeen, frame.Timestamp);
@@ -105,20 +88,9 @@ namespace Tarzan.Nfx.FlowTracker
             }
         }
 
-        /// <summary>
-        /// Gets the conversation for the given flow key. If neither upflow or
-        /// down flow exists in the flow table it returns <c>null</c>.
-        /// </summary>
-        /// <param name="upflowKey"></param>
-        /// <returns></returns>
-        public Conversation<FlowRecord>? GetConversation(FlowKey upflowKey)
+        public Conversation<PacketFlow>? GetConversation(FlowKey flowKey)
         {
-            var upflowExists = FlowTable.TryGetValue(upflowKey, out var upflow);
-            var downFlowKey = upflowKey.SwapEndpoints();
-            var downflowExists = FlowTable.TryGetValue(downFlowKey, out var downflow);
-            if (upflowExists || downflowExists)
-                return new Conversation<FlowRecord>() { ConversationKey = upflowKey, Upflow = upflow, Downflow = downflow };
-            else return null;
+            throw new NotImplementedException();
         }
     }
 }

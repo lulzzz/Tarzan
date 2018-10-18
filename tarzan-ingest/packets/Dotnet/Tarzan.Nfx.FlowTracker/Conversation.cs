@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.FlowTracker
 {
