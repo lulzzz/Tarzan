@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Model
 {
 
     /// <summary>

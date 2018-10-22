@@ -1,9 +1,7 @@
 ﻿using Netdx.Packets.Base;
 using System;
-using Tarzan.Nfx.FlowTracker;
-using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Model
 {
     /// <summary>
     /// Provides a flow key from the given frame. This class provides optimized 

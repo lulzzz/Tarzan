@@ -1,7 +1,12 @@
 ﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Cache;
 using Apache.Ignite.Core.Compute;
+using Apache.Ignite.Core.Datastream;
 using Apache.Ignite.Core.Resource;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.FlowTracker
@@ -17,6 +22,7 @@ namespace Tarzan.Nfx.FlowTracker
             public int TotalFrames { get; set; }
             public int CompletedFlows { get; set; }
             public int TotalFlows { get; set; }
+            public Stopwatch ElapsedTime { get; set; }
         }
 
         public IProgress<ProgressRecord> Progress { get; set; } = null;
@@ -34,9 +40,11 @@ namespace Tarzan.Nfx.FlowTracker
 
         public void Invoke()
         {
-            var progress = new ProgressRecord();
+            var progress = new ProgressRecord() { ElapsedTime = new Stopwatch() };
+            progress.ElapsedTime.Start();
             var flowTracker = TrackFlows(progress);
             PopulateFlowTable(flowTracker, progress);
+            progress.ElapsedTime.Stop();
         }
 
         private IFlowTracker<PacketFlow> TrackFlows(ProgressRecord progressRecord)
@@ -68,23 +76,46 @@ namespace Tarzan.Nfx.FlowTracker
         private void PopulateFlowTable(IFlowTracker<PacketFlow> flowTracker, ProgressRecord progressRecord)
         {
             var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>("flowtable");
-            var updateProcessor = new MergePacketFlowProcessor();
-            progressRecord.TotalFlows = flowTracker.FlowTable.Count;
-
-            var flowCount = 0;
-            foreach (var flow in flowTracker.FlowTable)
+            using (var dataStreamer = m_ignite.GetDataStreamer<FlowKey, PacketFlow>(flowCache.Name))
             {
-                flow.Value.FlowUid = FlowUidGenerator.NewUid(flow.Key, flow.Value.FirstSeen);
-                flowCache.Invoke(flow.Key, updateProcessor, flow.Value);
-                if (++flowCount % ProgressFlowBatch == 0)
+                dataStreamer.AllowOverwrite = true;
+                var updateProcessor = new MergePacketFlowProcessor();
+                dataStreamer.Receiver = new FlowStreamVisitor(updateProcessor);
+                
+                progressRecord.TotalFlows = flowTracker.FlowTable.Count;
+                var flowCount = 0;
+                foreach (var flow in flowTracker.FlowTable)
                 {
-                    progressRecord.CompletedFlows += ProgressFlowBatch;
-                    Progress?.Report(progressRecord);
+                    flow.Value.FlowUid = FlowUidGenerator.NewUid(flow.Key, flow.Value.FirstSeen);
+                    dataStreamer.AddData(flow.Key, flow.Value);
+                    if (++flowCount % ProgressFlowBatch == 0)
+                    {
+                        progressRecord.CompletedFlows += ProgressFlowBatch;
+                        Progress?.Report(progressRecord);
+                    }
+                }
+                progressRecord.CompletedFlows += flowCount % ProgressFlowBatch;
+                Progress?.Report(progressRecord);
+                dataStreamer.Flush();
+            }
+        }
+        [Serializable]
+        public sealed class FlowStreamVisitor : IStreamReceiver<FlowKey, PacketFlow>
+        {
+            private MergePacketFlowProcessor updateProcessor;
+            public FlowStreamVisitor(MergePacketFlowProcessor updateProcessor)
+            {
+                this.updateProcessor = updateProcessor;
+            }
+            public void Receive(ICache<FlowKey, PacketFlow> cache, ICollection<ICacheEntry<FlowKey, PacketFlow>> entries)
+            {
+                foreach (var entry in entries)
+                {
+                    cache.Invoke(entry.Key, updateProcessor, entry.Value);
                 }
             }
-            progressRecord.CompletedFlows += flowCount % ProgressFlowBatch;
-            Progress?.Report(progressRecord);
         }
+
     }
 }
 

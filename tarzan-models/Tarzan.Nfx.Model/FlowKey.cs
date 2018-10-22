@@ -1,4 +1,5 @@
 ﻿using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache.Affinity;
 using System;
 using System.Buffers.Binary;
 using System.Net;
@@ -23,7 +24,7 @@ namespace Tarzan.Nfx.Model
         }
 
         public byte[] Bytes { get; private set; }
-
+        [AffinityKeyMapped]
         public int HashCode { get; private set; }
 
         public override bool Equals(object obj)
@@ -116,16 +117,13 @@ namespace Tarzan.Nfx.Model
         public void WriteBinary(IBinaryWriter writer)
         {
             writer.WriteByteArray(nameof(FlowKey.Bytes), this.Bytes);
+            writer.WriteInt(nameof(FlowKey.HashCode), this.HashCode);
         }
 
         public void ReadBinary(IBinaryReader reader)
         {
-            var bytes = reader.ReadByteArray(nameof(FlowKey.Bytes));
-            if (bytes == null || bytes.Length != 40)
-            {
-                throw new ArgumentOutOfRangeException($"Invalid size of {nameof(FlowKey.Bytes)}. Must be exactly 40 bytes.");
-            }
-            this.Reload(bytes);
+            this.Bytes = reader.ReadByteArray(nameof(FlowKey.Bytes)); 
+            this.HashCode = reader.ReadInt(nameof(FlowKey.HashCode));
         }
     }
 }

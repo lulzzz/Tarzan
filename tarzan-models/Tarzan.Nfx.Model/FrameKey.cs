@@ -6,7 +6,8 @@ using System.Text;
 
 namespace Tarzan.Nfx.PcapLoader
 {
-    public class FrameKey : IBinarizable
+    [Serializable]
+    public struct FrameKey : IBinarizable
     {
         public int FrameNumber { get; set; }
         [AffinityKeyMapped]
@@ -16,7 +17,6 @@ namespace Tarzan.Nfx.PcapLoader
         {
             FrameNumber = reader.ReadInt(nameof(FrameNumber));
             FlowKeyHash = reader.ReadInt(nameof(FlowKeyHash));
-
         }
 
         public void WriteBinary(IBinaryWriter writer)

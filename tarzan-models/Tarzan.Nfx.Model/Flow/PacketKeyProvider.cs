@@ -1,8 +1,7 @@
 ﻿using PacketDotNet;
 using System.Net;
-using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Model
 {
     class PacketKeyProvider : IKeyProvider<FlowKey, Packet>
     {

@@ -120,7 +120,7 @@ namespace Tarzan.Nfx.FlowTracker
             }
             public void Report(FlowAnalyzer.ProgressRecord value)
             {
-                Console.WriteLine($"\rProgress: Frames={value.CompletedFrames}/{value.TotalFrames}, Flows={value.CompletedFlows}/{value.TotalFlows}.");
+                Console.WriteLine($"\rProgress: Frames={value.CompletedFrames}/{value.TotalFrames}, Flows={value.CompletedFlows}/{value.TotalFlows}, Elapsed={value.ElapsedTime.ElapsedMilliseconds}ms.");
             }
         }
     }

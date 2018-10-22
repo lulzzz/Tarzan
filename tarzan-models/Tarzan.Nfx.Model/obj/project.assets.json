@@ -179,6 +179,18 @@
           }
         }
       },
+      "MurmurHash.NETStandard/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "lib/netstandard1.4/MurmurHash-net-core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.4/MurmurHash-net-core.dll": {}
+        }
+      },
       "NETStandard.Library/2.0.3": {
         "type": "package",
         "dependencies": {
@@ -1362,10 +1374,10 @@
           "ref/netstandard1.5/System.Runtime.dll": {}
         }
       },
-      "System.Runtime.CompilerServices.Unsafe/4.5.0": {
+      "System.Runtime.CompilerServices.Unsafe/4.5.1": {
         "type": "package",
         "compile": {
-          "ref/netstandard2.0/_._": {}
+          "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
           "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll": {}
@@ -1951,6 +1963,21 @@
           "lib/netstandard1.3/Tnidea.Thrift.dll": {}
         }
       },
+      "Netdx.PacketDecoders/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "MurmurHash.NETStandard": "1.0.0",
+          "System.Memory": "4.5.1",
+          "System.Runtime.CompilerServices.Unsafe": "4.5.1"
+        },
+        "compile": {
+          "bin/placeholder/Netdx.PacketDecoders.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Netdx.PacketDecoders.dll": {}
+        }
+      },
       "Tarzan.Nfx.Utils/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -2169,6 +2196,16 @@
         "runtimes/win/lib/net46/Microsoft.Win32.Registry.dll",
         "runtimes/win/lib/netcore50/_._",
         "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Registry.dll"
+      ]
+    },
+    "MurmurHash.NETStandard/1.0.0": {
+      "sha512": "lLRxC9lpvargERqamiNHNVmBqrz0oU4Ctf57ZBOcNzOTSDYu8xIT0LDy4nWFqi6slt4JpvuQ4Qm0vh2F5wqUhg==",
+      "type": "package",
+      "path": "murmurhash.netstandard/1.0.0",
+      "files": [
+        "lib/netstandard1.4/MurmurHash-net-core.dll",
+        "murmurhash.netstandard.1.0.0.nupkg.sha512",
+        "murmurhash.netstandard.nuspec"
       ]
     },
     "NETStandard.Library/2.0.3": {
@@ -4779,10 +4816,10 @@
         "system.runtime.nuspec"
       ]
     },
-    "System.Runtime.CompilerServices.Unsafe/4.5.0": {
-      "sha512": "6zBxkHYemB0kQiHP3vGXGRXejZVoNVuMn2paUuqKKi5Wyjkxfkp+D0rd0c3VrGwotidRINt6KpOi2smL4VkJKw==",
+    "System.Runtime.CompilerServices.Unsafe/4.5.1": {
+      "sha512": "qUJMNWhbm9oZ3XaMFiEMiYmRPszbnXIkRIi7+4b2Md2xZ6JUOepf0/kY3S85qistRohl9OdMe4PsO+RdG2kTIQ==",
       "type": "package",
-      "path": "system.runtime.compilerservices.unsafe/4.5.0",
+      "path": "system.runtime.compilerservices.unsafe/4.5.1",
       "files": [
         ".signature.p7s",
         "LICENSE.TXT",
@@ -4793,13 +4830,11 @@
         "lib/netstandard1.0/System.Runtime.CompilerServices.Unsafe.xml",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/uap10.0.16300/_._",
         "ref/netstandard1.0/System.Runtime.CompilerServices.Unsafe.dll",
         "ref/netstandard1.0/System.Runtime.CompilerServices.Unsafe.xml",
         "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "ref/uap10.0.16300/_._",
-        "system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512",
+        "system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512",
         "system.runtime.compilerservices.unsafe.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -6177,6 +6212,11 @@
         "tnidea.thrift.nuspec"
       ]
     },
+    "Netdx.PacketDecoders/1.0.0": {
+      "type": "project",
+      "path": "../../tarzan-ingest/packets/Dotnet/Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj",
+      "msbuildProject": "../../tarzan-ingest/packets/Dotnet/Tarzan.Nfx.PacketDecoders/Tarzan.Nfx.PacketDecoders.csproj"
+    },
     "Tarzan.Nfx.Utils/1.0.0": {
       "type": "project",
       "path": "../../tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Utils/Tarzan.Nfx.Utils.csproj",
@@ -6188,6 +6228,7 @@
       "Apache.Ignite >= 2.6.0",
       "CassandraCSharpDriver >= 3.6.0",
       "NETStandard.Library >= 2.0.3",
+      "Netdx.PacketDecoders >= 1.0.0",
       "Newtonsoft.Json >= 11.0.2",
       "System.Memory >= 4.5.1",
       "Tarzan.Nfx.Utils >= 1.0.0",
@@ -6224,6 +6265,9 @@
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
+            "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.PacketDecoders\\Tarzan.Nfx.PacketDecoders.csproj": {
+              "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.PacketDecoders\\Tarzan.Nfx.PacketDecoders.csproj"
+            },
             "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Utils\\Tarzan.Nfx.Utils.csproj": {
               "projectPath": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\tarzan-ingest\\packets\\Dotnet\\Tarzan.Nfx.Utils\\Tarzan.Nfx.Utils.csproj"
             }

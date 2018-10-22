@@ -1,4 +1,7 @@
 ﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Cache.Affinity;
+using Apache.Ignite.Core.Cache.Configuration;
+using Apache.Ignite.Core.Cluster;
 using Apache.Ignite.Core.Datastream;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
 using Microsoft.Extensions.Logging.Console;
@@ -33,8 +36,6 @@ namespace Tarzan.Nfx.PcapLoader
         public event ChunkCompletedHandler OnChunkStored;
         public event ErrorFrameHandler OnErrorFrame;
 
-
-
         public async Task Invoke()
         {
             
@@ -54,7 +55,7 @@ namespace Tarzan.Nfx.PcapLoader
                     {
                         Endpoints = new[] { $"{ClusterNode.Address}:{(ClusterNode.Port != 0 ? ClusterNode.Port : DEFAULT_PORT)}" }
                     },
-                }
+                },
             };
             Ignition.ClientMode = true;
             using (var client = Ignition.Start(cfg))
@@ -74,11 +75,12 @@ namespace Tarzan.Nfx.PcapLoader
         private async Task ProcessFile(IIgnite client, FileInfo fileInfo, FastPcapFileReaderDevice device)
         {
             device.Open();
-            var cache = client.GetOrCreateCache<int, Frame>(fileInfo.Name);
-            using (var dataStreamer = client.GetDataStreamer<int, Frame>(fileInfo.Name))
+            var frameKeyProvider = new FrameKeyProvider();
+            var cache = client.GetOrCreateCache<FrameKey, Frame>(fileInfo.Name);
+            using (var dataStreamer = client.GetDataStreamer<FrameKey, Frame>(cache.Name))
             {
                 var frameIndex = 0;
-                var frameArray = new KeyValuePair<int, Frame>[ChunkSize];
+                var frameArray = new KeyValuePair<FrameKey, Frame>[ChunkSize];
                 var cacheStoreTask = Task.CompletedTask;
 
                 var currentChunkBytes = 0;
@@ -94,15 +96,16 @@ namespace Tarzan.Nfx.PcapLoader
                         Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
                         Data = rawCapture.Data
                     };
+                    var frameKey = new FrameKey { FrameNumber = frameIndex, FlowKeyHash = frameKeyProvider.GetKeyHash(frame) };
 
-                    frameArray[frameIndex % ChunkSize] = KeyValuePair.Create(frameIndex, frame);
+                    frameArray[frameIndex % ChunkSize] = KeyValuePair.Create(frameKey, frame);
 
                     // Is CHUNK full?
                     if (frameIndex % ChunkSize == ChunkSize - 1)
                     {
                         OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
                         cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
-                        frameArray = new KeyValuePair<int, Frame>[ChunkSize];
+                        frameArray = new KeyValuePair<FrameKey, Frame>[ChunkSize];
                         currentChunkNumber++;
                         currentChunkBytes = 0;
                     }
@@ -120,12 +123,12 @@ namespace Tarzan.Nfx.PcapLoader
             device.Close();
         }
 
-        private Action<Task> CreateStoreAction(IDataStreamer<int, Frame> dataStreamer, ICollection<KeyValuePair<int, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private Action<Task> CreateStoreAction(IDataStreamer<FrameKey, Frame> dataStreamer, ICollection<KeyValuePair<FrameKey, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
             return async (t) => await StoreChunk(dataStreamer, frameArray, count, currentChunkNumber, currentChunkBytes);
         }
 
-        private async Task StoreChunk(IDataStreamer<int, Frame> dataStreamer, ICollection<KeyValuePair<int, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private async Task StoreChunk(IDataStreamer<FrameKey, Frame> dataStreamer, ICollection<KeyValuePair<FrameKey, Frame>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
             await dataStreamer.AddData(frameArray);
             OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);

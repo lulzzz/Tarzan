@@ -1,4 +1,5 @@
-﻿using Apache.Ignite.Core.Cache;
+﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Cache;
 using System;
 using Tarzan.Nfx.Model;
 
@@ -17,6 +18,7 @@ namespace Tarzan.Nfx.FlowTracker
             {
                 entry.Value = arg;
             }
+
             return null;
         }
 
