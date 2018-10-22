@@ -107,7 +107,26 @@ var cfg = new IgniteConfiguration
 </igniteConfiguration>
 ```
 
-* If new version of assembly is available the old one needs to be removed from the storage.
+* If new version of assembly is available the old one needs to be removed. The storage, by default located in ```work``` folder 
+contains for each node a subfolder ```binary_metadata```.
+
+
+## ETL Workload
+
+* Load Frames:
+
+```
+dotnet Tarzan.Nfx.PcapLoader.dll --cluster 127.0.0.1 --folder D:\Captures\ids\testbed-12jun-512 --mode stream
+```
+
+
+* Track flows:
+
+```
+dotnet Tarzan.Nfx.FlowTracker.dll -s testbed-12jun-000.pcap -s testbed-12jun-001.pcap -s testbed-12jun-002.pcap -s testbed-12jun-003.pcap -s testbed-12jun-004.pcap -s testbed-12jun-005.pcap -s testbed-12jun-006.pcap -s testbed-12jun-007.pcap -s testbed-12jun-008.pcap
+```
+
+
 
 ## Links
 

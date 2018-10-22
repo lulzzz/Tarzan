@@ -49,7 +49,7 @@ namespace Tarzan.Nfx.FlowTracker
 
         private IFlowTracker<PacketFlow> TrackFlows(ProgressRecord progressRecord)
         {
-            var cache = m_ignite.GetCache<int, Frame>(CacheName);
+            var cache = m_ignite.GetCache<FrameKey, Frame>(CacheName);
             progressRecord.TotalFrames = cache.GetLocalSize();
             Progress?.Report(progressRecord);
             var flowTracker = new FlowTracker(new FrameKeyProvider());

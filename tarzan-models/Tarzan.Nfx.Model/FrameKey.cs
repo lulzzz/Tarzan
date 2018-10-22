@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Tarzan.Nfx.PcapLoader
+namespace Tarzan.Nfx.Model
 {
     [Serializable]
     public struct FrameKey : IBinarizable
