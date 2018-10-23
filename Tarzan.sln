@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Dashboard", "tarzan-ui\Tarzan.Nfx.Dashboard\Tarzan.Nfx.Dashboard.csproj", "{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ingest", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ingest\Tarzan.Nfx.Ingest.csproj", "{870F9B4C-24BA-4C84-AE7B-BD1CF618D5BB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Model", "tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj", "{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj", "{A0CE1828-D7F3-443B-A2AE-D4234366AA48}"
@@ -17,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PacketDecodersTest", "tarza
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifiers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Analyzers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.Analyzers.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Analyzers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Analyzers\Tarzan.Nfx.Analyzers.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PcapLoader", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
 EndProject
@@ -46,10 +44,6 @@ Global
 		{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{870F9B4C-24BA-4C84-AE7B-BD1CF618D5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{870F9B4C-24BA-4C84-AE7B-BD1CF618D5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{870F9B4C-24BA-4C84-AE7B-BD1CF618D5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{870F9B4C-24BA-4C84-AE7B-BD1CF618D5BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}.Release|Any CPU.ActiveCfg = Release|Any CPU
