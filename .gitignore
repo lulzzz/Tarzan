@@ -64,6 +64,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+# Output Directory
+out/
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -340,3 +343,4 @@ tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/obj/Debug/netcoreapp2.0/Tarzan.Nf
 .vs/Tarzan/v15/Server/sqlite3/storage.ide-wal
 tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.dll
 tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.pdb
+.vs/Tarzan/v15/.suo
