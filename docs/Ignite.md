@@ -110,6 +110,8 @@ var cfg = new IgniteConfiguration
 * If new version of assembly is available the old one needs to be removed. The storage, by default located in ```work``` folder 
 contains for each node a subfolder ```binary_metadata```.
 
+* Although auto assembly loading is enabled, assembly containing the code should be located in the server's directory or on the path as specified in ```Tarzan.Nfx.IgniteServer.runtimeconfig.dev.json```. If the assembly cannot be found
+the client hangs in job execution. 
 
 ## ETL Workload
 

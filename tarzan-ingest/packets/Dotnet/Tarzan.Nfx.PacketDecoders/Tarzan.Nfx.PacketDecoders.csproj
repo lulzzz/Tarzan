@@ -32,4 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.json&quot; &quot;$(SolutionDir)out\server\&quot;" />
+  </Target>
 </Project>
