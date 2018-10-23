@@ -1,16 +1,10 @@
-using System;
+using SharpPcap;
+using SharpPcap.LibPcap;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Attributes;
-using Netdx.PacketDecoders;
-using Netdx.Packets.Base;
-using SharpPcap;
-using SharpPcap.LibPcap;
-using Tarzan.Nfx.FlowTracker;
-using Tarzan.Nfx.Ingest;
-using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.PacketDecoders;
 using Xunit;
 
 namespace PacketDecodersTests

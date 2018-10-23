@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using PacketDotNet;
 using SharpPcap;
@@ -10,9 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Tarzan.Nfx.FlowTracker;
-using Tarzan.Nfx.Ingest;
-using Tarzan.Nfx.Ingest.Flow;
+using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 
 namespace PacketDecodersTest
 {
@@ -45,24 +43,24 @@ namespace PacketDecodersTest
             FlowKey GetUdpFlowKey(UdpPacket udp)
             {
                 return FlowKey.Create((byte)IPProtocolType.UDP,
-                    (udp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
+                    (udp.ParentPacket as IPPacket).SourceAddress.GetAddressBytes(),
                     udp.SourcePort,
-                    (udp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
+                    (udp.ParentPacket as IPPacket).DestinationAddress.GetAddressBytes(),
                     udp.DestinationPort);
             }
             FlowKey GetTcpFlowKey(TcpPacket tcp)
             {
                 return FlowKey.Create(
                     (byte)IPProtocolType.TCP,
-                    (tcp.ParentPacket as IpPacket).SourceAddress.GetAddressBytes(),
+                    (tcp.ParentPacket as IPPacket).SourceAddress.GetAddressBytes(),
                     tcp.SourcePort,
-                    (tcp.ParentPacket as IpPacket).DestinationAddress.GetAddressBytes(),
+                    (tcp.ParentPacket as IPPacket).DestinationAddress.GetAddressBytes(),
                     tcp.DestinationPort);
             }
-            FlowKey GetIpFlowKey(IpPacket ip)
+            FlowKey GetIpFlowKey(IPPacket ip)
             {
                 return FlowKey.Create(
-                    (byte)(ip.Version == IpVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
+                    (byte)(ip.Version == IPVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
                     ip.SourceAddress.GetAddressBytes(), 0,
                     ip.DestinationAddress.GetAddressBytes(), 0
                 );
@@ -75,7 +73,7 @@ namespace PacketDecodersTest
                 default:
                     switch ((InternetPacket)packet.Extract(typeof(InternetPacket)))
                     {
-                        case IpPacket ip: return GetIpFlowKey(ip);
+                        case IPPacket ip: return GetIpFlowKey(ip);
                         default: return FlowKey.Create((byte)IPProtocolType.NONE, 
                             IPAddress.None.GetAddressBytes(), 0, IPAddress.None.GetAddressBytes(), 0);
 
