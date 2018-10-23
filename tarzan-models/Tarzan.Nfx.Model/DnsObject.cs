@@ -7,6 +7,7 @@ namespace Tarzan.Nfx.Model
 {
     public partial class DnsObject
     {
+        public static string CACHE_NAME = "dnsobjects";
         public static Map<DnsObject> Mapping =>
             new Map<DnsObject>()
                 .TableName(Pluralizer.Pluralize(nameof(DnsObject)))

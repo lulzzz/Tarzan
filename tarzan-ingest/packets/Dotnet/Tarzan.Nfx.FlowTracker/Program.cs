@@ -92,7 +92,7 @@ namespace Tarzan.Nfx.Analyzers
                         if (traceArgument.HasValue())
                         {
                             var frameCache = ignite.GetCache<FrameKey, Frame>(cacheName);
-                            var flowCache = ignite.GetOrCreateCache<FlowKey, PacketFlow>("flowtable");
+                            var flowCache = ignite.GetOrCreateCache<FlowKey, PacketFlow>(PacketFlow.CACHE_NAME);
                             Console.WriteLine($"Done. Frames={frameCache.GetSize()}, Flows={flowCache.GetSize()}.");
                             Console.WriteLine($"Top 10 Flows:");
                             foreach (var flow in flowCache.OrderByDescending(x=>x.Value.Octets).Take(10))

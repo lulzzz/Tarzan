@@ -76,7 +76,7 @@ namespace Tarzan.Nfx.Analyzers
         /// <param name="flowTracker">A flow tracker object that contains a local flow cache.</param>
         private void PopulateFlowTable(IFlowTracker<PacketFlow> flowTracker, ProgressRecord progressRecord)
         {
-            var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>("flowtable");
+            var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>(PacketFlow.CACHE_NAME);
             using (var dataStreamer = m_ignite.GetDataStreamer<FlowKey, PacketFlow>(flowCache.Name))
             {
                 dataStreamer.AllowOverwrite = true;

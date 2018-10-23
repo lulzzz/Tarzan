@@ -11,6 +11,9 @@ namespace Tarzan.Nfx.Model
     /// </summary>
     public partial class PacketFlow : IBinarizable
     {
+        public static string CACHE_NAME = "flowtable";
+
+
         public static Map<PacketFlow> Mapping =>
             new Map<PacketFlow>()
                 .TableName(Pluralizer.Pluralize(nameof(PacketFlow)))
