@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Analyzers
 {
     public struct Conversation<TFlowValue>
     {
@@ -24,7 +24,5 @@ namespace Tarzan.Nfx.FlowTracker
                 Downflow = x.Value;
             }
         }
-
-
     }
 }

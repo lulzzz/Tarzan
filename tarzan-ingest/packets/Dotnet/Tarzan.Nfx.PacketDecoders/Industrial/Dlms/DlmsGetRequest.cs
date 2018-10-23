@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Kaitai;
 
-namespace Netdx.Packets.Industrial
+namespace Tarzan.Nfx.Packets.Industrial
 {
     public partial class DlmsGetRequest : KaitaiStruct
     {

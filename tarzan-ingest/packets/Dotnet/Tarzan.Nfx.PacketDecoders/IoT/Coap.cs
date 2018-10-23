@@ -4,7 +4,7 @@ using Kaitai;
 using System;
 using System.Collections.Generic;
 
-namespace Netdx.Packets.IoT
+namespace Tarzan.Nfx.Packets.IoT
 {
     public partial class Coap : KaitaiStruct
     {

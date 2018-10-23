@@ -1,6 +1,5 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Binary;
-using Apache.Ignite.Core.Cache;
 using Apache.Ignite.Core.Cache.Query;
 using Apache.Ignite.Core.Cluster;
 using Apache.Ignite.Core.Compute;
@@ -18,13 +17,13 @@ using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
 
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Analyzers
 {
     /// <summary>
     /// Implements UI for FlowTracker. 
     /// To execute FlowTracker programatically from the code use: <code>compute.Broadcast(new FlowAnalyzer() { CacheName = cacheName });</code>
     /// </summary>
-    class Program
+    partial class Program
     {
         const string DEFAULT_EP = "127.0.0.1:47500";
         static void Main(string[] args)
@@ -143,28 +142,6 @@ namespace Tarzan.Nfx.FlowTracker
             public void Report(FlowAnalyzer.ProgressRecord value)
             {
                 Console.WriteLine($"\rProgress: Frames={value.CompletedFrames}/{value.TotalFrames}, Flows={value.CompletedFlows}/{value.TotalFlows}, Elapsed={value.ElapsedTime.ElapsedMilliseconds}ms.");
-            }
-        }
-
-        [Serializable]
-        public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, Frame>
-        {
-            public FlowKey FlowKey { get; set; }
-            public IKeyProvider<FlowKey, Frame> KeyProvider { get; set; }
-
-            public CacheEntryFrameFilter(FlowKey flowKey)
-            {
-                FlowKey = flowKey;
-                KeyProvider = new FrameKeyProvider();
-            }
-
-            public CacheEntryFrameFilter()
-            {
-            }
-
-            public bool Invoke(ICacheEntry<FrameKey, Frame> frame)
-            {
-                return FlowKey.HashCode != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
             }
         }
     }

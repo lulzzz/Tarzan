@@ -3,7 +3,7 @@
 using Kaitai;
 using System.Collections.Generic;
 
-namespace Netdx.Packets.Industrial
+namespace Tarzan.Nfx.Packets.Industrial
 {
 
     /// <summary>

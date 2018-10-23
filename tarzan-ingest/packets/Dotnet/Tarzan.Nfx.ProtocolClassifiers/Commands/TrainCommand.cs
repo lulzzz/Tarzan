@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Extensions.CommandLineUtils;
 using SharpPcap;
 using SharpPcap.LibPcap;
-using Tarzan.Nfx.FlowTracker;
+using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 
@@ -39,7 +39,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
         {
             // training folder contains pcaps for each protocol. Each pcap has name corresponding to the protocol. 
             var statClassifier = new Statistical.StatisticalClassifier();
-            var portClassifier = new PortBased.PortBasedClassifier<FlowRecord>();
+            var portClassifier = new PortBased.PortBasedClassifier<FlowRecord<Statistical.FlowStatisticalVector>>();
             portClassifier.LoadConfiguration(null);
             foreach(var capFile in Directory.EnumerateFiles(trainingFolder,"*.cap"))
                 using (var errorLog = new StreamWriter(File.Create(Path.ChangeExtension(capFile, "errors"))))
@@ -48,7 +48,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
                     // read pcap, compute flows, merge to biflows, and train the classifier:
                     var device = new CaptureFileReaderDevice(capFile);
                     // Open the device for capturing
-                    var flowTracker = new FlowTrackerWithContent(new FrameKeyProvider());
+                    var flowTracker = new FlowTracker(new FrameKeyProvider());
                     device.Open();
 
                     RawCapture packet = null;
@@ -71,18 +71,29 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
                             errorLog.WriteLine($"[#{frameIndex}] {e.Message}");
                         }
                     }
-    
+                    var flowTable = flowTracker.FlowTable.Select(f => KeyValuePair.Create(f.Key, new FlowRecord<Statistical.FlowStatisticalVector> { Flow = f.Value }));
+                    Conversation<FlowRecord<Statistical.FlowStatisticalVector>> getConversation(KeyValuePair<FlowKey, FlowRecord<Statistical.FlowStatisticalVector>> upflow)
+                    {
+                        var downflow = flowTracker.FlowTable.GetValueOrDefault(upflow.Key.SwapEndpoints());
+                        return new Conversation<FlowRecord<Statistical.FlowStatisticalVector>>
+                        {
+                            ConversationKey = upflow.Key,
+                            Upflow = upflow.Value,
+                            Downflow = new FlowRecord<Statistical.FlowStatisticalVector> { Flow = downflow }
+                        };
+                    }
+
                     // HACK: What if there is a single flow conversation, where src.port < dst.port ?
-                    var conversations = flowTracker.FlowTable.Where(f => f.Key.SourcePort > f.Key.DestinationPort).Select(f => flowTracker.GetConversation(f.Key)).Where(x => x!=null).ToList();
+                    var conversations = flowTable.Where(f => f.Key.SourcePort > f.Key.DestinationPort).Select(f => getConversation(f)).ToList();
 
                     // TRAIN CLASSIFIERS FOR THE RECOGNIZED CONVERSATIONS:
                     foreach (var conversation in conversations)
                     {   
                         // use port based classifier to get rough information on the flow in the pcap:
-                        var protocol = portClassifier.Match(conversation.Value);
-                        Console.WriteLine($"{conversation.Value.ConversationKey.ToString()} | {protocol.ProtocolName} ({protocol.Similarity})");
+                        var protocol = portClassifier.Match(conversation);
+                        Console.WriteLine($"{conversation.ConversationKey.ToString()} | {protocol.ProtocolName} ({protocol.Similarity})");
 
-                        statClassifier.Train(protocolName, conversation.Value);
+                        statClassifier.Train(protocolName, conversation);
                     }
 
 

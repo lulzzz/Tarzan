@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Tarzan.Nfx.FlowTracker;
+using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.PortBased

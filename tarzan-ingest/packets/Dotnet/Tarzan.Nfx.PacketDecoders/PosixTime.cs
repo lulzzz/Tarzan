@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Netdx.PacketDecoders
+namespace Tarzan.Nfx.PacketDecoders
 {
     public class PosixTime
     {

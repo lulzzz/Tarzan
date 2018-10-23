@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 
-namespace Tarzan.Nfx.FlowTracker
+namespace Tarzan.Nfx.Analyzers
 {
 
 
     [Serializable]
-    class FlowAnalyzer : IComputeAction
+    public partial class FlowAnalyzer : IComputeAction
     {
         public class ProgressRecord
         {

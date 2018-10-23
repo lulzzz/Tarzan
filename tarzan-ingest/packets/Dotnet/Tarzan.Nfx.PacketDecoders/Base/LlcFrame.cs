@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Kaitai;
 
-namespace Netdx.Packets.Base
+namespace Tarzan.Nfx.Packets.Base
 {
     public partial class LlcFrame : KaitaiStruct
     {

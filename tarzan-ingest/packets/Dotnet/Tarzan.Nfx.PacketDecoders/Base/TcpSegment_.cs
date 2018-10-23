@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace Netdx.Packets.Base
+namespace Tarzan.Nfx.Packets.Base
 {
     public partial class TcpSegment
     {

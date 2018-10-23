@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Netdx.PacketDecoders</PackageId>
-    <AssemblyName>Netdx.PacketDecoders</AssemblyName>
-    <RootNamespace>Netdx.PacketDecoders</RootNamespace>
+    <AssemblyName>Tarzan.Nfx.PacketDecoders</AssemblyName>
+    <RootNamespace>Tarzan.Nfx.PacketDecoders</RootNamespace>
     <Authors>Ondrej Rysavy</Authors>
     <Company>FIT BUT</Company>
   </PropertyGroup>

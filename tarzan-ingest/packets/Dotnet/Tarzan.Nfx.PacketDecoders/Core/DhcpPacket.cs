@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Kaitai;
 
-namespace Netdx.Packets.Core
+namespace Tarzan.Nfx.Packets.Core
 {
     public partial class DhcpPacket : KaitaiStruct
     {

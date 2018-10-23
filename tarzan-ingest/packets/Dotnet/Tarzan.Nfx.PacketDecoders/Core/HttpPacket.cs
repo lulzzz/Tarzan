@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Netdx.Packets.Core
+namespace Tarzan.Nfx.Packets.Core
 {
     public enum HttpPacketType { Request, Response, Data }
     /// <summary>

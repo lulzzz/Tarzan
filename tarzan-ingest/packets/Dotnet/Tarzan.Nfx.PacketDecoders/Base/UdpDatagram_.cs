@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Netdx.Packets.Base
+namespace Tarzan.Nfx.Packets.Base
 {
     public partial class UdpDatagram
     {

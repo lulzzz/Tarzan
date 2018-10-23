@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tarzan.Nfx.FlowTracker;
+using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers
 {
+    /// <summary>
+    /// The interface defines common methods of protocol classifiers.
+    /// </summary>
+    /// <typeparam name="TFlowRecord">A type of flow record. Some classifiers require access to content of packets, their metadata or aggregated flow data.</typeparam>
     public interface IProtocolClassifier<TFlowRecord>
     {
         void LoadConfiguration(string filepath);

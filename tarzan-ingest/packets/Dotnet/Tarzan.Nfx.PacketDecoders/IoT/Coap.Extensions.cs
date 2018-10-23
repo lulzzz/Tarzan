@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Netdx.Packets.IoT
+namespace Tarzan.Nfx.Packets.IoT
 {
     public enum RequestMethod
     {

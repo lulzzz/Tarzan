@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 
-namespace Netdx.Packets.Core
+namespace Tarzan.Nfx.Packets.Core
 {
 
     /// <summary>
