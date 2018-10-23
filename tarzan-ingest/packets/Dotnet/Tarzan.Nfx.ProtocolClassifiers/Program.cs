@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.CommandLineUtils;
 using System;
-using Tarzan.Nfx.ProtocolClassifiers.Commands;
 
 namespace Tarzan.Nfx.ProtocolClassifiers
 {
@@ -10,8 +9,8 @@ namespace Tarzan.Nfx.ProtocolClassifiers
         {
             var commandLineApplication = new CommandLineApplication(true);
 
-            var trainCmd = new TrainCommand();
-            commandLineApplication.Command(trainCmd.Name, trainCmd.ExecuteCommand);
+            // var trainCmd = new TrainCommand();
+            // commandLineApplication.Command(trainCmd.Name, trainCmd.ExecuteCommand);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.Name = typeof(Program).Assembly.GetName().Name;

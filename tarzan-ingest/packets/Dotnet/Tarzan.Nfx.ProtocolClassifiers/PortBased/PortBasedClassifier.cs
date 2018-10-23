@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.PortBased
 {
-    public class PortBasedClassifier<TAny> : IProtocolClassifier<TAny>
+    public class PortBasedClassifier : IProtocolClassifier<FlowKey>
     {
         Dictionary<string, ServiceName> m_serviceDictionary;
 
@@ -83,12 +81,12 @@ namespace Tarzan.Nfx.ProtocolClassifiers.PortBased
         }
 
 
-        public void Train(string protocol,  Conversation<TAny> conversation)
+        public void Train(string protocol,  Conversation<FlowKey> conversation)
         {
             throw new NotImplementedException();
         }
 
-        public ClassifierMatch Match(Conversation<TAny> conversation)
+        public ClassifierMatch Match(Conversation<FlowKey> conversation)
         {
             var protocolName = DetectService(conversation.ConversationKey);
             return new ClassifierMatch
@@ -98,7 +96,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.PortBased
             };
         }
 
-        public IEnumerable<ClassifierMatch> Matches(Conversation<TAny> conversation)
+        public IEnumerable<ClassifierMatch> Matches(Conversation<FlowKey> conversation)
         {
             yield return Match(conversation);
         }

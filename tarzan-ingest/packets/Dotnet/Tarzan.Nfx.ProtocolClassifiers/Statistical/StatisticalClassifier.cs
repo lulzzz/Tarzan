@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.Statistical
 {
-    public class FlowStatisticalVector
+    public class FlowVector
     {
 
     }
-    public class StatisticalClassifier : IProtocolClassifier<FlowRecord<FlowStatisticalVector>>
+    public class StatisticalClassifier : IProtocolClassifier<FlowVector>
     {
         public void LoadConfiguration(string filepath)
         {
             throw new NotImplementedException();
         }
 
-        public ClassifierMatch Match(Conversation<FlowRecord<FlowStatisticalVector>> conversation)
+        public ClassifierMatch Match(Conversation<FlowVector> conversation)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ClassifierMatch> Matches(Conversation<FlowRecord<FlowStatisticalVector>> conversation)
+        public IEnumerable<ClassifierMatch> Matches(Conversation<FlowVector> conversation)
         {
             throw new NotImplementedException();
         }
@@ -32,7 +30,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Statistical
             throw new NotImplementedException();
         }
 
-        public void Train(string protocol, Conversation<FlowRecord<FlowStatisticalVector>> conversation)
+        public void Train(string protocol, Conversation<FlowVector> conversation)
         {
             throw new NotImplementedException();
         }

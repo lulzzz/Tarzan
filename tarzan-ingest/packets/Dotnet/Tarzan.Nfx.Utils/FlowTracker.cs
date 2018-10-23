@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Analyzers
+namespace Tarzan.Nfx.Utils
 {
-
     /// <summary>
     /// This class implementes a simple algorithm that groups packet into flows. 
     /// Flows are stored in the local dictionary.

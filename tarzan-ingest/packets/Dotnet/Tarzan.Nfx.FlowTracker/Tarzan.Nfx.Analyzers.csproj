@@ -33,6 +33,7 @@
     <ProjectReference Include="..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj" />
   </ItemGroup>
 
 </Project>

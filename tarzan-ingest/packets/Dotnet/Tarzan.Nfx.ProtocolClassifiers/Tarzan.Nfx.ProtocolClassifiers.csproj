@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\TrainCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="PortBased\Resources\service-names-port-numbers.csv" />
   </ItemGroup>
 
@@ -17,13 +21,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Commands\TrainCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
-    <ProjectReference Include="..\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.Analyzers.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

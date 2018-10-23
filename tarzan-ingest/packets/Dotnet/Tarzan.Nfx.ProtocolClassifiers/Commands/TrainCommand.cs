@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.CommandLineUtils;
+using SharpPcap;
+using SharpPcap.LibPcap;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Microsoft.Extensions.CommandLineUtils;
-using SharpPcap;
-using SharpPcap.LibPcap;
-using Tarzan.Nfx.Analyzers;
 using Tarzan.Nfx.Model;
-using Tarzan.Nfx.PacketDecoders;
+using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.Commands
 {
@@ -39,7 +37,7 @@ namespace Tarzan.Nfx.ProtocolClassifiers.Commands
         {
             // training folder contains pcaps for each protocol. Each pcap has name corresponding to the protocol. 
             var statClassifier = new Statistical.StatisticalClassifier();
-            var portClassifier = new PortBased.PortBasedClassifier<FlowRecord<Statistical.FlowStatisticalVector>>();
+            var portClassifier = new PortBased.PortBasedClassifier();
             portClassifier.LoadConfiguration(null);
             foreach(var capFile in Directory.EnumerateFiles(trainingFolder,"*.cap"))
                 using (var errorLog = new StreamWriter(File.Create(Path.ChangeExtension(capFile, "errors"))))

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarzan.Nfx.Analyzers;
+﻿using System.Collections.Generic;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.ProtocolClassifiers

@@ -18,10 +18,6 @@
     <PackageReference Include="Tnidea.Thrift" Version="0.9.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;" />
   </Target>

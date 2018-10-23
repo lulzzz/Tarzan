@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Analyzers
+namespace Tarzan.Nfx.Model
 {
     /// <summary>
     /// Defines operations required for flow tracker implementation.

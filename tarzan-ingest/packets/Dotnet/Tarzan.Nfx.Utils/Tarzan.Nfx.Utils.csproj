@@ -9,4 +9,8 @@
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
+  </ItemGroup>
+
 </Project>

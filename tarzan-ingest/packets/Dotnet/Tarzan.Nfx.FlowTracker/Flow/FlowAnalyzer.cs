@@ -6,9 +6,9 @@ using Apache.Ignite.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
+using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.Analyzers
 {

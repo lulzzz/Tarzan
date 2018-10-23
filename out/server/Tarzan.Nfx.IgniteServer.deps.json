@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "7088b6e448c56d70875389ab2b3b417f2071b36a"
+    "signature": "2d26b6cbf8dd091295c65d7197f7e7d00ce291b7"
   },
   "compilationOptions": {},
   "targets": {
@@ -316,17 +316,6 @@
       "runtime.native.System.Security.Cryptography/4.0.0": {
         "dependencies": {
           "Microsoft.NETCore.Targets": "1.1.0"
-        }
-      },
-      "SharpPcap.Standard/4.4.0": {
-        "dependencies": {
-          "log4net": "2.0.8"
-        },
-        "runtime": {
-          "lib/netstandard2.0/SharpPcap.dll": {
-            "assemblyVersion": "4.4.0.0",
-            "fileVersion": "4.4.0.0"
-          }
         }
       },
       "System.AppContext/4.1.0": {
@@ -1343,7 +1332,7 @@
           "Tarzan.Nfx.Model": "1.0.0"
         },
         "runtime": {
-          "Netdx.PacketDecoders.dll": {}
+          "Tarzan.Nfx.PacketDecoders.dll": {}
         }
       },
       "Tarzan.Nfx.Ignite/1.0.0": {
@@ -1362,19 +1351,10 @@
           "CassandraCSharpDriver": "3.6.0",
           "Newtonsoft.Json": "11.0.2",
           "System.Memory": "4.5.1",
-          "Tarzan.Nfx.Utils": "1.0.0",
           "Tnidea.Thrift": "0.9.3"
         },
         "runtime": {
           "Tarzan.Nfx.Model.dll": {}
-        }
-      },
-      "Tarzan.Nfx.Utils/1.0.0": {
-        "dependencies": {
-          "SharpPcap.Standard": "4.4.0"
-        },
-        "runtime": {
-          "Tarzan.Nfx.Utils.dll": {}
         }
       }
     }
@@ -1573,13 +1553,6 @@
       "sha512": "sha512-2CQK0jmO6Eu7ZeMgD+LOFbNJSXHFVQbCJJkEyEwowh1SCgYnrn9W9RykMfpeeVGw7h4IBvYikzpGUlmZTUafJw==",
       "path": "runtime.native.system.security.cryptography/4.0.0",
       "hashPath": "runtime.native.system.security.cryptography.4.0.0.nupkg.sha512"
-    },
-    "SharpPcap.Standard/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-WmNm0JF5MNs6AbD8Jx+P1ZwwCasSejqwxZd/i1K04LNUyVxAUb7f7ZaW5vuFJQl5L/KYSZ+djE3bJwTkTTMr0g==",
-      "path": "sharppcap.standard/4.4.0",
-      "hashPath": "sharppcap.standard.4.4.0.nupkg.sha512"
     },
     "System.AppContext/4.1.0": {
       "type": "package",
@@ -2103,11 +2076,6 @@
       "sha512": ""
     },
     "Tarzan.Nfx.Model/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Tarzan.Nfx.Utils/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

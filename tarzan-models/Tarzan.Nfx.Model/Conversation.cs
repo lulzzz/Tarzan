@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Analyzers
+namespace Tarzan.Nfx.Model
 {
-    public struct Conversation<TFlowValue>
+    public class Conversation<TFlowValue>
     {
-        public FlowKey ConversationKey;
-        public TFlowValue Upflow;
-        public TFlowValue Downflow;
+        public FlowKey ConversationKey { get; set; }
+        public TFlowValue Upflow { get; set; }
+        public TFlowValue Downflow { get; set; }
 
-        public Conversation(KeyValuePair<FlowKey, TFlowValue> x, KeyValuePair<FlowKey, TFlowValue> y) : this()
+        public Conversation() { }
+        public Conversation(KeyValuePair<FlowKey, TFlowValue> x, KeyValuePair<FlowKey, TFlowValue> y)
         {
             if (x.Key.SourcePort > y.Key.SourcePort)
             {
