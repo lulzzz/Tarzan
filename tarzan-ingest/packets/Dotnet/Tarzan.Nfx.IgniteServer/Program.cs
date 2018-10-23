@@ -1,14 +1,5 @@
-﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Cache.Configuration;
-using Apache.Ignite.Core.Configuration;
-using Apache.Ignite.Core.Deployment;
-using Apache.Ignite.Core.Discovery.Tcp;
-using Apache.Ignite.Core.Discovery.Tcp.Static;
-using Microsoft.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging.Console;
+﻿using Microsoft.Extensions.CommandLineUtils;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tarzan.Nfx.IgniteServer
 {
@@ -20,8 +11,6 @@ namespace Tarzan.Nfx.IgniteServer
 
         enum EventIds : int { EVT_METRICS, EVT_IGNITE_STATUS };
 
-
-         
         static void Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(true);

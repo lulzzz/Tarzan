@@ -8,6 +8,7 @@ using SharpPcap;
 using SharpPcap.LibPcap;
 using Tarzan.Nfx.FlowTracker;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 
 namespace Tarzan.Nfx.ProtocolClassifiers.Commands
 {

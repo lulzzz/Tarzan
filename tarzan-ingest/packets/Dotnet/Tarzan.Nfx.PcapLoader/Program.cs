@@ -1,18 +1,7 @@
-﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Client;
-using Apache.Ignite.Core.Client.Cache;
-using Apache.Ignite.Core.Communication.Tcp;
-using Microsoft.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging.Console;
-using SharpPcap;
+﻿using Microsoft.Extensions.CommandLineUtils;
 using ShellProgressBar;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Utils;
 

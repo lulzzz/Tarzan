@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 
 namespace Tarzan.Nfx.FlowTracker
 {
@@ -115,7 +116,6 @@ namespace Tarzan.Nfx.FlowTracker
                 }
             }
         }
-
     }
 }
 

@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.PcapLoader

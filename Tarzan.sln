@@ -32,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devnotes", "Devnotes", "{00
 		Ignite.md = Ignite.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Ignite", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj", "{B459F06A-6066-4037-B744-460E500A0AED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{D317B206-F11A-4593-B06C-70C0227E5A81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +82,10 @@ Global
 		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF54723-603F-4183-AFA1-D44B575CB0A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B459F06A-6066-4037-B744-460E500A0AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B459F06A-6066-4037-B744-460E500A0AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B459F06A-6066-4037-B744-460E500A0AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B459F06A-6066-4037-B744-460E500A0AED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

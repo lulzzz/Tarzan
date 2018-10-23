@@ -1,5 +1,5 @@
 ﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Communication.Tcp;
+using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Configuration;
 using Apache.Ignite.Core.Deployment;
 using Apache.Ignite.Core.Discovery.Tcp;
@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Tarzan.Nfx.Ignite;
 
 namespace Tarzan.Nfx.IgniteServer
 {
@@ -51,6 +51,7 @@ namespace Tarzan.Nfx.IgniteServer
                                      "-XX:+DisableExplicitGC",
                 },
                 PeerAssemblyLoadingMode = PeerAssemblyLoadingMode.CurrentAppDomain,
+               
                 DataStorageConfiguration = new DataStorageConfiguration(),
                 DiscoverySpi = new TcpDiscoverySpi
                 {

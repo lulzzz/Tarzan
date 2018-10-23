@@ -1,4 +1,7 @@
 ﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache;
+using Apache.Ignite.Core.Cache.Query;
 using Apache.Ignite.Core.Cluster;
 using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Discovery.Tcp;
@@ -10,7 +13,9 @@ using ShellProgressBar;
 using System;
 using System.Linq;
 using System.Net;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.FlowTracker
@@ -48,12 +53,15 @@ namespace Tarzan.Nfx.FlowTracker
 
                 if (loadArgument.HasValue())
                 {
+                    Console.WriteLine("Loading frames...");
                     var pcapLoader = new Tarzan.Nfx.PcapLoader.PcapLoader();
                     foreach (var fileName in loadArgument.Values)
                     {
+                        Console.WriteLine($"Loading frames from'{fileName}'...");
                         pcapLoader.SourceFiles.Add(new System.IO.FileInfo(fileName));
                     }
                     await pcapLoader.Invoke();
+                    Console.WriteLine("All frames loaded.");
                 }
 
                 Ignition.ClientMode = true;
@@ -84,9 +92,23 @@ namespace Tarzan.Nfx.FlowTracker
 
                         if (traceArgument.HasValue())
                         {
-                            var frameCache = ignite.GetCache<int, Frame>(cacheName);
+                            var frameCache = ignite.GetCache<FrameKey, Frame>(cacheName);
                             var flowCache = ignite.GetOrCreateCache<FlowKey, PacketFlow>("flowtable");
                             Console.WriteLine($"Done. Frames={frameCache.GetSize()}, Flows={flowCache.GetSize()}.");
+                            Console.WriteLine($"Top 10 Flows:");
+                            foreach (var flow in flowCache.OrderByDescending(x=>x.Value.Octets).Take(10))
+                            {
+                                var scanQuery = new ScanQuery<FrameKey, Frame>(new CacheEntryFrameFilter(flow.Key));
+                                //var scanQuery = new ScanQuery<FrameKey, Frame>(new CacheEntryFrameFilter2());
+                                var queryCursor = frameCache.Query(scanQuery);
+                                Console.WriteLine($"  Flow   {flow.Key.ToString()}:");
+                                var getFrameKey = new FrameKeyProvider();
+                                foreach (var cacheEntry in queryCursor)
+                                {
+                                    var key = getFrameKey.GetKey(cacheEntry.Value);
+                                    Console.WriteLine($"    [key={key},ts={cacheEntry.Value.Timestamp}, len={cacheEntry.Value.Data.Length}]");
+                                }
+                            }
                         }
                     }
                 }
@@ -121,6 +143,28 @@ namespace Tarzan.Nfx.FlowTracker
             public void Report(FlowAnalyzer.ProgressRecord value)
             {
                 Console.WriteLine($"\rProgress: Frames={value.CompletedFrames}/{value.TotalFrames}, Flows={value.CompletedFlows}/{value.TotalFlows}, Elapsed={value.ElapsedTime.ElapsedMilliseconds}ms.");
+            }
+        }
+
+        [Serializable]
+        public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, Frame>
+        {
+            public FlowKey FlowKey { get; set; }
+            public IKeyProvider<FlowKey, Frame> KeyProvider { get; set; }
+
+            public CacheEntryFrameFilter(FlowKey flowKey)
+            {
+                FlowKey = flowKey;
+                KeyProvider = new FrameKeyProvider();
+            }
+
+            public CacheEntryFrameFilter()
+            {
+            }
+
+            public bool Invoke(ICacheEntry<FrameKey, Frame> frame)
+            {
+                return FlowKey.HashCode != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
             }
         }
     }

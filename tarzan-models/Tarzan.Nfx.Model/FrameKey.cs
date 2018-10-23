@@ -15,14 +15,26 @@ namespace Tarzan.Nfx.Model
 
         public void ReadBinary(IBinaryReader reader)
         {
+#if !DEBUG
+            var rawReader = reader.GetRawReader();
+            FrameNumber = rawReader.ReadInt();
+            FlowKeyHash = rawReader.ReadInt();
+#else
             FrameNumber = reader.ReadInt(nameof(FrameNumber));
             FlowKeyHash = reader.ReadInt(nameof(FlowKeyHash));
+#endif
         }
 
         public void WriteBinary(IBinaryWriter writer)
         {
+#if !DEBUG
+            var rawWriter = reader.GetRawWriter();
+            rawWriter.WriteInt(FrameNumber);
+            rawWriter.WriteInt(FlowKeyHash);
+#else
             writer.WriteInt(nameof(FrameNumber), FrameNumber);
             writer.WriteInt(nameof(FlowKeyHash), FlowKeyHash);
+#endif
         }
     }
 }

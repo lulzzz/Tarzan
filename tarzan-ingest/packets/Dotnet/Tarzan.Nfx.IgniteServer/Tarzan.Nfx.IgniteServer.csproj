@@ -11,12 +11,13 @@
     <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+    <PackageReference Include="PacketDotNet" Version="0.19.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
-    <ProjectReference Include="..\Tarzan.Nfx.FlowTracker\Tarzan.Nfx.FlowTracker.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,13 @@
     <None Update="recreate-cluster.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="run-mini.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.json&quot; &quot;$(SolutionDir)out\server\&quot;" />
+  </Target>
 
 </Project>
