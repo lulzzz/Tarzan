@@ -12,8 +12,10 @@ using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.Analyzers
 {
-
-
+    /// <summary>
+    /// Takes all local objects from the frame cache specified by <see cref="FrameCacheName"/>, computes flow objects and 
+    /// merges the flow objects to the flow cache specified by <see cref="FlowCacheName"/>.
+    /// </summary>
     [Serializable]
     public partial class FlowAnalyzer : IComputeAction
     {
@@ -29,7 +31,15 @@ namespace Tarzan.Nfx.Analyzers
         public IProgress<ProgressRecord> Progress { get; set; } = null;
         public int ProgressFrameBatch { get; set; } = 1000;
         public int ProgressFlowBatch { get; set; } = 100;
-        public string CacheName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the frame cache;
+        /// </summary>
+        public string FrameCacheName { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the flow cache.
+        /// </summary>
+        public string FlowCacheName { get; set; } = PacketFlow.CACHE_NAME;
 
         [InstanceResource]
         private readonly IIgnite m_ignite;
@@ -39,44 +49,65 @@ namespace Tarzan.Nfx.Analyzers
             if (ignite != null) m_ignite = ignite;
         }
 
+        /// <summary>
+        /// Invokes the computation of the current compute action.
+        /// </summary>
         public void Invoke()
         {
+            Console.WriteLine("FlowAnalyzer is running...");
             var progress = new ProgressRecord() { ElapsedTime = new Stopwatch() };
             progress.ElapsedTime.Start();
+            Console.WriteLine($"Tracking flows in {FrameCacheName}...");
             var flowTracker = TrackFlows(progress);
-            PopulateFlowTable(flowTracker, progress);
+            Console.WriteLine($"Writing flows to {FlowCacheName}...");
+            PopulateFlowTable(flowTracker, progress);                            
             progress.ElapsedTime.Stop();
+            Console.WriteLine($"FlowAnalyzer completed, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.");
         }
 
         private IFlowTracker<PacketFlow> TrackFlows(ProgressRecord progressRecord)
         {
-            var cache = m_ignite.GetCache<FrameKey, Frame>(CacheName);
-            progressRecord.TotalFrames = cache.GetLocalSize();
-            Progress?.Report(progressRecord);
             var flowTracker = new FlowTracker(new FrameKeyProvider());
-            
-            var framesCount = 0;
-            foreach (var frame in cache.GetLocalEntries())
+            try
             {
-                flowTracker.ProcessFrame(frame.Value);
-                if (++framesCount % ProgressFrameBatch == 0)
+                var cache = m_ignite.GetCache<FrameKey, Frame>(FrameCacheName);
+                if (cache == null)
                 {
-                    progressRecord.CompletedFrames += ProgressFrameBatch;
+                    Console.WriteLine($"Source cache {FrameCacheName} does not exist...");
+                }
+                else
+                {
+                    progressRecord.TotalFrames = cache.GetLocalSize();
+                    Progress?.Report(progressRecord);
+
+                    var framesCount = 0;
+                    foreach (var frame in cache.GetLocalEntries())
+                    {
+                        flowTracker.ProcessFrame(frame.Value);
+                        if (++framesCount % ProgressFrameBatch == 0)
+                        {
+                            progressRecord.CompletedFrames += ProgressFrameBatch;
+                            Progress?.Report(progressRecord);
+                        }
+                    }
+                    progressRecord.CompletedFrames += framesCount % ProgressFrameBatch;
                     Progress?.Report(progressRecord);
                 }
             }
-            progressRecord.CompletedFrames += framesCount % ProgressFrameBatch;
-            Progress?.Report(progressRecord);
+            catch(Exception e)
+            {
+                Console.Error.WriteLine(e);    
+            }
             return flowTracker;
         }
 
         /// <summary>
-        /// Loads a local flow cache to the global flow table.
+        /// Stores the local flow cache to the global flow table.
         /// </summary>
         /// <param name="flowTracker">A flow tracker object that contains a local flow cache.</param>
         private void PopulateFlowTable(IFlowTracker<PacketFlow> flowTracker, ProgressRecord progressRecord)
         {
-            var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>(PacketFlow.CACHE_NAME);
+            var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>(FlowCacheName);
             using (var dataStreamer = m_ignite.GetDataStreamer<FlowKey, PacketFlow>(flowCache.Name))
             {
                 dataStreamer.AllowOverwrite = true;

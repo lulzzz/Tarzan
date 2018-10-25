@@ -1,15 +1,12 @@
-﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Binary;
+﻿using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache.Query;
 using Apache.Ignite.Core.Cluster;
 using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Discovery.Tcp;
-using Apache.Ignite.Core.Discovery.Tcp.Multicast;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
 using Apache.Ignite.Core.Resource;
 using Microsoft.Extensions.CommandLineUtils;
 using ShellProgressBar;
-using System;
 using System.Linq;
 using System.Net;
 using Tarzan.Nfx.Ignite;
@@ -25,30 +22,44 @@ namespace Tarzan.Nfx.Analyzers
     /// </summary>
     partial class Program
     {
-        const string DEFAULT_EP = "127.0.0.1:47500";
+        
         static void Main(string[] args)
         {
-            var commandLineApplication = new CommandLineApplication(true);
-            var clusterArgument = commandLineApplication.Option("-c|--cluster", "Enpoint string of any cluster node.", CommandOptionType.MultipleValue);
-            var cacheArgument = commandLineApplication.Option("-s|--cache", "Name of the cache with frames to process.", CommandOptionType.MultipleValue);
-            var loadArgument = commandLineApplication.Option("-l|--load", "Name of the file to be loaded into the cache.", CommandOptionType.MultipleValue);
-            var traceArgument = commandLineApplication.Option("-t|--trace", "If set, it various trace information during execution.", CommandOptionType.NoValue);
+            var commandLineApplication = new CommandLineApplication();
+            commandLineApplication.Name = "Tarzan.Nfx.Analyzers";
+            commandLineApplication.HelpOption("-?|-h|--help");
+
+            var clusterOption = commandLineApplication.Option("-c|--cluster <ConnectionString>",
+                "Connection string must specify address and the Discovery Spi port of at least one node of a cluster.",
+                CommandOptionType.MultipleValue);
+
+            var traceOption = commandLineApplication.Option("-t|--trace", 
+                "If set, it prints various trace information during execution.", 
+                CommandOptionType.NoValue);
+
+            commandLineApplication.Command(TrackFlowsCommand.Name, configuration: new TrackFlowsCommand(clusterOption).Configuration);
+
+            commandLineApplication.OnExecute(() => {
+                commandLineApplication.Error.WriteLine("Error: Command not specified!");
+                commandLineApplication.ShowHelp();
+                return 0;
+            });
+
+            try
+            {
+                commandLineApplication.Execute(args);
+            }
+            catch (CommandParsingException e)
+            {
+                commandLineApplication.Error.WriteLine($"Error: {e.Message}");
+                commandLineApplication.ShowHelp();
+            }
+            /*
             commandLineApplication.OnExecute(async () =>
             {
 
                 var endpoints = clusterArgument.HasValue() ? clusterArgument.Values.ToArray() : new[] { DEFAULT_EP };
-                var cfg = new IgniteConfiguration
-                {
-                    PeerAssemblyLoadingMode = Apache.Ignite.Core.Deployment.PeerAssemblyLoadingMode.CurrentAppDomain,
-                    DiscoverySpi = new Apache.Ignite.Core.Discovery.Tcp.TcpDiscoverySpi
-                    {
-                        IpFinder = new TcpDiscoveryMulticastIpFinder
-                        {
-                            MulticastGroup = "228.10.10.157",
-                            Endpoints = endpoints
-                        }
-                    },
-                };
+                
 
                 if (loadArgument.HasValue())
                 {
@@ -69,26 +80,7 @@ namespace Tarzan.Nfx.Analyzers
                 using (var ignite = Ignition.Start(cfg))
                 {
                     Console.WriteLine("Client started!");
-                    var cluster = ignite.GetCluster();
-                    var compute = ignite.GetCompute();
-
                     
-                    foreach (var cacheName in cacheArgument.Values)
-                    {
-                        Console.WriteLine($"Tracking flows in {cacheName}");
-                        
-                        Console.WriteLine($"Compute is {String.Join(",",compute.ClusterGroup.GetNodes().Select(n=>n.Id.ToString()))}");
-
-                       
-
-                        var flowAnalyzer = new FlowAnalyzer()
-                        {
-                            CacheName = cacheName,
-                            Progress = new ConsoleProgressReport()
-                        };
-                        
-                        compute.Broadcast(flowAnalyzer);
-
                         if (traceArgument.HasValue())
                         {
                             var frameCache = ignite.GetCache<FrameKey, Frame>(cacheName);
@@ -98,7 +90,6 @@ namespace Tarzan.Nfx.Analyzers
                             foreach (var flow in flowCache.OrderByDescending(x=>x.Value.Octets).Take(10))
                             {
                                 var scanQuery = new ScanQuery<FrameKey, Frame>(new CacheEntryFrameFilter(flow.Key));
-                                //var scanQuery = new ScanQuery<FrameKey, Frame>(new CacheEntryFrameFilter2());
                                 var queryCursor = frameCache.Query(scanQuery);
                                 Console.WriteLine($"  Flow   {flow.Key.ToString()}:");
                                 var getFrameKey = new FrameKeyProvider();
@@ -132,17 +123,7 @@ namespace Tarzan.Nfx.Analyzers
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
                 commandLineApplication.ShowHelp();
             }
-        }
-
-        public class ConsoleProgressReport : IProgress<FlowAnalyzer.ProgressRecord>
-        {
-            public ConsoleProgressReport()
-            {
-            }
-            public void Report(FlowAnalyzer.ProgressRecord value)
-            {
-                Console.WriteLine($"\rProgress: Frames={value.CompletedFrames}/{value.TotalFrames}, Flows={value.CompletedFlows}/{value.TotalFlows}, Elapsed={value.ElapsedTime.ElapsedMilliseconds}ms.");
-            }
+            */
         }
     }
 }
