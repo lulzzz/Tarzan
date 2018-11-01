@@ -17,6 +17,14 @@ namespace Tarzan.Nfx.Analyzers
     public class FrameCacheFlowProvider
     {
         private readonly IIgnite m_ignite;
+        /// <summary>
+        /// Names of frame caches.
+        /// </summary>
+        private string[] m_frameCacheNames;
+        /// <summary>
+        /// An array of compiled queries for all caches.
+        /// </summary>
+        private Func<int, IQueryCursor<ICacheEntry<FrameKey, FrameData>>>[] m_compiledQueries;
 
         /// <summary>
         /// Creates a new frame provider that searches for frames in the specified collection of caches.
@@ -25,39 +33,51 @@ namespace Tarzan.Nfx.Analyzers
         /// <param name="frameCacheNames">Collection of names of frame caches.</param>
         public FrameCacheFlowProvider(IIgnite ignite, IEnumerable<string> frameCacheNames)
         {
-            FrameCacheNames = frameCacheNames.ToArray();
+            
             m_ignite = ignite;
+            m_frameCacheNames = frameCacheNames.ToArray();
+            m_compiledQueries = new Func<int, IQueryCursor<ICacheEntry<FrameKey, FrameData>>>[m_frameCacheNames.Length];
+            for(int i = 0; i < m_frameCacheNames.Length; i++)
+            {
+                var queryable = CacheFactory.GetOrCreateFrameCache(m_ignite, m_frameCacheNames[i]).AsCacheQueryable();
+                m_compiledQueries[i] = CompiledQuery.Compile((int hashCode) => queryable.Where(x => x.Key.FlowKeyHash == hashCode));
+            }
         }
 
         /// <summary>
-        /// Names of frame caches.
-        /// </summary>
-        public string[] FrameCacheNames { get; }
-
-        /// <summary>
         /// Returns an enumeration of frames that belong to the given flow. 
-        /// To get the result the method performs a full scan 
-        /// query over all caches specified in <see cref="FrameCacheNames"/>.
+        /// To get the result the method uses an index-based  
+        /// query over all caches specified in <see cref="m_frameCacheNames"/>.
         /// </summary>
         /// <param name="flowKey">The key of the flow.</param>
         /// <returns>An enumeration of frames that belong to the given flow.</returns>
         public IEnumerable<KeyValuePair<FrameKey, FrameData>> GetFrames(FlowKey flowKey)
         {
-            foreach (var cacheName in FrameCacheNames)
+            var frameKeyProvider = new FrameKeyProvider();
+            foreach (var compiledQuery in m_compiledQueries)
             {
-                var frameCache = CacheFactory.GetOrCreateFrameCache(m_ignite, cacheName).AsCacheQueryable();
-                var queryResult = frameCache.Where(x => x.Key.FlowKeyHash == flowKey.HashCode);
+                var queryResult = compiledQuery(flowKey.HashCode);
                 foreach (var cacheEntry in queryResult)
                 {
-                    yield return KeyValuePair.Create(cacheEntry.Key, cacheEntry.Value);
+                    var frameKey = frameKeyProvider.GetKey(cacheEntry.Value);
+                    if (FlowKey.Compare(flowKey, frameKey))
+                    {
+                        yield return KeyValuePair.Create(cacheEntry.Key, cacheEntry.Value);
+                    }
                 }
             }                                                                                                     
         }
-
+        /// <summary>
+        /// Returns an enumeration of frames that belong to the given flow. 
+        /// To get the result the method performs a full scan 
+        /// query over all caches specified in <see cref="m_frameCacheNames"/>.
+        /// </summary>
+        /// <param name="flowKey">The key of the flow.</param>
+        /// <returns>An enumeration of frames that belong to the given flow.</returns>
         public IEnumerable<KeyValuePair<FrameKey, FrameData>> GetFramesByScan(FlowKey flowKey)
         {
             var scanQuery = new ScanQuery<FrameKey, FrameData>(new CacheEntryFrameFilter(flowKey));
-            foreach (var cacheName in FrameCacheNames)
+            foreach (var cacheName in m_frameCacheNames)
             {
                 var frameCache = CacheFactory.GetOrCreateFrameCache(m_ignite, cacheName);
                 var queryCursor = frameCache.Query(scanQuery);
