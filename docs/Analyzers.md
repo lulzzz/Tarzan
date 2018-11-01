@@ -4,7 +4,7 @@ TARZAN.NFX.ANALYZERS contains a collection of basic functions to process
 packet captures loaded in Ignite Cluster. Namely, the following functions are 
 available:
 
-* Flow Analyzer - determines netflows in captures
+* Flow Analyzer - identifies all flows in the given captures.
 * Application Detector - identifies applications or services for flows. 
 * DNS Analyzer - extracts information from DNS flows.
 * HTTP Analyzer - extracts information from HTTP flows, including content.
@@ -40,15 +40,27 @@ In the example, all flows in source cache named `testbed-12jun-000.pcap` are ide
 dotnet Tarzan.Nfx.Analyzers.dll --cluster 127.0.0.1:47500 track-flows -read testbed-12jun-000.pcap --write testbed-12jun-000.flows 
 ```
 
-## Application Detector
+## Service Detector
 ### USAGE:
 ```
-dotnet tarzan.nfx.analyzers.dll application --cache flowtable1  ... --cache flowtableN --method method1 ... --method methodN
+dotnet tarzan.nfx.analyzers.dll detect-services --cache flowtable1  ... --cache flowtableN --method method1 ... --method methodN
 ```
 ### INPUT:
 A collection of cache names that contains flows.
 ### OUTPUT:
 Sets ```ApplicationName``` property of the flows. 
+
+### Methods
+
+* Port based detection
+
+* Deep packet inspection, 
+REF: https://github.com/ntop/nDPI/blob/dev/src/include/ndpi_typedefs.h
+
+* 
+
+
+
 
 ## HTTP Analyzer
 ### INPUT

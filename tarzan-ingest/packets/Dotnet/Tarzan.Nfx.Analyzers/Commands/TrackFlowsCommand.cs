@@ -4,21 +4,20 @@ using System.Linq;
 using System.Text;
 using Apache.Ignite.Core;
 using Microsoft.Extensions.CommandLineUtils;
+using Tarzan.Nfx.Model;
 
-namespace Tarzan.Nfx.Analyzers
+namespace Tarzan.Nfx.Analyzers.Commands
 {
-    class TrackFlowsCommand
+    class TrackFlowsCommand : AbstractCommand
     {
-        private CommandOption m_clusterOption;
-
-        public TrackFlowsCommand(CommandOption clusterOption)
+        public TrackFlowsCommand(CommandOption clusterOption)  : base(clusterOption)
         {
-            this.m_clusterOption = clusterOption;
+            
         }
 
         public static string Name { get; private set; } = "track-flows";
 
-        internal void Configuration(CommandLineApplication command)
+        public override void Configuration(CommandLineApplication command)
         {
             command.Description = "Identifies all flows in the given captures.";
             command.HelpOption("-?|-h|--help");
@@ -33,7 +32,7 @@ namespace Tarzan.Nfx.Analyzers
 
             command.OnExecute(() =>
             {
-                using (var ignite = new IgniteClient(m_clusterOption.Values))
+                using (var ignite = CreateIgniteClient())
                 {
                     return ExecuteCommand(ignite.Start(), readOption.Values, writeOption.Value());
                 }
@@ -42,9 +41,11 @@ namespace Tarzan.Nfx.Analyzers
 
         private int ExecuteCommand(IIgnite ignite, IEnumerable<string> input, string output)
         {
-            var compute = ignite.GetCompute();
+            var compute = ignite.GetCompute();   
+            var flowCache = ignite.GetOrCreateCache<FlowKey, PacketFlow>(output);
             foreach (var cacheName in input)
             {
+                var frameCache = ignite.GetOrCreateCache<object, object>(cacheName);
                 Console.WriteLine($"Tracking flows in {cacheName}");
                 Console.WriteLine($"Compute is {String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}");
 
@@ -56,6 +57,7 @@ namespace Tarzan.Nfx.Analyzers
                 };
 
                 compute.Broadcast(flowAnalyzer);
+                Console.WriteLine($"Processed frames={frameCache.GetSize()}, flows={flowCache.GetSize()}.");
             }
             return 0;
         }

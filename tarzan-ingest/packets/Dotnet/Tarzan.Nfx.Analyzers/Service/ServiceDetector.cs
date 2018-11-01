@@ -3,39 +3,39 @@ using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Resource;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.ProtocolClassifiers.PortBased;
 
-namespace Tarzan.Nfx.Ingest.Analyzers
+namespace Tarzan.Nfx.Analyzers
 {
     public class ServiceDetector : IComputeAction
     {
         private readonly PortBasedClassifier m_classifier;
-        public ServiceDetector()
+        public ServiceDetector(string cacheName)
         {
             m_classifier = new PortBasedClassifier();
             m_classifier.LoadConfiguration(null);
+            m_cacheName = cacheName;
         }
          
         [InstanceResource]
         protected readonly IIgnite m_ignite;
+        private readonly string m_cacheName;
 
         public void Invoke()
         {
-            var flowCache = m_ignite.GetCache<FlowKey, PacketFlow>(PacketFlow.CACHE_NAME); 
+            var flowCache = m_ignite.GetCache<FlowKey, PacketFlow>(m_cacheName);
             var localFlows = flowCache.GetLocalEntries();
             var localFlowCount = flowCache.GetLocalSize();
 
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}]   INGEST: ServiceDetector: Processing {localFlowCount} local flows.");
+            Console.WriteLine($"ServiceDetector: Processing {localFlowCount} local flows from {flowCache.Name}.");
 
             var flows = localFlows.Select(x =>
             {
                 var value = x.Value;
                 var conv = new Conversation<FlowKey> { ConversationKey = x.Key, Upflow = x.Key, Downflow = x.Key.SwapEndpoints() };
-                value.ServiceName = m_classifier.Match(conv)?.ProtocolName; 
+                value.ServiceName = m_classifier.Match(conv)?.ProtocolName;
                 return KeyValuePair.Create(x.Key, value);
             });
             flowCache.PutAll(flows);

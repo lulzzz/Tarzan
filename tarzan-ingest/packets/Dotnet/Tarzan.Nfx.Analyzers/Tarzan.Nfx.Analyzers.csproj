@@ -15,10 +15,11 @@
 
   <ItemGroup>
     <Compile Remove="HttpAnalyzer.cs" />
+    <Compile Remove="Http\HttpAnalyzer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="HttpAnalyzer.cs" />
+    <None Include="Http\HttpAnalyzer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,10 @@
     <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tls\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

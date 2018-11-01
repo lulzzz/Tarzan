@@ -78,15 +78,24 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         [InstanceResource]
         protected readonly IIgnite m_ignite;
 
+        public string FlowCacheName { get; }
+        public string DnsCacheName { get; }
+
+        public DnsAnalyzer(string flowCacheName, string dnsCacheName)
+        {
+            FlowCacheName = flowCacheName;
+            DnsCacheName = dnsCacheName;
+        }
+
         public void Invoke()
         {
-            var flowCache = m_ignite.GetCache<FlowKey,PacketFlow>(PacketFlow.CACHE_NAME); 
-            var dnsObjectCache = m_ignite.GetOrCreateCache<string, DnsObject>(DnsObject.CACHE_NAME);
+            var flowCache = m_ignite.GetCache<FlowKey,PacketFlow>(FlowCacheName); 
+            var dnsObjectCache = m_ignite.GetOrCreateCache<string, DnsObject>(DnsCacheName);
 
             foreach (var dnsObject in flowCache.GetLocalEntries()
                 .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase)))
             {
-                throw new NotImplementedException();
+                
                 //var dnsObjects = Inspect(dnsObject.Key, packetStream).Select(x => KeyValuePair.Create(x.ObjectName, x));
                 //dnsObjectCache.PutAll(dnsObjects);
             }

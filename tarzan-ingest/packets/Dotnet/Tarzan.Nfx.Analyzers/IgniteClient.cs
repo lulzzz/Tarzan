@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Tarzan.Nfx.Analyzers
 {
-    class IgniteClient : IDisposable
+    public class IgniteClient : IDisposable
     {
         const string DEFAULT_ENPOINTS = "127.0.0.1:47500";
         private readonly IgniteConfiguration m_cfg;
