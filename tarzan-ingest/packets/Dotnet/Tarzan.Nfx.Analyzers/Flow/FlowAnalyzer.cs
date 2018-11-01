@@ -6,6 +6,7 @@ using Apache.Ignite.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
@@ -39,7 +40,7 @@ namespace Tarzan.Nfx.Analyzers
         /// <summary>
         /// Gets or sets the name of the flow cache.
         /// </summary>
-        public string FlowCacheName { get; set; } = PacketFlow.CACHE_NAME;
+        public string FlowCacheName { get; set; } = FlowData.CACHE_NAME;
 
         [InstanceResource]
         private readonly IIgnite m_ignite;
@@ -65,38 +66,31 @@ namespace Tarzan.Nfx.Analyzers
             Console.WriteLine($"FlowAnalyzer completed, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.");
         }
 
-        private IFlowTracker<PacketFlow> TrackFlows(ProgressRecord progressRecord)
+        private IFlowTracker<FlowData> TrackFlows(ProgressRecord progressRecord)
         {
             var flowTracker = new FlowTracker(new FrameKeyProvider());
             try
             {
-                var cache = m_ignite.GetCache<FrameKey, Frame>(FrameCacheName);
-                if (cache == null)
-                {
-                    Console.WriteLine($"Source cache {FrameCacheName} does not exist...");
-                }
-                else
-                {
-                    progressRecord.TotalFrames = cache.GetLocalSize();
-                    Progress?.Report(progressRecord);
+                var cache = CacheFactory.GetOrCreateFrameCache(m_ignite, FrameCacheName);
+                progressRecord.TotalFrames = cache.GetLocalSize();
+                Progress?.Report(progressRecord);
 
-                    var framesCount = 0;
-                    foreach (var frame in cache.GetLocalEntries())
+                var framesCount = 0;
+                foreach (var frame in cache.GetLocalEntries())
+                {
+                    flowTracker.ProcessFrame(frame.Value);
+                    if (++framesCount % ProgressFrameBatch == 0)
                     {
-                        flowTracker.ProcessFrame(frame.Value);
-                        if (++framesCount % ProgressFrameBatch == 0)
-                        {
-                            progressRecord.CompletedFrames += ProgressFrameBatch;
-                            Progress?.Report(progressRecord);
-                        }
+                        progressRecord.CompletedFrames += ProgressFrameBatch;
+                        Progress?.Report(progressRecord);
                     }
-                    progressRecord.CompletedFrames += framesCount % ProgressFrameBatch;
-                    Progress?.Report(progressRecord);
                 }
+                progressRecord.CompletedFrames += framesCount % ProgressFrameBatch;
+                Progress?.Report(progressRecord);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Console.Error.WriteLine(e);    
+                Console.Error.WriteLine(e);
             }
             return flowTracker;
         }
@@ -105,10 +99,10 @@ namespace Tarzan.Nfx.Analyzers
         /// Stores the local flow cache to the global flow table.
         /// </summary>
         /// <param name="flowTracker">A flow tracker object that contains a local flow cache.</param>
-        private void PopulateFlowTable(IFlowTracker<PacketFlow> flowTracker, ProgressRecord progressRecord)
+        private void PopulateFlowTable(IFlowTracker<FlowData> flowTracker, ProgressRecord progressRecord)
         {
-            var flowCache = m_ignite.GetOrCreateCache<FlowKey, PacketFlow>(FlowCacheName);
-            using (var dataStreamer = m_ignite.GetDataStreamer<FlowKey, PacketFlow>(flowCache.Name))
+            var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName);
+            using (var dataStreamer = m_ignite.GetDataStreamer<FlowKey, FlowData>(flowCache.Name))
             {
                 dataStreamer.AllowOverwrite = true;
                 var updateProcessor = new MergePacketFlowProcessor();
@@ -132,14 +126,14 @@ namespace Tarzan.Nfx.Analyzers
             }
         }
         [Serializable]
-        public sealed class FlowStreamVisitor : IStreamReceiver<FlowKey, PacketFlow>
+        public sealed class FlowStreamVisitor : IStreamReceiver<FlowKey, FlowData>
         {
             private MergePacketFlowProcessor updateProcessor;
             public FlowStreamVisitor(MergePacketFlowProcessor updateProcessor)
             {
                 this.updateProcessor = updateProcessor;
             }
-            public void Receive(ICache<FlowKey, PacketFlow> cache, ICollection<ICacheEntry<FlowKey, PacketFlow>> entries)
+            public void Receive(ICache<FlowKey, FlowData> cache, ICollection<ICacheEntry<FlowKey, FlowData>> entries)
             {
                 foreach (var entry in entries)
                 {

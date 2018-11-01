@@ -28,13 +28,13 @@ namespace Tarzan.Nfx.Analyzers
         {
             var commandLineApplication = new CommandLineApplication();
             commandLineApplication.Name = "Tarzan.Nfx.Analyzers";
-            commandLineApplication.HelpOption("-?|-h|--help");
+            commandLineApplication.HelpOption("-?|-Help");
 
-            var clusterOption = commandLineApplication.Option("-c|--cluster <ConnectionString>",
+            var clusterOption = commandLineApplication.Option("-Cluster <ConnectionString>",
                 "Connection string must specify address and the Discovery Spi port of at least one node of a cluster.",
                 CommandOptionType.MultipleValue);
 
-            var traceOption = commandLineApplication.Option("-t|--trace", 
+            var traceOption = commandLineApplication.Option("-Trace", 
                 "If set, it prints various trace information during execution.", 
                 CommandOptionType.NoValue);
 

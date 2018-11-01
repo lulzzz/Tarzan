@@ -4,6 +4,7 @@ using Apache.Ignite.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.ProtocolClassifiers.PortBased;
 
@@ -25,7 +26,7 @@ namespace Tarzan.Nfx.Analyzers
 
         public void Invoke()
         {
-            var flowCache = m_ignite.GetCache<FlowKey, PacketFlow>(m_cacheName);
+            var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite,m_cacheName);
             var localFlows = flowCache.GetLocalEntries();
             var localFlowCount = flowCache.GetLocalSize();
 

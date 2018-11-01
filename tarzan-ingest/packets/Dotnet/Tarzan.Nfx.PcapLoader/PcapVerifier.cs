@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
+using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.PcapLoader
@@ -19,9 +21,8 @@ namespace Tarzan.Nfx.PcapLoader
         public int ChunkSize { get; set; } = CHUNK_SIZE;
 
         public IPEndPoint ClusterNode { get; set; } = new IPEndPoint(IPAddress.Loopback, DEFAULT_PORT);
-
-
         public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
+        public string FrameCacheName { get; set; } = null;
 
         public event ChunkCompletedHandler OnChunkLoaded;
         public event ChunkCompletedHandler OnChunkStored;
@@ -69,8 +70,8 @@ namespace Tarzan.Nfx.PcapLoader
         private async Task ProcessFile(IIgnite client, FileInfo fileInfo, FastPcapFileReaderDevice device)
         {
             device.Open();
-
-            var cache = client.GetOrCreateCache<int, Frame>(fileInfo.Name);
+            var frameKeyProvider = new FrameKeyProvider();
+            var cache = CacheFactory.GetOrCreateFrameCache(client, FrameCacheName ?? fileInfo.Name);
             RawCapture rawCapture = null;
             var frameIndex = 0;
             var currentChunkBytes = 0;
@@ -79,14 +80,14 @@ namespace Tarzan.Nfx.PcapLoader
             {
                 currentChunkBytes += rawCapture.Data.Length + 4 * sizeof(int);
 
-                var frame = new Frame
+                var frame = new FrameData
                 {
                     LinkLayer = (LinkLayerType)rawCapture.LinkLayerType,
                     Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
                     Data = rawCapture.Data
                 };
-
-                var storedFrame = cache.Get(frameIndex);
+                var frameKey = new FrameKey { FrameNumber = frameIndex, FlowKeyHash = frameKeyProvider.GetKeyHash(frame) };
+                var storedFrame = cache.Get(frameKey);
                 if (storedFrame == null) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, null);
                 if (storedFrame != null && frame.Timestamp != storedFrame.Timestamp) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, storedFrame);
 

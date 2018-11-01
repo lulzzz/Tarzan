@@ -54,7 +54,7 @@ namespace Tarzan.Nfx.Model.Cassandra
 
             CaptureTable = new Table<Model.Capture>(Session);
             CaptureTable.CreateIfNotExists();
-            FlowTable = new Table<Model.PacketFlow>(Session);
+            FlowTable = new Table<Model.FlowData>(Session);
             FlowTable.CreateIfNotExists();
             HostTable = new Table<Model.Host>(Session);
             HostTable.CreateIfNotExists();
@@ -83,7 +83,7 @@ namespace Tarzan.Nfx.Model.Cassandra
             }
         }
 
-        public Table<PacketFlow> FlowTable { get; private set; }
+        public Table<FlowData> FlowTable { get; private set; }
         public Table<Host> HostTable { get; private set; }
         public Table<Service> ServiceTable { get; private set; }
         public Table<DnsObject> DnsTable { get; private set; }

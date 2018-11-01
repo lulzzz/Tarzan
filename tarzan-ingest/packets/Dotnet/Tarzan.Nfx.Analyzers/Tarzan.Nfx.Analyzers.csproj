@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
-    <AssemblyVersion>1.0.0.*</AssemblyVersion>  
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>  
     <Deterministic>false</Deterministic>
   </PropertyGroup>
 
@@ -41,8 +41,14 @@
     <Folder Include="Tls\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="load-track-detect.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.json&quot; &quot;$(SolutionDir)out\server\&quot;" />
+    <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.json&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.cmd&quot; &quot;$(SolutionDir)out\server\&quot;" />
   </Target>
 
 </Project>

@@ -8,7 +8,7 @@ namespace Tarzan.Nfx.Analyzers.Commands
 {
     public class DetectServicesCommand : AbstractCommand
     {
-        public static string Name { get; private set; } = "detect-services";
+        public static string Name { get; private set; } = "Detect-Services";
 
         public DetectServicesCommand(CommandOption clusterOption) : base(clusterOption)
         {
@@ -17,13 +17,13 @@ namespace Tarzan.Nfx.Analyzers.Commands
         public override void Configuration(CommandLineApplication command)
         {
             command.Description = "Identifies all flows in the given captures.";
-            command.HelpOption("-?|-h|--help");
+            command.HelpOption("-?|-Help");
 
-            var readOption = command.Option("-r|--cache <CacheName>",
+            var readOption = command.Option("-FlowCache <CacheName>",
                 "A name of cache that contains source flows to be classified. Multiple values can be specified.",
                 CommandOptionType.MultipleValue);
 
-            var methodOption = command.Option("-m|--method <Method>",
+            var methodOption = command.Option("-Method <Method>",
                 "A name of the classification/detection method.",
                 CommandOptionType.MultipleValue);
 

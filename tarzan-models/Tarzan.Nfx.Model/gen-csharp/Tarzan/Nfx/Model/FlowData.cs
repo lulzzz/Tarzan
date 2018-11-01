@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.Model
   #if !SILVERLIGHT
   [Serializable]
   #endif
-  public partial class PacketFlow : TBase
+  public partial class FlowData : TBase
   {
     private string _FlowUid;
     private string _Protocol;
@@ -197,7 +197,7 @@ namespace Tarzan.Nfx.Model
       public bool ServiceName;
     }
 
-    public PacketFlow() {
+    public FlowData() {
     }
 
     public void Read (TProtocol iprot)

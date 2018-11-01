@@ -15,18 +15,18 @@ namespace Tarzan.Nfx.Analyzers.Commands
             
         }
 
-        public static string Name { get; private set; } = "track-flows";
+        public static string Name { get; private set; } = "Track-Flows";
 
         public override void Configuration(CommandLineApplication command)
         {
             command.Description = "Identifies all flows in the given captures.";
-            command.HelpOption("-?|-h|--help");
+            command.HelpOption("-?|-Help");
 
-            var readOption = command.Option("-r|--read <CacheName>",
+            var readOption = command.Option("-PacketCache <CacheName>",
                         "A name of cache that contains source frames. Multiple values can be specified.",
                         CommandOptionType.MultipleValue);
 
-            var writeOption = command.Option("-w|--write <CacheName>",
+            var writeOption = command.Option("-WriteTo <CacheName>",
                         "A Possibly fresh name of the cache that will be populated with identified flows.",
                         CommandOptionType.SingleValue);
 
@@ -42,7 +42,7 @@ namespace Tarzan.Nfx.Analyzers.Commands
         private int ExecuteCommand(IIgnite ignite, IEnumerable<string> input, string output)
         {
             var compute = ignite.GetCompute();   
-            var flowCache = ignite.GetOrCreateCache<FlowKey, PacketFlow>(output);
+            var flowCache = ignite.GetOrCreateCache<FlowKey, FlowData>(output);
             foreach (var cacheName in input)
             {
                 var frameCache = ignite.GetOrCreateCache<object, object>(cacheName);

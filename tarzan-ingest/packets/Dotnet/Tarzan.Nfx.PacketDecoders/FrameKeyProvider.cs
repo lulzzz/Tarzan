@@ -9,14 +9,14 @@ namespace Tarzan.Nfx.PacketDecoders
     /// fast method for getting flow key from Ethernet frames only.
     /// For general method to get flow key from any other link type use <see cref="PacketKeyProvider"/> class.
     /// </summary>
-    public class FrameKeyProvider : IKeyProvider<FlowKey, Frame>
+    public class FrameKeyProvider : IKeyProvider<FlowKey, FrameData>
     {                    
         /// <summary>
         /// Gets the flow key for the given frame.
         /// </summary>
         /// <param name="frame">Frame object.</param>
         /// <returns>The flow key for the passed frame.</returns>
-        public FlowKey GetKey(Frame frame)
+        public FlowKey GetKey(FrameData frame)
         {
             if (frame.LinkLayer == LinkLayerType.Ethernet)
             {
@@ -28,7 +28,7 @@ namespace Tarzan.Nfx.PacketDecoders
             }
         }
 
-        public int GetKeyHash(Frame frame)
+        public int GetKeyHash(FrameData frame)
         {
             var frameKey = GetKey(frame);
             return frameKey.HashCode;

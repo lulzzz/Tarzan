@@ -9,12 +9,13 @@ namespace Tarzan.Nfx.PcapLoader
     public delegate void FileOpenHandler(object sender, FileInfo fileInfo);
     public delegate void FileCompletedHandler(object sender, FileInfo fileInfo);
     public delegate void ChunkCompletedHandler(object sender, int chunkNumber, int chunkBytes);
-    public delegate void ErrorFrameHandler(object sender, FileInfo fileInfo, int frameNumber, Frame frame);
+    public delegate void ErrorFrameHandler(object sender, FileInfo fileInfo, int frameNumber, FrameData frame);
     public interface IPcapProcessor
     {
         int ChunkSize { get; set; }
         IPEndPoint ClusterNode { get; set; }
         IList<FileInfo> SourceFiles { get; }
+        string FrameCacheName { get; set; }
 
         event ChunkCompletedHandler OnChunkLoaded;
         event ChunkCompletedHandler OnChunkStored;

@@ -1,11 +1,8 @@
 ﻿using Apache.Ignite.Core.Binary;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Tarzan.Nfx.Model
 {
-    public partial class Frame : IBinarizable
+    public class FrameData : IBinarizable
     {
         public long Timestamp { get; set; }
 

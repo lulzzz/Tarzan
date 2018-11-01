@@ -8,14 +8,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Packets.Core;
 
-namespace Tarzan.Nfx.Ingest.Analyzers
+namespace Tarzan.Nfx.Analyzers
 {
     public class DnsAnalyzer : IComputeAction
-    {    
-        public static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, PacketFlow packetFlow, IEnumerable<Frame> frames)
+    {
+        [InstanceResource]
+        protected readonly IIgnite m_ignite;
+
+        public string FlowCacheName { get; }
+
+        public IEnumerable<string> FrameCacheNames { get; }
+
+        public string DnsCacheName { get; }
+
+        public DnsAnalyzer(string flowCacheName, IEnumerable<string> frameCacheNames, string dnsCacheName)
+        {
+            FlowCacheName = flowCacheName;
+            FrameCacheNames = frameCacheNames;
+            DnsCacheName = dnsCacheName;
+        }
+
+        public void Invoke()
+        {
+            Console.WriteLine($"Analyzing {FlowCacheName}...");
+            var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName);
+            var dnsObjectCache = CacheFactory.GetOrCreateCache<string, DnsObject>(m_ignite, DnsCacheName);
+
+            var frameProvider = new FrameCacheFlowProvider(m_ignite, FrameCacheNames);
+            foreach (var dnsFlow in flowCache.GetLocalEntries()
+                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                Console.Write($"Found DNS flow {dnsFlow.Key.ToString()}, getting frames...");
+                var frames = frameProvider.GetFrames(dnsFlow.Key);
+                Console.Write($"inspecting frames...");
+                var dnsObjects = Inspect(dnsFlow.Key, dnsFlow.Value, frames.Select(x => x.Value)).Select(x => KeyValuePair.Create(x.ObjectName, x)).ToList();
+                Console.Write($"done, found {dnsObjects.Count} items, storing to {DnsCacheName}...");
+                dnsObjectCache.PutAll(dnsObjects);
+                Console.WriteLine("ok.");
+            }
+        }
+
+        private static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, FlowData packetFlow, IEnumerable<FrameData> frames)
         {
             var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
             var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);
@@ -39,7 +76,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         }
 
 
-        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<Frame> packetList)
+        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<FrameData> packetList)
         {
             var result = new List<DnsObject>(); 
             foreach (var frame in packetList)
@@ -73,32 +110,6 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 }
             }
             return result;
-        }
-
-        [InstanceResource]
-        protected readonly IIgnite m_ignite;
-
-        public string FlowCacheName { get; }
-        public string DnsCacheName { get; }
-
-        public DnsAnalyzer(string flowCacheName, string dnsCacheName)
-        {
-            FlowCacheName = flowCacheName;
-            DnsCacheName = dnsCacheName;
-        }
-
-        public void Invoke()
-        {
-            var flowCache = m_ignite.GetCache<FlowKey,PacketFlow>(FlowCacheName); 
-            var dnsObjectCache = m_ignite.GetOrCreateCache<string, DnsObject>(DnsCacheName);
-
-            foreach (var dnsObject in flowCache.GetLocalEntries()
-                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                
-                //var dnsObjects = Inspect(dnsObject.Key, packetStream).Select(x => KeyValuePair.Create(x.ObjectName, x));
-                //dnsObjectCache.PutAll(dnsObjects);
-            }
         }
     }
 }

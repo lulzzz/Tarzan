@@ -12,10 +12,10 @@ namespace Tarzan.Nfx.Ignite
     /// because this filter is sent over the wire to remote nodes and needs to be serialized.
     /// </summary>
     [Serializable]
-    public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, Frame>
+    public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, FrameData>
     {
         public FlowKey FlowKey { get; set; }
-        public IKeyProvider<FlowKey, Frame> KeyProvider { get; set; }
+        public IKeyProvider<FlowKey, FrameData> KeyProvider { get; set; }
 
         public CacheEntryFrameFilter(FlowKey flowKey)
         {
@@ -27,7 +27,7 @@ namespace Tarzan.Nfx.Ignite
         {
         }
 
-        public bool Invoke(ICacheEntry<FrameKey, Frame> frame)
+        public bool Invoke(ICacheEntry<FrameKey, FrameData> frame)
         {
             return FlowKey.HashCode != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
         }

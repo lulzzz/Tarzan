@@ -24,12 +24,12 @@ namespace Tarzan.Nfx.Model
         /// Process a given frame.
         /// </summary>
         /// <param name="frame"></param>
-        void ProcessFrame(Frame frame);
+        void ProcessFrame(FrameData frame);
 
         /// <summary>
         /// Process all frames in the given collection.
         /// </summary>
         /// <param name="frames"></param>
-        void ProcessFrames(IEnumerable<Frame> frames);
+        void ProcessFrames(IEnumerable<FrameData> frames);
     }
 }

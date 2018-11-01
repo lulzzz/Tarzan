@@ -27,7 +27,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         }
 
         [HttpGet("range/{start}/count/{length}")]
-        public IEnumerable<PacketFlow> FetchRange(int start, int length)
+        public IEnumerable<FlowData> FetchRange(int start, int length)
         {
             return m_dataset.FlowTable.Execute().Skip(start).Take(length);
         }
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Dashboard.Controllers
         /// <param name="id">Flow record identifier.</param>
         /// <returns>A flow record of the specified id.</returns>
         [HttpGet("item/{uid}")]
-        public PacketFlow FetchRecordById(string uid)
+        public FlowData FetchRecordById(string uid)
         {
             return m_dataset.FlowTable.Where(x => x.FlowUid == uid).FirstOrDefault().Execute();
         }

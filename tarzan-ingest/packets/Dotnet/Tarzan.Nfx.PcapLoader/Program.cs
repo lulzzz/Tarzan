@@ -13,17 +13,18 @@ namespace Tarzan.Nfx.PcapLoader
         static void Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(true);
-            var chunkSizeArgument = commandLineApplication.Option("-s|--chunk", "A size of processing chunk. Packets are loaded and processed in chunks.", CommandOptionType.SingleValue);
-            var clusterArgument = commandLineApplication.Option("-c|--cluster", "Enpoint string of any cluster node.", CommandOptionType.SingleValue);
-            var fileArgument = commandLineApplication.Option("-f|--file", "Source pcap file(s) to be loaded to the cluster.", CommandOptionType.MultipleValue);
-            var folderArgument = commandLineApplication.Option("-g|--folder", "Folder where to read source pcap files to be loaded to the cluster.", CommandOptionType.MultipleValue);
-            var modeArgument = commandLineApplication.Option("-m|--mode", "Mode of loading data to cache. It can be either 'put' or 'stream'. Mode verify is available to test data integrity.", CommandOptionType.SingleValue);
-            var disableProgressBarArgument = commandLineApplication.Option("--disableProgressBar", "Disables progress bar.", CommandOptionType.NoValue);
+            var chunkSizeOption = commandLineApplication.Option("-ChunkSize", "A size of processing chunk. Packets are loaded and processed in chunks.", CommandOptionType.SingleValue);
+            var clusterOption = commandLineApplication.Option("-Cluster", "Enpoint string of any cluster node.", CommandOptionType.SingleValue);
+            var sourceFileOption = commandLineApplication.Option("-SourceFile", "Source pcap file to be loaded to the cluster.", CommandOptionType.MultipleValue);
+            var sourceFolderOption = commandLineApplication.Option("-SourceFolder", "Folder where to read source pcap files to be loaded to the cluster.", CommandOptionType.MultipleValue);
+            var modeOption = commandLineApplication.Option("-Mode", "Mode of loading data to Ignite cluster. It can be either 'put' or 'stream'. Mode verify is available to test data integrity.", CommandOptionType.SingleValue);
+            var writeToOption = commandLineApplication.Option("-WriteTo", "Name of the cache where the loader stores the loaded frames. If not specified, the cache will have the same name of the name of the source file.", CommandOptionType.SingleValue);
+            var disableProgressBarOption = commandLineApplication.Option("-DisableProgressBar", "Disables progress bar.", CommandOptionType.NoValue);
             commandLineApplication.OnExecute(async () =>
             {
-                var mode = modeArgument.HasValue() ? Enum.TryParse<ProgramMode>(modeArgument.Value(), true, out var parsedMode) ? parsedMode : ProgramMode.Put : ProgramMode.Put;
+                var mode = modeOption.HasValue() ? Enum.TryParse<ProgramMode>(modeOption.Value(), true, out var parsedMode) ? parsedMode : ProgramMode.Put : ProgramMode.Put;
 
-                if (fileArgument.HasValue() || folderArgument.HasValue())
+                if (sourceFileOption.HasValue() || sourceFolderOption.HasValue())
                 {
                     string verb = "";
                     IPcapProcessor loader = null;
@@ -34,22 +35,24 @@ namespace Tarzan.Nfx.PcapLoader
                         case ProgramMode.Verify: loader = new PcapVerifier(); verb = "Verifying"; break;
                         default: loader = new PcapLoader(); break;
                     }
-                    foreach (var file in fileArgument.Values)
+                    foreach (var file in sourceFileOption.Values)
                     {
                         if (File.Exists(file)) loader.SourceFiles.Add(new FileInfo(file));
                     }
-                    foreach (var folder in folderArgument.Values)
+                    foreach (var folder in sourceFolderOption.Values)
                     {
                         foreach (var file in Directory.EnumerateFiles(folder, "*.?cap"))
                         {
                             loader.SourceFiles.Add(new FileInfo(file));
                         }
                     }
-                    if (chunkSizeArgument.HasValue() && int.TryParse(chunkSizeArgument.Value(), out var chunkSize)) { loader.ChunkSize = chunkSize; }
+                    if (chunkSizeOption.HasValue() && int.TryParse(chunkSizeOption.Value(), out var chunkSize)) { loader.ChunkSize = chunkSize; }
 
-                    if (clusterArgument.HasValue())
+                    if (writeToOption.HasValue()) { loader.FrameCacheName = writeToOption.Value();  }
+
+                    if (clusterOption.HasValue())
                     {
-                        var ep = IPEndPointExtensions.Parse(clusterArgument.Value(), 0);
+                        var ep = IPEndPointExtensions.Parse(clusterOption.Value(), 0);
                         loader.ClusterNode = ep;
                     }
 
@@ -67,7 +70,7 @@ namespace Tarzan.Nfx.PcapLoader
                         ProgressCharacter = '─',
                         ProgressBarOnBottom = true
                     };
-                    if (disableProgressBarArgument.HasValue())
+                    if (disableProgressBarOption.HasValue())
                     {
                         await loader.Invoke();
                     }
@@ -111,7 +114,7 @@ namespace Tarzan.Nfx.PcapLoader
                                 storedBytes += chunkBytes;
                                 pbStore.Tick(storedBytes);
                             }
-                            void Loader_OnErrorFrame(object sender, FileInfo fileInfo, int frameNumber, Frame frame)
+                            void Loader_OnErrorFrame(object sender, FileInfo fileInfo, int frameNumber, FrameData frame)
                             {
                                 if (frame != null) errorBytes += frame.Data.Length + 32;
                                 errorPackets++;

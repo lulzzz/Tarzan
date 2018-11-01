@@ -1,9 +1,11 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Cache;
 using Apache.Ignite.Core.Cache.Query;
+using Apache.Ignite.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 
@@ -39,16 +41,29 @@ namespace Tarzan.Nfx.Analyzers
         /// </summary>
         /// <param name="flowKey">The key of the flow.</param>
         /// <returns>An enumeration of frames that belong to the given flow.</returns>
-        public IEnumerable<ICacheEntry<FrameKey, Frame>> GetFrames(FlowKey flowKey)
+        public IEnumerable<KeyValuePair<FrameKey, FrameData>> GetFrames(FlowKey flowKey)
         {
-            var scanQuery = new ScanQuery<FrameKey, Frame>(new CacheEntryFrameFilter(flowKey));
             foreach (var cacheName in FrameCacheNames)
             {
-                var frameCache = m_ignite.GetCache<FrameKey, Frame>(cacheName);
+                var frameCache = CacheFactory.GetOrCreateFrameCache(m_ignite, cacheName).AsCacheQueryable();
+                var queryResult = frameCache.Where(x => x.Key.FlowKeyHash == flowKey.HashCode);
+                foreach (var cacheEntry in queryResult)
+                {
+                    yield return KeyValuePair.Create(cacheEntry.Key, cacheEntry.Value);
+                }
+            }                                                                                                     
+        }
+
+        public IEnumerable<KeyValuePair<FrameKey, FrameData>> GetFramesByScan(FlowKey flowKey)
+        {
+            var scanQuery = new ScanQuery<FrameKey, FrameData>(new CacheEntryFrameFilter(flowKey));
+            foreach (var cacheName in FrameCacheNames)
+            {
+                var frameCache = CacheFactory.GetOrCreateFrameCache(m_ignite, cacheName);
                 var queryCursor = frameCache.Query(scanQuery);
                 foreach (var cacheEntry in queryCursor)
                 {
-                    yield return cacheEntry;
+                    yield return KeyValuePair.Create(cacheEntry.Key, cacheEntry.Value);
                 }
             }
         }
@@ -58,10 +73,10 @@ namespace Tarzan.Nfx.Analyzers
     /// This filter selects all frames of the specified flow.
     /// </summary>  
     [Serializable]
-    public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, Frame>
+    public class CacheEntryFrameFilter : ICacheEntryFilter<FrameKey, FrameData>
     {
         public FlowKey FlowKey { get; set; }
-        public IKeyProvider<FlowKey, Frame> KeyProvider { get; set; }
+        public IKeyProvider<FlowKey, FrameData> KeyProvider { get; set; }
 
         public CacheEntryFrameFilter(FlowKey flowKey)
         {
@@ -73,7 +88,7 @@ namespace Tarzan.Nfx.Analyzers
         {
         }
 
-        public bool Invoke(ICacheEntry<FrameKey, Frame> frame)
+        public bool Invoke(ICacheEntry<FrameKey, FrameData> frame)
         {
             return FlowKey.HashCode != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
         }

@@ -12,24 +12,24 @@ namespace Tarzan.Nfx.Utils
     /// As a further optimization we may consider the method used by DPDK:
     /// https://dpdk.readthedocs.io/en/v16.04/prog_guide/hash_lib.html#hash-api-overview.
     /// </remarks>
-    public partial class FlowTracker : IFlowTracker<PacketFlow>
+    public partial class FlowTracker : IFlowTracker<FlowData>
     {
         /// <summary>
         /// Gets the dictionary of all existing flows.
         /// </summary>
-        public Dictionary<FlowKey, PacketFlow> FlowTable { get; private set; }
+        public Dictionary<FlowKey, FlowData> FlowTable { get; private set; }
 
-        IKeyProvider<FlowKey, Frame> m_keyProvider;
+        IKeyProvider<FlowKey, FrameData> m_keyProvider;
         /// <summary>
         /// Gets the number of packets that were processed since this object was created.
         /// </summary>
         public int TotalFrameCount { get; private set; }
 
-        IDictionary<FlowKey, PacketFlow> IFlowTracker<PacketFlow>.FlowTable => FlowTable;
+        IDictionary<FlowKey, FlowData> IFlowTracker<FlowData>.FlowTable => FlowTable;
 
-        public FlowTracker(IKeyProvider<FlowKey, Frame> keyProvider)
+        public FlowTracker(IKeyProvider<FlowKey, FrameData> keyProvider)
         {
-            FlowTable = new Dictionary<FlowKey, PacketFlow>();
+            FlowTable = new Dictionary<FlowKey, FlowData>();
             m_keyProvider = keyProvider;
         }
 
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Utils
         /// <summary>
         /// Processes the provided packet and creates or updates the corresponding flow.
         /// </summary>
-        public void ProcessFrame(Frame frame)
+        public void ProcessFrame(FrameData frame)
         {
             if (frame == null) return;
             TotalFrameCount++;
@@ -53,9 +53,9 @@ namespace Tarzan.Nfx.Utils
             }
         }
 
-        private PacketFlow PacketFlowFrom(FlowKey flowKey, Frame frame, string flowUid)
+        private FlowData PacketFlowFrom(FlowKey flowKey, FrameData frame, string flowUid)
         {
-            return new PacketFlow()
+            return new FlowData()
             {
                 FlowUid = flowUid,
                 Protocol = flowKey.Protocol.ToString(),
@@ -69,7 +69,7 @@ namespace Tarzan.Nfx.Utils
                 Packets = 1
             };
         }
-        private PacketFlow PacketFlowUpdate(PacketFlow packetFlow, Frame frame)
+        private FlowData PacketFlowUpdate(FlowData packetFlow, FrameData frame)
         {
             packetFlow.FirstSeen = Math.Min(packetFlow.FirstSeen, frame.Timestamp);
             packetFlow.LastSeen = Math.Max(packetFlow.LastSeen, frame.Timestamp);
@@ -78,7 +78,7 @@ namespace Tarzan.Nfx.Utils
             return packetFlow;
         }
 
-        public void ProcessFrames(IEnumerable<Frame> frames)
+        public void ProcessFrames(IEnumerable<FrameData> frames)
         {
             foreach(var frame in frames)
             {

@@ -11,11 +11,12 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Utils;
 
-using FrameCache = Apache.Ignite.Core.Client.Cache.ICacheClient<Tarzan.Nfx.Model.FrameKey, Tarzan.Nfx.Model.Frame>;
+using FrameCache = Apache.Ignite.Core.Client.Cache.ICacheClient<Tarzan.Nfx.Model.FrameKey, Tarzan.Nfx.Model.FrameData>;
 
 namespace Tarzan.Nfx.PcapLoader
 {
@@ -30,6 +31,7 @@ namespace Tarzan.Nfx.PcapLoader
         public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
 
         public IPEndPoint ClusterNode { get; set; } = new IPEndPoint(IPAddress.Loopback, DEFAULT_PORT);
+        public string FrameCacheName { get; set; } = null; 
 
         public event FileOpenHandler OnFileOpen;
         public event FileCompletedHandler OnFileCompleted;
@@ -64,10 +66,10 @@ namespace Tarzan.Nfx.PcapLoader
             device.Open();
 
             var frameKeyProvider = new FrameKeyProvider();
-            var packetCache = client.GetOrCreateCache<FrameKey, Frame>(fileInfo.Name);
+            var packetCache = CacheFactory.GetOrCreateFrameCache(client, FrameCacheName ?? fileInfo.Name);
 
             var frameIndex = 0;
-            var frameArray = new KeyValuePair<FrameKey, Frame>[ChunkSize];
+            var frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
             var cacheStoreTask = Task.CompletedTask;
 
             var currentChunkBytes = 0;
@@ -77,7 +79,7 @@ namespace Tarzan.Nfx.PcapLoader
             {
                 currentChunkBytes += rawCapture.Data.Length + 4 * sizeof(int);
 
-                var frame = new Frame
+                var frame = new FrameData
                 {
                     LinkLayer = (LinkLayerType)rawCapture.LinkLayerType,
                     Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
@@ -92,7 +94,7 @@ namespace Tarzan.Nfx.PcapLoader
                 {
                     OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
                     cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(packetCache, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
-                    frameArray = new KeyValuePair<FrameKey, Frame>[ChunkSize];
+                    frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
                     currentChunkNumber++;
                     currentChunkBytes = 0;
                 }
@@ -106,12 +108,12 @@ namespace Tarzan.Nfx.PcapLoader
             device.Close();
         }
 
-        private Action<Task> CreateStoreAction(FrameCache packetCache, KeyValuePair<FrameKey, Frame>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private Action<Task> CreateStoreAction(FrameCache packetCache, KeyValuePair<FrameKey, FrameData>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
             return (t) => StoreChunk(packetCache, frameArray, count, currentChunkNumber, currentChunkBytes);
         }
 
-        private void StoreChunk(FrameCache packetCache, KeyValuePair<FrameKey, Frame>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private void StoreChunk(FrameCache packetCache, KeyValuePair<FrameKey, FrameData>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
             packetCache.PutAll(frameArray.Take(count));
             OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);

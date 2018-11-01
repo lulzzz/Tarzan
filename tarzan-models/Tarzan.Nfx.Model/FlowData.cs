@@ -9,14 +9,14 @@ namespace Tarzan.Nfx.Model
     /// <summary>
     /// Represents a single flow record.
     /// </summary>
-    public partial class PacketFlow : IBinarizable
+    public partial class FlowData : IBinarizable
     {
         public static string CACHE_NAME = "flowtable";
 
 
-        public static Map<PacketFlow> Mapping =>
-            new Map<PacketFlow>()
-                .TableName(Pluralizer.Pluralize(nameof(PacketFlow)))
+        public static Map<FlowData> Mapping =>
+            new Map<FlowData>()
+                .TableName(Pluralizer.Pluralize(nameof(FlowData)))
                 .PartitionKey(x => x.FlowUid)
                 .Column(f => f.SourceIpAddress, cc => cc.Ignore())
                 .Column(f => f.DestinationIpAddress, cc => cc.Ignore())

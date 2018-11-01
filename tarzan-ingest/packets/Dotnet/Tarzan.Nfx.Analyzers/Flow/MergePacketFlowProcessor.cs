@@ -7,9 +7,9 @@ namespace Tarzan.Nfx.Analyzers
 {
     public partial class FlowAnalyzer
     {
-        public class MergePacketFlowProcessor : ICacheEntryProcessor<FlowKey, PacketFlow, PacketFlow, PacketFlow>
+        public class MergePacketFlowProcessor : ICacheEntryProcessor<FlowKey, FlowData, FlowData, FlowData>
         {
-            public PacketFlow Process(IMutableCacheEntry<FlowKey, PacketFlow> entry, PacketFlow arg)
+            public FlowData Process(IMutableCacheEntry<FlowKey, FlowData> entry, FlowData arg)
             {
                 if (entry.Exists)
                 {
@@ -24,12 +24,12 @@ namespace Tarzan.Nfx.Analyzers
                 return null;
             }
 
-            public static PacketFlow Merge(PacketFlow flow1, PacketFlow flow2, string flowUid)
+            public static FlowData Merge(FlowData flow1, FlowData flow2, string flowUid)
             {
                 if (flow1 == null) throw new ArgumentNullException(nameof(flow1));
                 if (flow2 == null) throw new ArgumentNullException(nameof(flow2));
 
-                return new PacketFlow()
+                return new FlowData()
                 {
                     FlowUid = flowUid,
                     Protocol = flow1.Protocol,

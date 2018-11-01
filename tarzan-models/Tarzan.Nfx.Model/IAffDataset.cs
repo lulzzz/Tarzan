@@ -9,7 +9,7 @@ namespace Tarzan.Nfx.Model
         Table<Capture> CaptureTable { get; }
         Table<AffObject> CatalogueTable { get; }
         Table<DnsObject> DnsTable { get; }
-        Table<PacketFlow> FlowTable { get; }
+        Table<FlowData> FlowTable { get; }
         Table<Host> HostTable { get; }
         Table<HttpObject> HttpTable { get; }
         IMapper Mapper { get; }
