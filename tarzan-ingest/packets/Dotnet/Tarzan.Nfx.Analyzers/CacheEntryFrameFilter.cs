@@ -39,7 +39,7 @@ namespace Tarzan.Nfx.Analyzers
             m_compiledQueries = new Func<int, IQueryCursor<ICacheEntry<FrameKey, FrameData>>>[m_frameCacheNames.Length];
             for(int i = 0; i < m_frameCacheNames.Length; i++)
             {
-                var queryable = CacheFactory.GetOrCreateFrameCache(m_ignite, m_frameCacheNames[i]).AsCacheQueryable();
+                var queryable = CacheFactory.GetOrCreateFrameCache(m_ignite, m_frameCacheNames[i]).AsCacheQueryable(local: true);
                 m_compiledQueries[i] = CompiledQuery.Compile((int hashCode) => queryable.Where(x => x.Key.FlowKeyHash == hashCode));
             }
         }

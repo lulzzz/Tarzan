@@ -52,7 +52,7 @@ namespace Tarzan.Nfx.Analyzers
             }
         }
 
-        private static IEnumerable<Model.DnsObject> Inspect(FlowKey flowKey, FlowData packetFlow, IEnumerable<FrameData> frames)
+        private static IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData packetFlow, IEnumerable<FrameData> frames)
         {
             var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
             var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);
