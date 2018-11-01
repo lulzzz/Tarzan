@@ -14,6 +14,8 @@ namespace Tarzan.Nfx.Ignite
     {
         public static ICache<FrameKey, FrameData> GetOrCreateFrameCache(IIgnite ignite, string cacheName)
         {
+            return GetOrCreateCache<FrameKey, FrameData>(ignite, cacheName);
+            /*
             var cacheCfg = new CacheConfiguration()
             {
                 Name = cacheName,
@@ -30,10 +32,13 @@ namespace Tarzan.Nfx.Ignite
             };
 
             return ignite.GetOrCreateCache<FrameKey, FrameData>(cacheCfg);
+            */
         }
 
         public static ICacheClient<FrameKey, FrameData> GetOrCreateFrameCache(IIgniteClient ignite, string cacheName)
         {
+            return GetOrCreateCache<FrameKey, FrameData>(ignite, cacheName);
+            /*
             var cacheCfg = new CacheClientConfiguration()
             {
                 Name = cacheName,
@@ -50,6 +55,7 @@ namespace Tarzan.Nfx.Ignite
             };
 
             return ignite.GetOrCreateCache<FrameKey, FrameData>(cacheCfg);
+            */
         }
 
         public static ICache<FlowKey, FlowData> GetOrCreateFlowCache(IIgnite ignite, string cacheName)
@@ -69,7 +75,14 @@ namespace Tarzan.Nfx.Ignite
                 Name = cacheName,
                 CacheMode = CacheMode.Partitioned,
                 GroupName = typeof(TData).FullName,
-
+                QueryEntities = new[]
+                {
+                    new QueryEntity
+                    {
+                        KeyType = typeof(TKey),
+                        ValueType = typeof(TData),
+                    }
+                }
             };
 
             return ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
@@ -81,7 +94,14 @@ namespace Tarzan.Nfx.Ignite
                 Name = cacheName,
                 CacheMode = CacheMode.Partitioned,
                 GroupName = typeof(TData).FullName,
-                
+                QueryEntities = new[]
+                {
+                    new QueryEntity
+                    {
+                        KeyType = typeof(TKey),
+                        ValueType = typeof(TData),
+                    }
+                }
             };
 
             return ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
