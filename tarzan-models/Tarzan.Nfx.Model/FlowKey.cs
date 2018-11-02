@@ -116,8 +116,8 @@ namespace Tarzan.Nfx.Model
             fixed (byte* bytePtr = bytes)
             {
                 var intPtr = (int*)bytePtr;
-                return intPtr[0] ^ intPtr[1] ^ intPtr[2] ^ intPtr[3] ^ intPtr[4]
-                    ^ intPtr[5] ^ intPtr[6] ^ intPtr[7] ^ intPtr[8] ^ intPtr[9];
+                return (31 * (31 * (31 * (31 * (31 * (31 * (31 * (31 * (31 * intPtr[0] + intPtr[1]) + intPtr[2]) + intPtr[3]) + intPtr[4])
+                    + intPtr[5]) + intPtr[6]) + intPtr[7]) + intPtr[8]) + intPtr[9]);
             }
         }
 
