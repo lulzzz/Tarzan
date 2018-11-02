@@ -41,5 +41,10 @@ namespace Tarzan.Nfx.Model
                     && this.FlowKeyHash == other.FlowKeyHash;
             }
         }
+
+        public override int GetHashCode()
+        {
+            return HashCodeHelper.CombineHashCodes(FrameNumber.GetHashCode(), FlowKeyHash.GetHashCode());   
+        }
     }
 }

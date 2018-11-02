@@ -33,5 +33,13 @@ namespace Tarzan.Nfx.Model
                 && this.Timestamp == other.Timestamp
                 && new Span<byte>(this.Data).SequenceEqual(other.Data);
         }
+
+        // https://blogs.msdn.microsoft.com/ericlippert/2011/02/28/guidelines-and-rules-for-gethashcode/
+        public override int GetHashCode()
+        {
+            var fieldsHashCode = HashCodeHelper.CombineHashCodes(Timestamp.GetHashCode(),LinkLayer.GetHashCode());
+            var arrayHashCode = HashCodeHelper.ArrayHashCode(this.Data);
+            return HashCodeHelper.CombineHashCodes(fieldsHashCode, arrayHashCode);  
+        }
     }
 }
