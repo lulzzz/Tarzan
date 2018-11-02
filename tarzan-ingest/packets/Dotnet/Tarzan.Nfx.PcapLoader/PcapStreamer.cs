@@ -9,6 +9,7 @@ using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Ignite;
@@ -23,7 +24,7 @@ namespace Tarzan.Nfx.PcapLoader
         const int maxOnHeap = 1024;
         const int maxOffHeap = 1024;
         public const int DEFAULT_PORT = 47500;
-        public const int CHUNK_SIZE = 100;
+        public const int CHUNK_SIZE = 200;
         readonly ConsoleLogger m_logger = new ConsoleLogger("Loader", (s, ll) => true, true);
 
         public int ChunkSize { get; set; } = CHUNK_SIZE;
@@ -108,7 +109,7 @@ namespace Tarzan.Nfx.PcapLoader
                     {
                         OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
                         cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
-                        frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
+                        //frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
                         currentChunkNumber++;
                         currentChunkBytes = 0;
                     }
@@ -126,12 +127,14 @@ namespace Tarzan.Nfx.PcapLoader
             device.Close();
         }
 
-        private Action<Task> CreateStoreAction(IDataStreamer<FrameKey, FrameData> dataStreamer, ICollection<KeyValuePair<FrameKey, FrameData>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private Action<Task> CreateStoreAction(IDataStreamer<FrameKey, FrameData> dataStreamer, KeyValuePair<FrameKey, FrameData>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
-            return async (t) => await StoreChunk(dataStreamer, frameArray, count, currentChunkNumber, currentChunkBytes);
+            var buffer = new KeyValuePair<FrameKey, FrameData>[count];
+            Array.Copy(frameArray, buffer, count);
+            return async (t) => await StoreChunk(dataStreamer, buffer, currentChunkNumber, currentChunkBytes);
         }
 
-        private async Task StoreChunk(IDataStreamer<FrameKey, FrameData> dataStreamer, ICollection<KeyValuePair<FrameKey, FrameData>> frameArray, int count, int currentChunkNumber, int currentChunkBytes)
+        private async Task StoreChunk(IDataStreamer<FrameKey, FrameData> dataStreamer, KeyValuePair<FrameKey, FrameData>[] frameArray, int currentChunkNumber, int currentChunkBytes)
         {
             await dataStreamer.AddData(frameArray);
             OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);

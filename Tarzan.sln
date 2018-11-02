@@ -30,9 +30,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devnotes", "Devnotes", "{00
 		Ignite.md = Ignite.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Ignite", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj", "{B459F06A-6066-4037-B744-460E500A0AED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ignite", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj", "{B459F06A-6066-4037-B744-460E500A0AED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{D317B206-F11A-4593-B06C-70C0227E5A81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tarzan.Nfx.Ignite.Tests", "tarzan-ingest\packets\Dotnet\Tests\Tarzan.Nfx.Ignite.Tests\Tarzan.Nfx.Ignite.Tests.csproj", "{BF134A63-C674-42ED-9287-536F20C59DF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,10 @@ Global
 		{B459F06A-6066-4037-B744-460E500A0AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B459F06A-6066-4037-B744-460E500A0AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B459F06A-6066-4037-B744-460E500A0AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF134A63-C674-42ED-9287-536F20C59DF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF134A63-C674-42ED-9287-536F20C59DF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF134A63-C674-42ED-9287-536F20C59DF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF134A63-C674-42ED-9287-536F20C59DF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BBA8F935-1EB8-4666-BB50-8B3AAD118247} = {C2276483-C4A8-4F0D-A988-9DB081C10199}
 		{00CEB506-D543-41AC-B778-04FACC266316} = {F53B5D59-66A2-41B4-B468-B0CF42B32E4B}
+		{BF134A63-C674-42ED-9287-536F20C59DF9} = {C2276483-C4A8-4F0D-A988-9DB081C10199}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {43FA7675-4C85-4595-AA1D-085E54AC590E}

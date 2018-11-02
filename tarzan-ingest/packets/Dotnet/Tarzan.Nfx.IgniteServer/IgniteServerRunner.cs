@@ -15,10 +15,12 @@ using Tarzan.Nfx.Ignite;
 
 namespace Tarzan.Nfx.IgniteServer
 {
-    class IgniteServerRunner : IDisposable
+    public class IgniteServerRunner : IDisposable
     {
         private ConsoleLogger m_logger = new ConsoleLogger("Tarzan.IgniteServer", (s, ll) => true, true);
         private IgniteConfiguration m_igniteConfiguration;
+
+        public IIgnite Ignite { get; private set; }
 
         public IgniteServerRunner(string configurationFile=null)
         {
@@ -67,7 +69,7 @@ namespace Tarzan.Nfx.IgniteServer
 
         public void SetClusterEnpoints(ICollection<string> values)
         {
-            if (m_ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
+            if (Ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
             switch (m_igniteConfiguration.DiscoverySpi)
             {
                 case TcpDiscoverySpi tcpDiscoverySpi:
@@ -79,7 +81,7 @@ namespace Tarzan.Nfx.IgniteServer
 
         public void SetServerPort(int value)
         {
-            if (m_ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
+            if (Ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
             switch (m_igniteConfiguration.DiscoverySpi)
             {
                 case TcpDiscoverySpi tcpDiscoverySpi:
@@ -91,12 +93,12 @@ namespace Tarzan.Nfx.IgniteServer
 
         public void SetOnHeapMemoryLimit(int value)
         {
-            if (m_ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
+            if (Ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
             m_igniteConfiguration.JvmMaxMemoryMb = value;
         }
         public void SetOffHeapMemoryLimit(int value)
         {
-            if (m_ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
+            if (Ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
             if (m_igniteConfiguration?.DataStorageConfiguration?.DefaultDataRegionConfiguration != null)
             {
                 m_igniteConfiguration.DataStorageConfiguration.DefaultDataRegionConfiguration.MaxSize = (long)value * 1024 * 1024;
@@ -120,7 +122,7 @@ namespace Tarzan.Nfx.IgniteServer
         }
         public void SetConsistentId(string cid)
         {
-            if (m_ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
+            if (Ignite != null) throw new InvalidOperationException("Cannot configure running instances.");
             m_igniteConfiguration.ConsistentId = cid;
         }
 
@@ -129,36 +131,38 @@ namespace Tarzan.Nfx.IgniteServer
 
         }
 
-        IIgnite m_ignite;
         public async Task Run()
         {
             var tcs = new TaskCompletionSource<string>();
             m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server stopped.", null);
-
-            m_ignite = Ignition.Start(m_igniteConfiguration);                                                                                                                                                                                                      
+            Ignite = Ignition.Start(m_igniteConfiguration); 
+            
             var cts = new CancellationTokenSource();
-            m_ignite.Stopped += (s, e) => tcs.SetResult(e.ToString());
-            var localSpidPort = (m_ignite.GetConfiguration().DiscoverySpi as TcpDiscoverySpi).LocalPort;
+            Ignite.Stopped += (s, e) => tcs.SetResult(e.ToString());
+            var localSpidPort = (Ignite.GetConfiguration().DiscoverySpi as TcpDiscoverySpi).LocalPort;
             m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server is running (Local SpiDiscovery Port={localSpidPort}), press CTRL+C to terminate.", null);
             await tcs.Task;
             m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server stopped.", null);
         }
 
+        public void Terminate()
+        {            
+            Ignition.Stop(Ignite.Name, true);
+        }
         public void Stop()
         {
-            throw new NotImplementedException();
+            Ignition.Stop(Ignite.Name, false);            
         }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    m_ignite.Dispose();    
+                    Ignite.Dispose();    
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

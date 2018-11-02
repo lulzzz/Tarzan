@@ -29,7 +29,7 @@ namespace Tarzan.Nfx.Ignite
 
         public bool Invoke(ICacheEntry<FrameKey, FrameData> frame)
         {
-            return FlowKey.HashCode != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
+            return FlowKey.FlowKeyHash != frame.Key.FlowKeyHash ? false : FlowKey.Equals(KeyProvider.GetKey(frame.Value));
         }
     }
 }

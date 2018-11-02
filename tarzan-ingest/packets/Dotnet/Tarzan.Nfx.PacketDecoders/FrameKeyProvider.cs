@@ -31,7 +31,7 @@ namespace Tarzan.Nfx.PacketDecoders
         public int GetKeyHash(FrameData frame)
         {
             var frameKey = GetKey(frame);
-            return frameKey.HashCode;
+            return frameKey.FlowKeyHash;
         }
 
         /// <summary>

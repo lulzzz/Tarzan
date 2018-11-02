@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Apache.Ignite.Core;
 using Microsoft.Extensions.CommandLineUtils;
+using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Analyzers.Commands
@@ -39,11 +40,11 @@ namespace Tarzan.Nfx.Analyzers.Commands
             });
         }
 
-        private int ExecuteCommand(IIgnite ignite, IEnumerable<string> input, string output)
+        private int ExecuteCommand(IIgnite ignite, IEnumerable<string> sourceFrameCacheNames, string flowCacheName)
         {
             var compute = ignite.GetCompute();   
-            var flowCache = ignite.GetOrCreateCache<FlowKey, FlowData>(output);
-            foreach (var cacheName in input)
+            var flowCache = CacheFactory.GetOrCreateFlowCache(ignite, flowCacheName);
+            foreach (var cacheName in sourceFrameCacheNames)
             {
                 var frameCache = ignite.GetOrCreateCache<object, object>(cacheName);
                 Console.WriteLine($"Tracking flows in {cacheName}");
@@ -52,7 +53,7 @@ namespace Tarzan.Nfx.Analyzers.Commands
                 var flowAnalyzer = new FlowAnalyzer()
                 {
                     FrameCacheName = cacheName,
-                    FlowCacheName = output,
+                    FlowCacheName = flowCacheName,
                     Progress = new ConsoleProgressReport()
                 };
 

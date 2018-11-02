@@ -13,19 +13,34 @@ namespace Tarzan.Nfx.Model
     [Serializable]
     public class FlowKey : IBinarizable
     {
-        static class Fields
+        public byte[] Bytes { get; private set; }
+
+        [AffinityKeyMapped]
+        public int FlowKeyHash { get; private set; }
+
+        public FlowKey(byte[] bytes)
         {
-            internal const int ProtocolPosition = 0;
-            internal const int ProtocolFamilyPosition = 1;
-            internal const int SourceAddressPosition = 4;
-            internal const int SourcePortPosition = 20;
-            internal const int DestinationAddressPosition = 22;
-            internal const int DestinationPortPosition = 38;
+            if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
+            this.Bytes = bytes;
+            this.FlowKeyHash = GetHashCode(bytes);
         }
 
-        public byte[] Bytes { get; private set; }
-        [AffinityKeyMapped]
-        public int HashCode { get; private set; }
+        public void Reload(byte[] bytes)
+        {
+            if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
+            this.Bytes = bytes;
+            this.FlowKeyHash = GetHashCode(bytes);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.FlowKeyHash;
+        }
+
+        public override string ToString()
+        {
+            return $"{(ProtocolType)Protocol}:{SourceIpAddress}:{SourcePort}>{DestinationIpAddress}:{DestinationPort}";
+        }
 
         public override bool Equals(object obj)
         {
@@ -33,51 +48,43 @@ namespace Tarzan.Nfx.Model
             return Compare(this, that);
         }
 
-        public override int GetHashCode()
+        public FlowKey SwapEndpoints()
         {
-            return this.HashCode;
+            return Create((byte)this.Protocol, this.DestinationAddress, this.DestinationPort, this.SourceAddress, this.SourcePort);
         }
-        public override string ToString()
+
+        public void WriteBinary(IBinaryWriter writer)
         {
-            return $"{(ProtocolType)Protocol}:{SourceIpAddress}:{SourcePort}>{DestinationIpAddress}:{DestinationPort}";
+            writer.WriteByteArray(nameof(FlowKey.Bytes), this.Bytes);
+            writer.WriteInt(nameof(FlowKey.FlowKeyHash), this.FlowKeyHash);
+        }
+
+        public void ReadBinary(IBinaryReader reader)
+        {
+            this.Bytes = reader.ReadByteArray(nameof(FlowKey.Bytes));
+            this.FlowKeyHash = reader.ReadInt(nameof(FlowKey.FlowKeyHash));
         }
 
         public IPAddress SourceIpAddress => new IPAddress(SourceAddress.ToArray());
-
         public IPAddress DestinationIpAddress => new IPAddress(DestinationAddress.ToArray());
 
-        public FlowKey(byte[] bytes)
-        {
-            if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
-            this.Bytes = bytes;
-            this.HashCode = GetHashCode(bytes);
-        }
-
-        public void Reload(byte[] bytes)
-        {
-            if (bytes.Length != 40) throw new ArgumentException("Invalid size of input array. Must be exactly 40 bytes.");
-            this.Bytes = bytes;
-            this.HashCode = GetHashCode(bytes);
-        }
-
         public ProtocolType Protocol => (ProtocolType)Bytes[Fields.ProtocolPosition];
-        internal Span<Byte> ProtocolByte => new Span<byte>(Bytes,Fields.ProtocolPosition, 1);
-
+        internal Span<byte> ProtocolByte => new Span<byte>(Bytes,Fields.ProtocolPosition, 1);
 
         public ProtocolFamily ProtocolFamily => (ProtocolFamily)Bytes[Fields.ProtocolFamilyPosition];
-         Span<Byte> ProtocolFamilyByte => new Span<byte>(Bytes,Fields.ProtocolFamilyPosition, 1);
+         Span<byte> ProtocolFamilyByte => new Span<byte>(Bytes,Fields.ProtocolFamilyPosition, 1);
 
         public ReadOnlySpan<byte> SourceAddress => new Span<byte>(Bytes, Fields.SourceAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
          Span<byte> SourceAddressBytes => new Span<byte>(Bytes, Fields.SourceAddressPosition, 16);
 
         public ReadOnlySpan<byte> DestinationAddress => new Span<byte>(Bytes, Fields.DestinationAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
-         Span<Byte> DestinationAddressBytes => new Span<byte>(Bytes, Fields.DestinationAddressPosition, 16);
+         Span<byte> DestinationAddressBytes => new Span<byte>(Bytes, Fields.DestinationAddressPosition, 16);
 
-        public UInt16 SourcePort => BinaryPrimitives.ReadUInt16BigEndian(SourcePortBytes);
-         Span<Byte> SourcePortBytes => new Span<byte>(Bytes, Fields.SourcePortPosition ,2);
+        public ushort SourcePort => BinaryPrimitives.ReadUInt16BigEndian(SourcePortBytes);
+         Span<byte> SourcePortBytes => new Span<byte>(Bytes, Fields.SourcePortPosition ,2);
 
-        public UInt16 DestinationPort => BinaryPrimitives.ReadUInt16BigEndian(DestinationPortBytes);
-         Span<Byte> DestinationPortBytes => new Span<byte>(Bytes, Fields.DestinationPortPosition, 2);
+        public ushort DestinationPort => BinaryPrimitives.ReadUInt16BigEndian(DestinationPortBytes);
+         Span<byte> DestinationPortBytes => new Span<byte>(Bytes, Fields.DestinationPortPosition, 2);
 
         public IPEndPoint SourceEndpoint => new IPEndPoint(new IPAddress(SourceAddress.ToArray()), SourcePort);
         public IPEndPoint DestinationEndpoint => new IPEndPoint(new IPAddress(DestinationAddress.ToArray()), DestinationPort);
@@ -91,11 +98,17 @@ namespace Tarzan.Nfx.Model
             destinationAddress.CopyTo(new Span<byte>(bytes, Fields.DestinationAddressPosition, 16));
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.SourcePortPosition, 2), sourcePort);
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.DestinationPortPosition, 2), destinationPort);
-            return new FlowKey(bytes);
+            return new FlowKey(bytes);  
         }
+
+        public static FlowKey Create(ProtocolType protocol, IPAddress sourceAddress, int sourcePort, IPAddress destinationAddress, int destinationPort)
+        {
+            return Create((byte)protocol, sourceAddress.GetAddressBytes(), (ushort)sourcePort, destinationAddress.GetAddressBytes(), (ushort)destinationPort);
+        }
+
         public static bool Compare(FlowKey f1, FlowKey f2)
         {
-            return f1.HashCode == f2.HashCode && new Span<byte>(f1.Bytes).SequenceEqual(f2.Bytes);
+            return f1.FlowKeyHash == f2.FlowKeyHash && new Span<byte>(f1.Bytes).SequenceEqual(f2.Bytes);
         }
 
         private static unsafe int GetHashCode(Span<byte> bytes)
@@ -108,22 +121,14 @@ namespace Tarzan.Nfx.Model
             }
         }
 
-
-        public FlowKey SwapEndpoints()
+        static class Fields
         {
-            return FlowKey.Create((byte)this.Protocol, this.DestinationAddress, this.DestinationPort, this.SourceAddress, this.SourcePort);
-        }
-
-        public void WriteBinary(IBinaryWriter writer)
-        {
-            writer.WriteByteArray(nameof(FlowKey.Bytes), this.Bytes);
-            writer.WriteInt(nameof(FlowKey.HashCode), this.HashCode);
-        }
-
-        public void ReadBinary(IBinaryReader reader)
-        {
-            this.Bytes = reader.ReadByteArray(nameof(FlowKey.Bytes)); 
-            this.HashCode = reader.ReadInt(nameof(FlowKey.HashCode));
+            internal const int ProtocolPosition = 0;
+            internal const int ProtocolFamilyPosition = 1;
+            internal const int SourceAddressPosition = 4;
+            internal const int SourcePortPosition = 20;
+            internal const int DestinationAddressPosition = 22;
+            internal const int DestinationPortPosition = 38;
         }
     }
 }

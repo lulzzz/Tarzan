@@ -8,9 +8,11 @@ using System.Text;
 namespace Tarzan.Nfx.Model
 {
     [Serializable]
-    public struct FrameKey : IBinarizable
+    public class FrameKey : IBinarizable
     {
+        [QuerySqlField()]
         public int FrameNumber { get; set; }
+
         [AffinityKeyMapped]
         [QuerySqlField(IsIndexed=true)]
         public int FlowKeyHash { get; set; }
@@ -25,6 +27,19 @@ namespace Tarzan.Nfx.Model
         {
             writer.WriteInt(nameof(FrameNumber), FrameNumber);
             writer.WriteInt(nameof(FlowKeyHash), FlowKeyHash);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is FrameKey other))
+            {
+                return false;
+            }
+            else
+            {
+                return this.FrameNumber == other.FrameNumber
+                    && this.FlowKeyHash == other.FlowKeyHash;
+            }
         }
     }
 }

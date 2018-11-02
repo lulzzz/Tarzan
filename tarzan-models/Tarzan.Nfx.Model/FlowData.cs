@@ -1,37 +1,38 @@
+using Apache.Ignite.Core.Binary;
+using Apache.Ignite.Core.Cache.Configuration;
 using System;
 using System.Net;
-using Apache.Ignite.Core.Binary;
-using Cassandra.Mapping;
-using Newtonsoft.Json;
 
 namespace Tarzan.Nfx.Model
 {
     /// <summary>
     /// Represents a single flow record.
     /// </summary>
+    [Serializable]
     public partial class FlowData : IBinarizable
     {
-        public static string CACHE_NAME = "flowtable";
-
-
-        public static Map<FlowData> Mapping =>
-            new Map<FlowData>()
-                .TableName(Pluralizer.Pluralize(nameof(FlowData)))
-                .PartitionKey(x => x.FlowUid)
-                .Column(f => f.SourceIpAddress, cc => cc.Ignore())
-                .Column(f => f.DestinationIpAddress, cc => cc.Ignore())
-                .Column(f => f.__isset, cc => cc.Ignore())
-                .Column(f => f.Protocol, cc => cc.WithSecondaryIndex())
-                .Column(f => f.SourceAddress, cc => cc.WithSecondaryIndex())
-                .Column(f => f.SourcePort, cc => cc.WithSecondaryIndex())
-                .Column(f => f.DestinationAddress, cc => cc.WithSecondaryIndex())
-                .Column(f => f.DestinationPort, cc => cc.WithSecondaryIndex());
-
-        public string ObjectName => $"urn:aff4:flow/{this.FlowUid}";
-        [JsonIgnore]
-        public IPAddress SourceIpAddress => IPAddress.Parse(this.SourceAddress);
-        [JsonIgnore]
-        public IPAddress DestinationIpAddress => IPAddress.Parse(this.DestinationAddress);
+        [QuerySqlField]
+        public string FlowUid { get; set; }
+        [QuerySqlField]
+        public string Protocol { get; set; }
+        [QuerySqlField]
+        public string SourceAddress { get; set; }
+        [QuerySqlField]
+        public int SourcePort { get; set; }
+        [QuerySqlField]
+        public string DestinationAddress { get; set; }
+        [QuerySqlField]
+        public int DestinationPort { get; set; }
+        [QuerySqlField]
+        public long FirstSeen { get; set; }
+        [QuerySqlField]
+        public long LastSeen { get; set; }
+        [QuerySqlField]
+        public int Packets { get; set; }
+        [QuerySqlField]
+        public long Octets { get; set; }
+        [QuerySqlField(IsIndexed = true)]
+        public string ServiceName { get; set; }
 
         public void ReadBinary(IBinaryReader reader)
         {
@@ -62,5 +63,11 @@ namespace Tarzan.Nfx.Model
             writer.WriteLong(nameof(Octets), Octets);
             writer.WriteString(nameof(ServiceName), ServiceName);
         }
+
+        public string ObjectName => $"urn:aff4:flow/{this.FlowUid}";
+
+        public IPAddress SourceIpAddress => IPAddress.Parse(this.SourceAddress);
+
+        public IPAddress DestinationIpAddress => IPAddress.Parse(this.DestinationAddress);
     }
 }

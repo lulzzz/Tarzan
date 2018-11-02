@@ -1,6 +1,7 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Resource;
+using Apache.Ignite.Linq;
 using Kaitai;
 using PacketDotNet;
 using System;
@@ -35,15 +36,15 @@ namespace Tarzan.Nfx.Analyzers
         public void Invoke()
         {
             Console.WriteLine($"Analyzing {FlowCacheName}...");
-            var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName);
+            var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName).AsCacheQueryable(local: true);            
+            var frameCache = new FrameCacheCollection(m_ignite, FrameCacheNames);
             var dnsObjectCache = CacheFactory.GetOrCreateCache<string, DnsObject>(m_ignite, DnsCacheName);
 
-            var frameProvider = new FrameCacheFlowProvider(m_ignite, FrameCacheNames);
-            foreach (var dnsFlow in flowCache.GetLocalEntries()
-                .Where(f => String.Equals("domain", f.Value.ServiceName, StringComparison.InvariantCultureIgnoreCase)))
+            var dnsFlows = flowCache.Where(f => f.Value.ServiceName == "domain");
+            foreach (var dnsFlow in dnsFlows)
             {
                 Console.Write($"Found DNS flow {dnsFlow.Key.ToString()}, getting frames...");
-                var frames = frameProvider.GetFrames(dnsFlow.Key);
+                var frames = frameCache.GetFrames(dnsFlow.Key);
                 Console.Write($"inspecting frames...");
                 var dnsObjects = Inspect(dnsFlow.Key, dnsFlow.Value, frames.Select(x => x.Value)).Select(x => KeyValuePair.Create(x.ObjectName, x)).ToList();
                 Console.Write($"done, found {dnsObjects.Count} items, storing to {DnsCacheName}...");
@@ -52,12 +53,12 @@ namespace Tarzan.Nfx.Analyzers
             }
         }
 
-        private static IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData packetFlow, IEnumerable<FrameData> frames)
+        private static IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData flowData, IEnumerable<FrameData> frames)
         {
-            var sourceEndpoint = new IPEndPoint(flowKey.SourceIpAddress, flowKey.SourcePort);
-            var destinationEndpoint = new IPEndPoint(flowKey.DestinationIpAddress, flowKey.DestinationPort);
+            var sourceEndpoint = flowKey.SourceEndpoint;
+            var destinationEndpoint = flowKey.DestinationEndpoint;
 
-            var flowId = packetFlow.FlowUid;
+            var flowId = flowData.FlowUid;
 
             // DNS response?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
@@ -67,7 +68,7 @@ namespace Tarzan.Nfx.Analyzers
             }
 
             // DNS request?
-            if (flowKey.Protocol == ProtocolType.Udp && destinationEndpoint.Port == 53)
+            if (flowKey.Protocol == ProtocolType.Udp && flowKey.DestinationPort == 53)
             {
                 var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, frames);
                 return dns;
@@ -89,7 +90,7 @@ namespace Tarzan.Nfx.Analyzers
                     var dnsPacket = new DnsPacket(stream);
                     foreach (var (answer, index) in dnsPacket.Answers.Select((x, i) => (x, i + 1)))
                     {
-                        var dnsModel = new Model.DnsObject
+                        var dnsObject = new Model.DnsObject
                         {
                             Client = client.ToString(),
                             Server = server.ToString(),
@@ -101,7 +102,7 @@ namespace Tarzan.Nfx.Analyzers
                             DnsQuery = answer.Name.DomainNameString,
                             DnsAnswer = answer.AnswerString,
                         };
-                        result.Add(dnsModel);
+                        result.Add(dnsObject);
                     }
                 }
                 catch(Exception)

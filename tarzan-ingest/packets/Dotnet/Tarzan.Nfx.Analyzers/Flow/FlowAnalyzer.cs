@@ -40,7 +40,7 @@ namespace Tarzan.Nfx.Analyzers
         /// <summary>
         /// Gets or sets the name of the flow cache.
         /// </summary>
-        public string FlowCacheName { get; set; } = FlowData.CACHE_NAME;
+        public string FlowCacheName { get; set; }
 
         [InstanceResource]
         private readonly IIgnite m_ignite;
