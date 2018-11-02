@@ -1,19 +1,8 @@
-﻿using Apache.Ignite.Core.Binary;
-using Apache.Ignite.Core.Cache.Query;
-using Apache.Ignite.Core.Cluster;
-using Apache.Ignite.Core.Compute;
-using Apache.Ignite.Core.Discovery.Tcp;
-using Apache.Ignite.Core.Discovery.Tcp.Static;
-using Apache.Ignite.Core.Resource;
-using Microsoft.Extensions.CommandLineUtils;
-using ShellProgressBar;
-using System.Linq;
-using System.Net;
+﻿using Microsoft.Extensions.CommandLineUtils;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using Tarzan.Nfx.Analyzers.Commands;
-using Tarzan.Nfx.Ignite;
-using Tarzan.Nfx.Model;
-using Tarzan.Nfx.PacketDecoders;
-using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.Analyzers
 {
@@ -24,8 +13,38 @@ namespace Tarzan.Nfx.Analyzers
     partial class Program
     {
         
+        static void SetupLogging()
+        {
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+            
+            // Step 2. Create targets
+            var consoleTarget = new ColoredConsoleTarget("console")
+            {
+                Layout = @"[${date:format=HH\:mm\:ss}] ${level}: ${message} ${exception}"
+            };
+            config.AddTarget(consoleTarget);
+
+            var fileTarget = new FileTarget("errorfile")
+            {
+                FileName = "${basedir}/Tarzan.Nfx.Analyzers.log",
+                Layout = "[${longdate}] ${level}: ${message}  ${exception}"
+            };
+            config.AddTarget(fileTarget);
+
+
+            // Step 3. Define rules            
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget); 
+
+            // Step 4. Activate the configuration
+            LogManager.Configuration = config;
+        }
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
+            SetupLogging();            
+            logger.Debug("Application started.");
+
             var commandLineApplication = new CommandLineApplication();
             commandLineApplication.Name = "Tarzan.Nfx.Analyzers";
             commandLineApplication.HelpOption("-?|-Help");
@@ -34,9 +53,9 @@ namespace Tarzan.Nfx.Analyzers
                 "Connection string must specify address and the Discovery Spi port of at least one node of a cluster.",
                 CommandOptionType.MultipleValue);
 
-            var traceOption = commandLineApplication.Option("-Trace", 
+            var LogLevel = commandLineApplication.Option("-LogLevel", 
                 "If set, it prints various trace information during execution.", 
-                CommandOptionType.NoValue);
+                CommandOptionType.SingleValue);
 
             commandLineApplication.Command(TrackFlowsCommand.Name, configuration: new TrackFlowsCommand(clusterOption).Configuration);
             commandLineApplication.Command(DetectServicesCommand.Name, configuration: new DetectServicesCommand(clusterOption).Configuration);
@@ -57,6 +76,7 @@ namespace Tarzan.Nfx.Analyzers
                 commandLineApplication.Error.WriteLine($"Error: {e.Message}");
                 commandLineApplication.ShowHelp();
             }
+            logger.Debug("Application ended.");
         }
     }
 }

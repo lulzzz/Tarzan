@@ -1,11 +1,14 @@
 ﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Cache;
+using Apache.Ignite.Core.Cache.Query;
 using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Datastream;
 using Apache.Ignite.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Tarzan.Nfx.Ignite;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
@@ -55,15 +58,13 @@ namespace Tarzan.Nfx.Analyzers
         /// </summary>
         public void Invoke()
         {
-            Console.WriteLine("FlowAnalyzer is running...");
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Starting compute action {nameof(FlowAnalyzer)}...", null, null, null, null, null);
             var progress = new ProgressRecord() { ElapsedTime = new Stopwatch() };
             progress.ElapsedTime.Start();
-            Console.WriteLine($"Tracking flows in {FrameCacheName}...");
-            var flowTracker = TrackFlows(progress);
-            Console.WriteLine($"Writing flows to {FlowCacheName}...");
+            var flowTracker = TrackFlowsUsingQuery(progress);
             PopulateFlowTable(flowTracker, progress);                            
             progress.ElapsedTime.Stop();
-            Console.WriteLine($"FlowAnalyzer completed, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.");
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"{nameof(FlowAnalyzer)} completed, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.", null, null, null, null, null);
         }
 
         private IFlowTracker<FlowData> TrackFlows(ProgressRecord progressRecord)
@@ -79,6 +80,36 @@ namespace Tarzan.Nfx.Analyzers
                 foreach (var frame in cache.GetLocalEntries())
                 {
                     flowTracker.ProcessFrame(frame.Value);
+                    if (++framesCount % ProgressFrameBatch == 0)
+                    {
+                        progressRecord.CompletedFrames += ProgressFrameBatch;
+                        Progress?.Report(progressRecord);
+                    }
+                }
+                progressRecord.CompletedFrames += framesCount % ProgressFrameBatch;
+                Progress?.Report(progressRecord);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+            }
+            return flowTracker;
+        }
+
+        private IFlowTracker<FlowData> TrackFlowsUsingQuery(ProgressRecord progressRecord)
+        {
+            var flowTracker = new FlowTracker(new FrameKeyProvider());
+            try
+            {
+                var cache = CacheFactory.GetOrCreateFrameCache(m_ignite, FrameCacheName);                
+                var query = new ScanQuery<FrameKey,FrameData>();
+                progressRecord.TotalFrames = cache.GetLocalSize();
+                Progress?.Report(progressRecord);
+
+                var framesCount = 0;
+                foreach (var cursor in cache.Query(query))
+                {
+                    flowTracker.ProcessFrame(cursor.Value);
                     if (++framesCount % ProgressFrameBatch == 0)
                     {
                         progressRecord.CompletedFrames += ProgressFrameBatch;
@@ -125,19 +156,36 @@ namespace Tarzan.Nfx.Analyzers
                 dataStreamer.Flush();
             }
         }
+
+        [Serializable]
+        public sealed class FrameStreamVisitor : IStreamReceiver<FrameKey, FrameData>
+        {
+            private readonly FlowTracker m_flowTracker;
+
+            public FrameStreamVisitor(FlowTracker flowTracker)
+            {
+                m_flowTracker = flowTracker;
+            }
+
+            public void Receive(ICache<FrameKey, FrameData> cache, ICollection<ICacheEntry<FrameKey, FrameData>> entries)
+            {
+                m_flowTracker.ProcessFrames(entries.Select(x => x.Value));
+            }
+        }
+
         [Serializable]
         public sealed class FlowStreamVisitor : IStreamReceiver<FlowKey, FlowData>
         {
-            private MergePacketFlowProcessor updateProcessor;
+            private MergePacketFlowProcessor m_updateProcessor;
             public FlowStreamVisitor(MergePacketFlowProcessor updateProcessor)
             {
-                this.updateProcessor = updateProcessor;
+                this.m_updateProcessor = updateProcessor;
             }
             public void Receive(ICache<FlowKey, FlowData> cache, ICollection<ICacheEntry<FlowKey, FlowData>> entries)
             {
                 foreach (var entry in entries)
                 {
-                    cache.Invoke(entry.Key, updateProcessor, entry.Value);
+                    cache.Invoke(entry.Key, m_updateProcessor, entry.Value);
                 }
             }
         }

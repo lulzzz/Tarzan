@@ -1,23 +1,21 @@
 ﻿using Apache.Ignite.Core;
-using Apache.Ignite.Core.Binary;
 using Apache.Ignite.Core.Configuration;
 using Apache.Ignite.Core.Deployment;
 using Apache.Ignite.Core.Discovery.Tcp;
 using Apache.Ignite.Core.Discovery.Tcp.Multicast;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
-using Microsoft.Extensions.Logging.Console;
+using Apache.Ignite.NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Tarzan.Nfx.Ignite;
 
 namespace Tarzan.Nfx.IgniteServer
 {
     public class IgniteServerRunner : IDisposable
     {
-        private ConsoleLogger m_logger = new ConsoleLogger("Tarzan.IgniteServer", (s, ll) => true, true);
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();        
         private IgniteConfiguration m_igniteConfiguration;
 
         public IIgnite Ignite { get; private set; }
@@ -33,6 +31,7 @@ namespace Tarzan.Nfx.IgniteServer
             {
                 m_igniteConfiguration = GetDefaultConfiguration();
             }
+            m_igniteConfiguration.Logger = new IgniteNLogLogger();
         }
 
         private static IgniteConfiguration LoadConfiguration(string filename)
@@ -64,6 +63,7 @@ namespace Tarzan.Nfx.IgniteServer
                     }
                 }
             };
+            
             return cfg;
         }
 
@@ -134,15 +134,14 @@ namespace Tarzan.Nfx.IgniteServer
         public async Task Run()
         {
             var tcs = new TaskCompletionSource<string>();
-            m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server stopped.", null);
-            Ignite = Ignition.Start(m_igniteConfiguration); 
-            
+            logger.Info("Starting Ignite Server...");
+            Ignite = Ignition.Start(m_igniteConfiguration);
             var cts = new CancellationTokenSource();
             Ignite.Stopped += (s, e) => tcs.SetResult(e.ToString());
             var localSpidPort = (Ignite.GetConfiguration().DiscoverySpi as TcpDiscoverySpi).LocalPort;
-            m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server is running (Local SpiDiscovery Port={localSpidPort}), press CTRL+C to terminate.", null);
+            logger.Info($"Ignite server is running (Local SpiDiscovery Port={localSpidPort}), press CTRL+C to terminate.");
             await tcs.Task;
-            m_logger.WriteMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Status", 0, $"Ignite server stopped.", null);
+            logger.Info("Ignite server stopped.");
         }
 
         public void Terminate()

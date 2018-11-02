@@ -109,7 +109,6 @@ namespace Tarzan.Nfx.PcapLoader
                     {
                         OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
                         cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
-                        //frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
                         currentChunkNumber++;
                         currentChunkBytes = 0;
                     }

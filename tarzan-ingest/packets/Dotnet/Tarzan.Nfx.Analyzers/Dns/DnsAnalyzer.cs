@@ -3,6 +3,7 @@ using Apache.Ignite.Core.Compute;
 using Apache.Ignite.Core.Resource;
 using Apache.Ignite.Linq;
 using Kaitai;
+using NLog;
 using PacketDotNet;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace Tarzan.Nfx.Analyzers
 
         public void Invoke()
         {
-            Console.WriteLine($"Analyzing {FlowCacheName}...");
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} started.", null, null, nameof(DnsAnalyzer), "", null);
             var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName).AsCacheQueryable(local: true);            
             var frameCache = new FrameCacheCollection(m_ignite, FrameCacheNames);
             var dnsObjectCache = CacheFactory.GetOrCreateCache<string, DnsObject>(m_ignite, DnsCacheName);
@@ -43,17 +44,14 @@ namespace Tarzan.Nfx.Analyzers
             var dnsFlows = flowCache.Where(f => f.Value.ServiceName == "domain");
             foreach (var dnsFlow in dnsFlows)
             {
-                Console.Write($"Found DNS flow {dnsFlow.Key.ToString()}, getting frames...");
-                var frames = frameCache.GetFrames(dnsFlow.Key);
-                Console.Write($"inspecting frames...");
+                var frames = frameCache.GetFrames(dnsFlow.Key);                
                 var dnsObjects = Inspect(dnsFlow.Key, dnsFlow.Value, frames.Select(x => x.Value)).Select(x => KeyValuePair.Create(x.ObjectName, x)).ToList();
-                Console.Write($"done, found {dnsObjects.Count} items, storing to {DnsCacheName}...");
                 dnsObjectCache.PutAll(dnsObjects);
-                Console.WriteLine("ok.");
             }
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} completed.", null, null, nameof(DnsAnalyzer), "", null);
         }
 
-        private static IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData flowData, IEnumerable<FrameData> frames)
+        private IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData flowData, IEnumerable<FrameData> frames)
         {
             var sourceEndpoint = flowKey.SourceEndpoint;
             var destinationEndpoint = flowKey.DestinationEndpoint;
@@ -63,21 +61,21 @@ namespace Tarzan.Nfx.Analyzers
             // DNS response?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.SourcePort == 53)
             {
-                var dns = InspectPackets(destinationEndpoint, sourceEndpoint, flowId, frames);
+                var dns = ExtractDnsObjects(destinationEndpoint, sourceEndpoint, flowId, frames);
                 return dns;
             }
 
             // DNS request?
             if (flowKey.Protocol == ProtocolType.Udp && flowKey.DestinationPort == 53)
             {
-                var dns = InspectPackets(sourceEndpoint, destinationEndpoint, flowId, frames);
+                var dns = ExtractDnsObjects(sourceEndpoint, destinationEndpoint, flowId, frames);
                 return dns;
             }
             return Array.Empty<Model.DnsObject>();
         }
 
 
-        private static IEnumerable<Model.DnsObject> InspectPackets(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<FrameData> packetList)
+        private IEnumerable<Model.DnsObject> ExtractDnsObjects(System.Net.IPEndPoint client, System.Net.IPEndPoint server, string flowId, IEnumerable<FrameData> packetList)
         {
             var result = new List<DnsObject>(); 
             foreach (var frame in packetList)
@@ -88,14 +86,16 @@ namespace Tarzan.Nfx.Analyzers
                     var udpPacket = packet.Extract(typeof(UdpPacket)) as UdpPacket;
                     var stream = new KaitaiStream(udpPacket.PayloadData);
                     var dnsPacket = new DnsPacket(stream);
+                    var clientString = client.ToString();
+                    var serverString = server.ToString();
                     foreach (var (answer, index) in dnsPacket.Answers.Select((x, i) => (x, i + 1)))
                     {
                         var dnsObject = new Model.DnsObject
                         {
-                            Client = client.ToString(),
-                            Server = server.ToString(),
+                            Client = clientString,
+                            Server = serverString,
                             Timestamp = frame.Timestamp,
-                            FlowUid = flowId.ToString(),
+                            FlowUid = flowId,
                             TransactionId = $"{dnsPacket.TransactionId.ToString("X4")}-{index.ToString("D4")}",
                             DnsType = answer.Type.ToString().ToUpperInvariant(),
                             DnsTtl = answer.Ttl,
@@ -105,9 +105,9 @@ namespace Tarzan.Nfx.Analyzers
                         result.Add(dnsObject);
                     }
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
-                    // TODO: LOG Errors!
+                    m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Error, "InpsectPackets error", null, null, "Error", "", e);
                 }
             }
             return result;

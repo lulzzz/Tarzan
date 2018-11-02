@@ -11,6 +11,7 @@ namespace Tarzan.Nfx.Analyzers.Commands
 {
     class TrackFlowsCommand : AbstractCommand
     {
+        private static NLog.Logger m_logger = NLog.LogManager.GetCurrentClassLogger();
         public TrackFlowsCommand(CommandOption clusterOption)  : base(clusterOption)
         {
             
@@ -42,23 +43,21 @@ namespace Tarzan.Nfx.Analyzers.Commands
 
         private int ExecuteCommand(IIgnite ignite, IEnumerable<string> sourceFrameCacheNames, string flowCacheName)
         {
+            
             var compute = ignite.GetCompute();   
             var flowCache = CacheFactory.GetOrCreateFlowCache(ignite, flowCacheName);
             foreach (var cacheName in sourceFrameCacheNames)
             {
                 var frameCache = ignite.GetOrCreateCache<object, object>(cacheName);
-                Console.WriteLine($"Tracking flows in {cacheName}");
-                Console.WriteLine($"Compute is {String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}");
-
+                m_logger.Info($"Tracking flows in frame cache:{cacheName}...");
                 var flowAnalyzer = new FlowAnalyzer()
                 {
                     FrameCacheName = cacheName,
                     FlowCacheName = flowCacheName,
-                    Progress = new ConsoleProgressReport()
                 };
 
                 compute.Broadcast(flowAnalyzer);
-                Console.WriteLine($"Processed frames={frameCache.GetSize()}, flows={flowCache.GetSize()}.");
+                m_logger.Info($"Tracking flows in frame cache:{cacheName} done, frames={frameCache.GetSize()}, flows={flowCache.GetSize()}.");
             }
             return 0;
         }

@@ -1,5 +1,7 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Discovery.Tcp.Multicast;
+using Apache.Ignite.NLog;
+using NLog;
 using System;
 using System.Collections.Generic;
 
@@ -7,9 +9,13 @@ namespace Tarzan.Nfx.Analyzers
 {
     public class IgniteClient : IDisposable
     {
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         const string DEFAULT_ENPOINTS = "127.0.0.1:47500";
         private readonly IgniteConfiguration m_cfg;
         private IIgnite m_ignite;
+        
+
         public IgniteClient(ICollection<string> endpoints = null)
         {
             if (endpoints == null)
@@ -26,12 +32,15 @@ namespace Tarzan.Nfx.Analyzers
                         Endpoints = endpoints
                     }
                 },
+                Logger = new IgniteNLogLogger()
             };
         }
 
         public void SetEndpoints(ICollection<string> endpoints)
         {
             if (m_ignite != null) throw new InvalidOperationException("Cannot set endpoints for running client.");
+
+            logger.Debug($"Set TcpDiscoverySpi endpoints: {String.Join(',',endpoints)}.");
             m_cfg.DiscoverySpi = new Apache.Ignite.Core.Discovery.Tcp.TcpDiscoverySpi
                 {
                     IpFinder = new TcpDiscoveryMulticastIpFinder
@@ -44,7 +53,9 @@ namespace Tarzan.Nfx.Analyzers
         public IIgnite Start()
         {
             Ignition.ClientMode = true;
+            logger.Trace("Starting Ignite Client...");
             m_ignite = Ignition.Start(m_cfg);
+            logger.Trace("...Ignite Client started.");
             return m_ignite;
         }
 
@@ -57,7 +68,10 @@ namespace Tarzan.Nfx.Analyzers
             {
                 if (disposing)
                 {
+                    logger.Trace("Disposing Ignite Client...");
                     m_ignite.Dispose();
+                    logger.Trace("...Ignite Client disposed.");
+
                 }
                 disposedValue = true;
             }

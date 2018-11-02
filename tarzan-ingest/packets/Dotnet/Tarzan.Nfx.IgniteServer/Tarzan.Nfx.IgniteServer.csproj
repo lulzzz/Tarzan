@@ -9,8 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Apache.Ignite" Version="2.6.0" />
     <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite.NLog" Version="2.6.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+    <PackageReference Include="NLog" Version="4.5.10" />
     <PackageReference Include="PacketDotNet" Version="0.19.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>

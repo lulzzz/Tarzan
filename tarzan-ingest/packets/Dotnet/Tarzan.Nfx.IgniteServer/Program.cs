@@ -1,4 +1,8 @@
 ﻿using Microsoft.Extensions.CommandLineUtils;
+using NLog;
+using NLog.Config;
+using NLog.Layouts;
+using NLog.Targets;
 using System;
 
 namespace Tarzan.Nfx.IgniteServer
@@ -13,6 +17,7 @@ namespace Tarzan.Nfx.IgniteServer
 
         static void Main(string[] args)
         {
+            SetupLogging();
             var commandLineApplication = new CommandLineApplication(true);
 
             var configFileArgument = commandLineApplication.Option("-f|--config", "XML configuration file. If not file is specified then default configuration is used.", CommandOptionType.SingleValue);
@@ -54,6 +59,33 @@ namespace Tarzan.Nfx.IgniteServer
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
                 commandLineApplication.ShowHelp();
             }
+        }
+
+        static void SetupLogging()
+        {
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+
+            // Step 2. Create targets
+            var consoleTarget = new ColoredConsoleTarget("console")
+            {
+                Layout = @"[${date:format=HH\:mm\:ss}] ${level}: ${message} ${exception}"
+            };
+            config.AddTarget(consoleTarget);
+
+            var fileTarget = new FileTarget("errorfile")
+            {
+                FileName = "${basedir}/Tarzan.Nfx.IgniteServer.log",
+                Layout = "[${longdate}] ${level}: ${message}  ${exception}"
+            };
+            config.AddTarget(fileTarget);
+
+
+            // Step 3. Define rules            
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget); // all to console
+
+            // Step 4. Activate the configuration
+            LogManager.Configuration = config;
         }
     }
 }

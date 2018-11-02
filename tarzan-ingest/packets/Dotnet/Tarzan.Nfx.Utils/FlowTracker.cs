@@ -32,7 +32,6 @@ namespace Tarzan.Nfx.Utils
             FlowTable = new Dictionary<FlowKey, FlowData>();
             m_keyProvider = keyProvider;
         }
-
         
         /// <summary>
         /// Processes the provided packet and creates or updates the corresponding flow.

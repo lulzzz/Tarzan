@@ -8,6 +8,8 @@ namespace Tarzan.Nfx.Analyzers.Commands
 {
     public class DetectServicesCommand : AbstractCommand
     {
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static string Name { get; private set; } = "Detect-Services";
 
         public DetectServicesCommand(CommandOption clusterOption) : base(clusterOption)
@@ -42,12 +44,10 @@ namespace Tarzan.Nfx.Analyzers.Commands
             foreach (var cacheName in sources)
             {
                 var flowCache = ignite.GetOrCreateCache<object, object>(cacheName);
-                Console.WriteLine($"Detecting services in {cacheName}");
-                Console.WriteLine($"Compute is {String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}");
-
+                logger.Info($"Detecting services in flow cache: {cacheName}...");                
                 var serviceDetector = new ServiceDetector(flowCache.Name);
                 compute.Broadcast(serviceDetector);
-                Console.WriteLine($"Completed, stats: flows={flowCache.GetSize()}.");
+                logger.Info($"Detecting services in flow cache: {cacheName} completed.");
             }
             return 0;
         }

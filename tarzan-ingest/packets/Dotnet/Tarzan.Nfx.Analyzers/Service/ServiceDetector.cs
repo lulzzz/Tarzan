@@ -30,16 +30,22 @@ namespace Tarzan.Nfx.Analyzers
             var localFlows = flowCache.GetLocalEntries();
             var localFlowCount = flowCache.GetLocalSize();
 
-            Console.WriteLine($"ServiceDetector: Processing {localFlowCount} local flows from {flowCache.Name}.");
-
-            var flows = localFlows.Select(x =>
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info,
+                $"Compute action {nameof(ServiceDetector)}: Processing {localFlowCount} local flows from {flowCache.Name}.",
+                null, null, null, null, null);
+            
+            var flows = localFlows.Select(entry =>
             {
-                var value = x.Value;
-                var conv = new Conversation<FlowKey> { ConversationKey = x.Key, Upflow = x.Key, Downflow = x.Key.SwapEndpoints() };
-                value.ServiceName = m_classifier.Match(conv)?.ProtocolName;
-                return KeyValuePair.Create(x.Key, value);
+                var value = entry.Value;
+                var conversation = new Conversation<FlowKey> { ConversationKey = entry.Key, Upflow = entry.Key, Downflow = entry.Key.SwapEndpoints() };
+                value.ServiceName = m_classifier.Match(conversation)?.ProtocolName;
+                return KeyValuePair.Create(entry.Key, value);
             });
             flowCache.PutAll(flows);
+
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info,
+                $"Compute action {nameof(ServiceDetector)}: Done.",
+                null, null, null, null, null);            
         }
     }
 }

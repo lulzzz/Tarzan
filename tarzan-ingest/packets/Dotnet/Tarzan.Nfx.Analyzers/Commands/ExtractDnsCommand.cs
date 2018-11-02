@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Apache.Ignite.Core;
+using Microsoft.Extensions.CommandLineUtils;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Apache.Ignite.Core;
-using Microsoft.Extensions.CommandLineUtils;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Analyzers.Commands
 {
     class ExtractDnsCommand : AbstractCommand
     {
+        private static NLog.Logger m_logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static string Name { get; private set; } = "Extract-Dns";
 
         public ExtractDnsCommand(CommandOption clusterOption) : base(clusterOption)
@@ -46,16 +48,17 @@ namespace Tarzan.Nfx.Analyzers.Commands
         private int ExecuteCommand(IIgnite ignite, List<string> flowCacheNames, List<string> packetCacheNames, string dnsOutCacheName)
         {
             var compute = ignite.GetCompute();
-            Console.WriteLine($"Compute is {String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}");
+            m_logger.Info($"Compute cluster nodes: [{String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}].");
 
             foreach (var flowCacheName in flowCacheNames)
             {
                 var dnsAnalyzer = new DnsAnalyzer(flowCacheName, packetCacheNames, dnsOutCacheName);
-                Console.Write($"Analyzing {flowCacheName}...");
+                m_logger.Info($"Source flow cache: {flowCacheName}.");
+                m_logger.Info($"Broadcasting compute action: {typeof(DnsAnalyzer).AssemblyQualifiedName}...");
                 compute.Broadcast(dnsAnalyzer);
-                Console.WriteLine("Done.");
+                m_logger.Info("Remote computation done.");
                 var dnsCache = ignite.GetOrCreateCache<string, DnsObject>(dnsOutCacheName);
-                Console.WriteLine($"Processed dns={dnsCache.GetSize()}.");
+                m_logger.Info($"Found {dnsCache.GetSize()} dns objects.");
             }
             return 0;
         }
