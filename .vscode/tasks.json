@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/tarzan-ingest/packets/Dotnet/Tests/PacketDecoders/PacketDecodersTest.csproj"
+                "${workspaceFolder}/Tarzan.sln"
             ],
             "problemMatcher": "$msCompile"
         }

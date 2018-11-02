@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C2276483-C4A8-4F0D-A988-9DB081C10199}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PacketDecodersTest", "tarzan-ingest\packets\Dotnet\Tests\PacketDecoders\PacketDecodersTest.csproj", "{BBA8F935-1EB8-4666-BB50-8B3AAD118247}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders.Tests", "tarzan-ingest\packets\Dotnet\Tests\Tarzan.Nfx.PacketDecoders.Tests\Tarzan.Nfx.PacketDecoders.Tests.csproj", "{BBA8F935-1EB8-4666-BB50-8B3AAD118247}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifiers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
 EndProject
