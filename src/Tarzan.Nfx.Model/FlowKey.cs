@@ -106,9 +106,22 @@ namespace Tarzan.Nfx.Model
             return Create((byte)protocol, sourceAddress.GetAddressBytes(), (ushort)sourcePort, destinationAddress.GetAddressBytes(), (ushort)destinationPort);
         }
 
-        public static bool Compare(FlowKey f1, FlowKey f2)
+        public static unsafe bool Compare(FlowKey f1, FlowKey f2)
         {
-            return f1.FlowKeyHash == f2.FlowKeyHash && new Span<byte>(f1.Bytes).SequenceEqual(f2.Bytes);
+            return (f1 == f2 ) 
+                || (f1.FlowKeyHash == f2.FlowKeyHash) && Compare(f1.Bytes,f2.Bytes);
+        }
+        private static unsafe bool Compare(Span<byte> bytes1, Span<byte> bytes2)
+        {
+                fixed(byte* ref1 = bytes1)
+                fixed(byte* ref2 = bytes2)
+                {
+                    var ptr1 = (ulong*) ref1;
+                    var ptr2 = (ulong*) ref2;
+                    return ptr1[0] == ptr2[0] && ptr1[1] == ptr2[1] && ptr1[2] == ptr2[2] 
+                    && ptr1[3] == ptr2[3] && ptr1[4] == ptr2[4]; 
+                }
+            
         }
 
         private static unsafe int GetHashCode(Span<byte> bytes)
