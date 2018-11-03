@@ -20,4 +20,7 @@ The structure of the solution is organized in the following top level folders:
 * lib - Things that can NEVER exist in a nuget package
 * artifacts - Build outputs go here. Doing a build.cmd/build.sh generates artifacts here (nupkgs, dlls, pdbs, etc.)
 * packages - NuGet packages
-* build - Build customizations (custom msbuild files/psake/fake/albacore/etc) scripts
+* build - Build customizations (custom msbuild files) scripts
+
+### Building
+Currently, building the solution means just to run ```dotnet build Tarzan.sln```.
