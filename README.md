@@ -1,4 +1,4 @@
-# TARZAN.NFX: A Network Forensix Platform
+# TARZAN.NFX: A Network Forensic Platform
 
 TARZAN.NFX is a distributed network forensics platform that aims to provide common functionality expected from a modern network forensic tool. The platform employs a distributed architecture that enables scaling and extensibility.
 The following technologies form the basic environment for implementation of the TARZAN.NFX:
@@ -23,4 +23,5 @@ The structure of the solution is organized in the following top level folders:
 * build - Build customizations (custom msbuild files) scripts
 
 ### Building
-Currently, building the solution means just to run ```dotnet build Tarzan.sln```.
+Currently, building the solution means just to run ```dotnet build Tarzan.sln```. By executing scripts build.cmd or
+build.sh the solution is compiled and binary files are copied to ```artifacts```.
