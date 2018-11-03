@@ -14,14 +14,17 @@ namespace Tarzan.Nfx.Model.Tests
     {
         byte[] flowKeyBytes;
         
-        HashAlgorithm murmurHash;
+        HashAlgorithm murmurHashSafe;
+        HashAlgorithm murmurHashUnsafe;
+        
         [GlobalSetup]
         public void Setup()
         {
             Random random = new Random();
             flowKeyBytes = new byte[40];
             random.NextBytes(flowKeyBytes);
-            murmurHash = Murmur.MurmurHash.Create32();
+            murmurHashSafe = Murmur.MurmurHash.Create32(managed:true);
+            murmurHashUnsafe = Murmur.MurmurHash.Create32(managed:false);
         }
 
 
@@ -56,9 +59,15 @@ namespace Tarzan.Nfx.Model.Tests
             }    
         }
         [Benchmark]
-        public int MurmurHash()
+        public int MurmurHashSafe()
         {
-            var bytes = murmurHash.ComputeHash(flowKeyBytes); 
+            var bytes = murmurHashSafe.ComputeHash(flowKeyBytes); 
+            return BitConverter.ToInt32(bytes,0);   
+        }
+        [Benchmark]
+        public int MurmurHashUnsafe()
+        {
+            var bytes = murmurHashUnsafe.ComputeHash(flowKeyBytes); 
             return BitConverter.ToInt32(bytes,0);   
         }
     }
