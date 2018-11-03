@@ -30,7 +30,7 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
   </ItemGroup>
   <!--
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

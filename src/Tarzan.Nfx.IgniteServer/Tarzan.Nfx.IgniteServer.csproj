@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj" />

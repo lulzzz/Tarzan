@@ -8,3 +8,16 @@ The following technologies form the basic environment for implementation of the 
 * Apache Spark -- provides a scalable data processing engine suitable for specific types of operations.
 
 * Cassandra -- provides persistence layer for data in rest.
+
+
+## Solution organization
+The structure of the solution is organized in the following top level folders:
+
+* src - Main projects (the product code)
+* tests - Test projects
+* docs - Documentation stuff, markdown files, help files etc.
+* samples (optional) - Sample projects
+* lib - Things that can NEVER exist in a nuget package
+* artifacts - Build outputs go here. Doing a build.cmd/build.sh generates artifacts here (nupkgs, dlls, pdbs, etc.)
+* packages - NuGet packages
+* build - Build customizations (custom msbuild files/psake/fake/albacore/etc) scripts

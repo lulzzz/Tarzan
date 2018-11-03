@@ -4,47 +4,35 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>  
-    <Deterministic>false</Deterministic>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="HttpAnalyzer.cs" />
-    <Compile Remove="Http\HttpAnalyzer.cs" />
-  </ItemGroup>
+    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+    <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
+    <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
+    <PackageReference Include="ShellProgressBar" Version="4.2.0" />
 
-  <ItemGroup>
-    <None Include="Http\HttpAnalyzer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Apache.Ignite.NLog" Version="2.6.0" />
     <PackageReference Include="NLog" Version="4.5.10" />
-    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
-    <PackageReference Include="ShellProgressBar" Version="4.2.0" />
-    <PackageReference Include="Tnidea.Thrift" Version="0.9.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
-    <ProjectReference Include="..\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj" />
-    <ProjectReference Include="..\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Tls\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="load-track-detect.cmd">
+    <None Update="load.cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="test.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

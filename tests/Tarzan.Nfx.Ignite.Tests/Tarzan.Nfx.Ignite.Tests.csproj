@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj" />
-    <ProjectReference Include="..\..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
+    <ProjectReference Include="..\..\src\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj" />
+    <ProjectReference Include="..\..\src\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
   </ItemGroup>
 
 </Project>

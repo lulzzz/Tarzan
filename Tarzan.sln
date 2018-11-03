@@ -3,29 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Dashboard", "tarzan-ui\Tarzan.Nfx.Dashboard\Tarzan.Nfx.Dashboard.csproj", "{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Dashboard", "src\Tarzan.Nfx.Dashboard\Tarzan.Nfx.Dashboard.csproj", "{C59D8FA4-A2D4-4B4E-BAC2-39185643F5A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Model", "tarzan-models\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj", "{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Model", "src\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj", "{8870EE12-981F-4DF6-9F02-7EEF4A3A869C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj", "{A0CE1828-D7F3-443B-A2AE-D4234366AA48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders", "src\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj", "{A0CE1828-D7F3-443B-A2AE-D4234366AA48}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders.Tests", "tarzan-ingest\packets\Dotnet\Tests\Tarzan.Nfx.PacketDecoders.Tests\Tarzan.Nfx.PacketDecoders.Tests.csproj", "{BBA8F935-1EB8-4666-BB50-8B3AAD118247}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PacketDecoders.Tests", "tests\Tarzan.Nfx.PacketDecoders.Tests\Tarzan.Nfx.PacketDecoders.Tests.csproj", "{BBA8F935-1EB8-4666-BB50-8B3AAD118247}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifiers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.ProtocolClassifiers", "src\Tarzan.Nfx.ProtocolClassifiers\Tarzan.Nfx.ProtocolClassifiers.csproj", "{26590C2F-A45F-43D7-8217-35D0C0919C81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Analyzers", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Analyzers\Tarzan.Nfx.Analyzers.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Analyzers", "src\Tarzan.Nfx.Analyzers\Tarzan.Nfx.Analyzers.csproj", "{415D3F97-0E70-462E-BE79-7896091B040C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PcapLoader", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.PcapLoader", "src\Tarzan.Nfx.PcapLoader\Tarzan.Nfx.PcapLoader.csproj", "{2F8CA150-97BC-4DFA-A3D1-2C7E7FC390F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Utils", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Utils", "src\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj", "{1917234A-541A-4C51-B8FB-57F70E9D6711}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.IgniteServer", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj", "{4AF54723-603F-4183-AFA1-D44B575CB0A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.IgniteServer", "src\Tarzan.Nfx.IgniteServer\Tarzan.Nfx.IgniteServer.csproj", "{4AF54723-603F-4183-AFA1-D44B575CB0A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ignite", "tarzan-ingest\packets\Dotnet\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj", "{B459F06A-6066-4037-B744-460E500A0AED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ignite", "src\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj", "{B459F06A-6066-4037-B744-460E500A0AED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ignite.Tests", "tarzan-ingest\packets\Dotnet\Tests\Tarzan.Nfx.Ignite.Tests\Tarzan.Nfx.Ignite.Tests.csproj", "{BF134A63-C674-42ED-9287-536F20C59DF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Ignite.Tests", "tests\Tarzan.Nfx.Ignite.Tests\Tarzan.Nfx.Ignite.Tests.csproj", "{BF134A63-C674-42ED-9287-536F20C59DF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Model.Tests", "tarzan-ingest\packets\Dotnet\Tests\Tarzan.Nfx.Model.Tests\Tarzan.Nfx.Model.Tests.csproj", "{1F0EC926-ABB9-4D36-BD27-DC4445F4FA91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarzan.Nfx.Model.Tests", "tests\Tarzan.Nfx.Model.Tests\Tarzan.Nfx.Model.Tests.csproj", "{1F0EC926-ABB9-4D36-BD27-DC4445F4FA91}"
 EndProject
 
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{F53B5D59-66A2-41B4-B468-B0CF42B32E4B}"
