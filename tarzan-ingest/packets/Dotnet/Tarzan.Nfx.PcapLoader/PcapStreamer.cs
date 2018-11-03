@@ -4,6 +4,7 @@ using Apache.Ignite.Core.Cache.Configuration;
 using Apache.Ignite.Core.Cluster;
 using Apache.Ignite.Core.Datastream;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
+using Apache.Ignite.NLog;
 using Microsoft.Extensions.Logging.Console;
 using SharpPcap;
 using System;
@@ -20,7 +21,8 @@ using Tarzan.Nfx.Utils;
 namespace Tarzan.Nfx.PcapLoader
 {
     public class PcapStreamer : IPcapProcessor
-    {
+    {   private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         const int maxOnHeap = 1024;
         const int maxOffHeap = 1024;
         public const int DEFAULT_PORT = 47500;
@@ -62,6 +64,7 @@ namespace Tarzan.Nfx.PcapLoader
                 },
             };
             Ignition.ClientMode = true;
+            cfg.Logger = new IgniteNLogLogger();
             using (var client = Ignition.Start(cfg))
             {
                 foreach (var fileInfo in SourceFiles)

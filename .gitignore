@@ -345,3 +345,4 @@ tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nf
 tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nfx.Ingest.pdb
 .vs/Tarzan/v15/.suo
 *.classname1
+.DS_Store

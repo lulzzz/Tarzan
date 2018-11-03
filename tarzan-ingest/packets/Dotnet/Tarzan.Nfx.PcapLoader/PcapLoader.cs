@@ -22,10 +22,11 @@ namespace Tarzan.Nfx.PcapLoader
 {
     public class PcapLoader : IPcapProcessor
     {
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         public const int DEFAULT_PORT = 10800;
         public const int CHUNK_SIZE = 100;
-        readonly ConsoleLogger m_logger = new ConsoleLogger("Loader", (s, ll) => true, true);
-
+    
         public int ChunkSize { get; set; } = CHUNK_SIZE;
 
         public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
@@ -44,11 +45,11 @@ namespace Tarzan.Nfx.PcapLoader
             var cfg = new IgniteClientConfiguration
             {
                 Host = ClusterNode.Address.ToString(),
-                Port = ClusterNode.Port !=0 ? ClusterNode.Port : DEFAULT_PORT
+                Port = ClusterNode.Port !=0 ? ClusterNode.Port : DEFAULT_PORT,
             };
-
             using (var client = Ignition.StartClient(cfg))
             {
+                
                 foreach (var fileInfo in SourceFiles)
                 {
                     OnFileOpen?.Invoke(this, fileInfo);

@@ -16,6 +16,9 @@
     <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
     <PackageReference Include="ShellProgressBar" Version="4.2.0" />
+
+    <PackageReference Include="Apache.Ignite.NLog" Version="2.6.0" />
+    <PackageReference Include="NLog" Version="4.5.10" />
   </ItemGroup>
 
   <ItemGroup>

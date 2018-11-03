@@ -93,6 +93,15 @@ namespace Tarzan.Nfx.Ignite.Tests
             Assert.NotEmpty(flow);
         }
 
+
+        [Fact,TestPriority(3)]
+        public void FooWhere()
+        {
+            var flows = CacheFactory.GetOrCreateFlowCache(m_igniteFixture.Server.Ignite, "flows");
+            var c = flows.AsCacheQueryable().Where((x)=> true).ToList();
+
+        }
+
         public void Dispose()
         {
 

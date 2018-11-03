@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.CommandLineUtils;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using ShellProgressBar;
 using System;
 using System.IO;
@@ -9,6 +12,7 @@ namespace Tarzan.Nfx.PcapLoader
 {
     class Program
     {
+
         enum ProgramMode { Put, Stream, Verify }
         static void Main(string[] args)
         {
@@ -72,10 +76,12 @@ namespace Tarzan.Nfx.PcapLoader
                     };
                     if (disableProgressBarOption.HasValue())
                     {
+                        SetupLogging(true);
                         await loader.Invoke();
                     }
                     else
                     {
+                        SetupLogging(false);
                         Console.Clear();
                         using (var pbar = new ProgressBar(loader.SourceFiles.Count, "", pbRootOptions))
                         {
@@ -153,6 +159,33 @@ namespace Tarzan.Nfx.PcapLoader
                 commandLineApplication.Error.WriteLine($"ERROR: {e.Message}");
                 commandLineApplication.ShowHelp();
             }
+        }
+        static void SetupLogging(bool logToConsole)
+        {
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+            
+            // Step 2. Create targets
+            var consoleTarget = new ColoredConsoleTarget("console")
+            {
+                Layout = @"[${date:format=HH\:mm\:ss}] ${level}: ${message} ${exception}"
+            };
+            config.AddTarget(consoleTarget);
+
+            var fileTarget = new FileTarget("errorfile")
+            {
+                FileName = "${basedir}/Tarzan.Nfx.PcapLoader.err",
+                Layout = "[${longdate}] ${level}: ${message}  ${exception}"
+            };
+            config.AddTarget(fileTarget);
+
+            config.AddRuleForOneLevel(LogLevel.Error, fileTarget);
+            // Step 3. Define rules     
+            if (logToConsole)       
+                config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget); 
+
+            // Step 4. Activate the configuration
+            LogManager.Configuration = config;
         }
     }
 }

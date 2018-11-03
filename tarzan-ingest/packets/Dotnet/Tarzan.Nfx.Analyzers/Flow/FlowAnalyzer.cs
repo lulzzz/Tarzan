@@ -33,8 +33,8 @@ namespace Tarzan.Nfx.Analyzers
         }
 
         public IProgress<ProgressRecord> Progress { get; set; } = null;
-        public int ProgressFrameBatch { get; set; } = 1000;
-        public int ProgressFlowBatch { get; set; } = 100;
+        public int ProgressFrameBatch { get; set; } = 10000;
+        public int ProgressFlowBatch { get; set; } = 1000;
 
         /// <summary>
         /// Gets or sets the name of the frame cache;
@@ -58,26 +58,28 @@ namespace Tarzan.Nfx.Analyzers
         /// </summary>
         public void Invoke()
         {
-            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Starting compute action {nameof(FlowAnalyzer)}...", null, null, null, null, null);
+            var frameCache = CacheFactory.GetOrCreateFrameCache(m_ignite, FrameCacheName);
+            
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Starting compute action {nameof(FlowAnalyzer)}, local frames={frameCache.GetLocalSize()}...", null, null, null, null, null);
             var progress = new ProgressRecord() { ElapsedTime = new Stopwatch() };
             progress.ElapsedTime.Start();
-            var flowTracker = TrackFlowsUsingQuery(progress);
+            var flowTracker = TrackFlows(frameCache, progress);
             PopulateFlowTable(flowTracker, progress);                            
             progress.ElapsedTime.Stop();
-            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"{nameof(FlowAnalyzer)} completed, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.", null, null, null, null, null);
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"{nameof(FlowAnalyzer)} completed, tracked frames={flowTracker.TotalFrameCount}, identified flows={flowTracker.FlowTable.Count}, time elapsed={progress.ElapsedTime.ElapsedMilliseconds}ms.", null, null, null, null, null);
         }
 
-        private IFlowTracker<FlowData> TrackFlows(ProgressRecord progressRecord)
+        private IFlowTracker<FlowData> TrackFlows(ICache<FrameKey,FrameData> frameCache, ProgressRecord progressRecord)
         {
             var flowTracker = new FlowTracker(new FrameKeyProvider());
             try
             {
-                var cache = CacheFactory.GetOrCreateFrameCache(m_ignite, FrameCacheName);
-                progressRecord.TotalFrames = cache.GetLocalSize();
+                
+                progressRecord.TotalFrames = frameCache.GetLocalSize();
                 Progress?.Report(progressRecord);
 
                 var framesCount = 0;
-                foreach (var frame in cache.GetLocalEntries())
+                foreach (var frame in frameCache.GetLocalEntries())
                 {
                     flowTracker.ProcessFrame(frame.Value);
                     if (++framesCount % ProgressFrameBatch == 0)

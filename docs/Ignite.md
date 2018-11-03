@@ -1,7 +1,20 @@
 # Apache Ignite
 
 ## Requirements
-Apache Ignite requires Java 8 to be installed. The latest release can be found here: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
+As of this writing, the currently available Ignite nuget version is 2.6 (https://www.nuget.org/packages/Apache.Ignite/).
+This version is built against the Java 8 and .NET Framework 4.6 and .NET Core 2.0. While most of the 
+features work with newer version, for full functionality the correct Java and .NET versions are necessary.
+
+### Java 
+Apache Ignite requires Java 8 to be installed. The latest release of Java 8 is labeled
+as  Java SE Development Kit 8u192 and can be downloaded from here: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
+
+### .NET Core SDK 
+The .NET is compiled against .NET Framework v4.6. and .NET Core 2.0. 
+It is thus necessary to have a correct version of .NET runtime and SDK. When .NET Core > 2.0 is used 
+some strange runtime errors may happend. The correct version is .NET Core 2.0 and it is avialable from the 
+archive: https://www.microsoft.com/net/download/dotnet-core/2.0 Note that the last .NET Core 2.0 runtime is denoted as 2.0.9 and 
+the correspoding SDK is 2.1.209.
 
 ## Deployment
 

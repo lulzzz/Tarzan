@@ -11,38 +11,11 @@ namespace Tarzan.Nfx.Analyzers
     /// To execute FlowTracker programatically from the code use: <code>compute.Broadcast(new FlowAnalyzer() { CacheName = cacheName });</code>
     /// </summary>
     partial class Program
-    {
-        
-        static void SetupLogging()
-        {
-            // Step 1. Create configuration object 
-            var config = new LoggingConfiguration();
-            
-            // Step 2. Create targets
-            var consoleTarget = new ColoredConsoleTarget("console")
-            {
-                Layout = @"[${date:format=HH\:mm\:ss}] ${level}: ${message} ${exception}"
-            };
-            config.AddTarget(consoleTarget);
-
-            var fileTarget = new FileTarget("errorfile")
-            {
-                FileName = "${basedir}/Tarzan.Nfx.Analyzers.log",
-                Layout = "[${longdate}] ${level}: ${message}  ${exception}"
-            };
-            config.AddTarget(fileTarget);
-
-
-            // Step 3. Define rules            
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget); 
-
-            // Step 4. Activate the configuration
-            LogManager.Configuration = config;
-        }
+    { 
         private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
-            SetupLogging();            
+            SetupLogging(true);            
             logger.Debug("Application started.");
 
             var commandLineApplication = new CommandLineApplication();
@@ -77,6 +50,33 @@ namespace Tarzan.Nfx.Analyzers
                 commandLineApplication.ShowHelp();
             }
             logger.Debug("Application ended.");
+        }
+        static void SetupLogging(bool logToConsole)
+        {
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+            
+            // Step 2. Create targets
+            var consoleTarget = new ColoredConsoleTarget("console")
+            {
+                Layout = @"[${date:format=HH\:mm\:ss}] ${level}: ${message} ${exception}"
+            };
+            config.AddTarget(consoleTarget);
+
+            var fileTarget = new FileTarget("errorfile")
+            {
+                FileName = "${basedir}/Tarzan.Nfx.Analyzers.err",
+                Layout = "[${longdate}] ${level}: ${message}  ${exception}"
+            };
+            config.AddTarget(fileTarget);
+
+            config.AddRuleForOneLevel(LogLevel.Error, fileTarget);
+            // Step 3. Define rules     
+            if (logToConsole)       
+                config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget); 
+
+            // Step 4. Activate the configuration
+            LogManager.Configuration = config;
         }
     }
 }
