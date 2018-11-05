@@ -10,6 +10,12 @@ namespace Tarzan.Nfx.Model
         public TFlowValue Downflow { get; set; }
 
         public Conversation() { }
+        public Conversation(FlowKey flowKey, TFlowValue upflow, TFlowValue downflow)
+        {
+            ConversationKey = flowKey;
+            Upflow = upflow;
+            Downflow = downflow;
+        }
         public Conversation(KeyValuePair<FlowKey, TFlowValue> x, KeyValuePair<FlowKey, TFlowValue> y)
         {
             if (x.Key.SourcePort > y.Key.SourcePort)
