@@ -16,11 +16,11 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class PacketCacheCollection 
     {
-        public static IEnumerable<FrameData> GetOrderedPackets(this IFrameCacheCollection<FlowKey> frameCacheCollection, FlowKey flowKey)
+        public static IEnumerable<FrameData> GetOrderedPackets(this IReferencedCache<FlowKey,FrameKey,FrameData> frameCacheCollection, FlowKey flowKey)
         {
-            return frameCacheCollection.GetFrames(flowKey).OrderBy(f=>f.Value.Timestamp).Select(f=>f.Value);
+            return frameCacheCollection.GetItems(flowKey).OrderBy(f=>f.Value.Timestamp).Select(f=>f.Value);
         }
-        public static Conversation<IEnumerable<FrameData>> GetConversation(this IFrameCacheCollection<FlowKey> frameCache, FlowKey flowKey)
+        public static Conversation<IEnumerable<FrameData>> GetConversation(this IReferencedCache<FlowKey,FrameKey,FrameData> frameCache, FlowKey flowKey)
         {
             var upflowPackets = frameCache.GetOrderedPackets(flowKey);
             var downflowPackets = frameCache.GetOrderedPackets(flowKey.SwapEndpoints());

@@ -11,15 +11,11 @@ using Tarzan.Nfx.PacketDecoders;
 
 namespace Tarzan.Nfx.Ignite
 {
-    public interface IFrameCacheCollection<TREFKEY>
-    {
-         IEnumerable<ICacheEntry<FrameKey,FrameData>> GetFrames(TREFKEY referenceKey);    
-    }
     /// <summary>
     /// It represents a collection of frame caches and provides 
     /// operations for accessing individual frames or group of frames.
     /// </summary>
-    public class FrameCacheCollection : IFrameCacheCollection<FlowKey>
+    public class FrameCacheCollection : IReferencedCache<FlowKey,FrameKey,FrameData>
     {
         private readonly IIgnite m_ignite;
         /// <summary>
@@ -70,7 +66,7 @@ namespace Tarzan.Nfx.Ignite
         /// </summary>
         /// <param name="flowKey">The key of the flow.</param>
         /// <returns>An enumeration of frames that belong to the given flow.</returns>
-        public IEnumerable<ICacheEntry<FrameKey, FrameData>> GetFrames(FlowKey flowKey)
+        public IEnumerable<ICacheEntry<FrameKey, FrameData>> GetItems(FlowKey flowKey)
         {
             var frameKeyProvider = new FrameKeyProvider();
             foreach (var compiledQuery in m_compiledQueries)

@@ -38,13 +38,13 @@ namespace Tarzan.Nfx.Analyzers
         {
             m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} started.", null, null, nameof(DnsAnalyzer), "", null);
             var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName).AsCacheQueryable(local: true);            
-            var frameCache = new FrameCacheCollection(m_ignite, FrameCacheNames);
+            var frameCache = CacheFactory.GetFrameCacheCollection(m_ignite, FrameCacheNames);
             var dnsObjectCache = CacheFactory.GetOrCreateCache<string, DnsObject>(m_ignite, DnsCacheName);
 
             var dnsFlows = flowCache.Where(f => f.Value.ServiceName == "domain");
             foreach (var dnsFlow in dnsFlows)
             {
-                var frames = frameCache.GetFrames(dnsFlow.Key);                
+                var frames = frameCache.GetItems(dnsFlow.Key);                
                 var dnsObjects = Inspect(dnsFlow.Key, dnsFlow.Value, frames.Select(x => x.Value)).Select(x => KeyValuePair.Create(x.ObjectName, x)).ToList();
                 dnsObjectCache.PutAll(dnsObjects);
             }
