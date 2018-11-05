@@ -16,11 +16,11 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class PacketCacheCollection 
     {
-        public static IEnumerable<FrameData> GetOrderedPackets(this FrameCacheCollection frameCacheCollection, FlowKey flowKey)
+        public static IEnumerable<FrameData> GetOrderedPackets(this IFrameCacheCollection<FlowKey> frameCacheCollection, FlowKey flowKey)
         {
             return frameCacheCollection.GetFrames(flowKey).OrderBy(f=>f.Value.Timestamp).Select(f=>f.Value);
         }
-        public static Conversation<IEnumerable<FrameData>> GetConversation(this FrameCacheCollection frameCache, FlowKey flowKey)
+        public static Conversation<IEnumerable<FrameData>> GetConversation(this IFrameCacheCollection<FlowKey> frameCache, FlowKey flowKey)
         {
             var upflowPackets = frameCache.GetOrderedPackets(flowKey);
             var downflowPackets = frameCache.GetOrderedPackets(flowKey.SwapEndpoints());
@@ -63,25 +63,25 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 
         public IEnumerable<HttpObject> ExtractHttpObjects(Conversation<IEnumerable<FrameData>> conversation)
         {
-            var transactions = GetHttpConnections(conversation);
+            var connections = GetHttpConnections(conversation);
 
-            foreach (var transaction in transactions)
+            foreach (var connection in connections)
             {
-                var theRequest = transaction.Request.FirstOrDefault();
-                var theResponse = transaction.Response.FirstOrDefault();
+                var theRequest = connection.Request.FirstOrDefault();
+                var theResponse = connection.Response.FirstOrDefault();
 
                 if (theRequest.Packet?.PacketType != HttpPacketType.Request) continue;
                 if (theResponse.Packet?.PacketType != HttpPacketType.Response) continue;
 
                 var (username, password) = ExtractCredentials(theRequest.Packet.Header.GetLine("Authorization"));
 
-                var requestBytes = transaction.Request.Select(x => x.Packet.Body.Bytes).ToList();
-                var responseBytes = transaction.Response.Select(x => x.Packet.Body.Bytes).ToList();
+                var requestBytes = connection.Request.Select(x => x.Packet.Body.Bytes).ToList();
+                var responseBytes = connection.Response.Select(x => x.Packet.Body.Bytes).ToList();
 
                 var httpInfo = new HttpObject
                 {
                     FlowUid = conversation.ConversationKey.ToString(),
-                    ObjectIndex = transaction.Index.ToString("D4"),
+                    ObjectIndex = connection.Index.ToString("D4"),
                     Timestamp = theRequest.Timeval.ToUnixTimeMilliseconds(),
                     Method = theRequest.Packet.Request.Command,
                     Version = theRequest.Packet.Request.Version,
@@ -108,21 +108,27 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             }
         }
 
-        private IEnumerable<HttpTransaction> GetHttpConnections(Conversation<IEnumerable<FrameData>> tcpConversation)
+        private IEnumerable<HttpConnection> GetHttpConnections(Conversation<IEnumerable<FrameData>> tcpConversation)
         {
             var requests = GetHttpMessages(tcpConversation.Upflow);
             var responses = GetHttpMessages(tcpConversation.Downflow);
-            var transactions = requests.Zip(responses, (request, response) => (Request: request, Response: response)).Select((item, index) => new HttpTransaction { Request = item.Request, Response = item.Response, Index = index + 1 });
+            var transactions = requests.Zip(responses, (request, response) => (Request: request, Response: response)).Select((item, index) => new HttpConnection { Request = item.Request, Response = item.Response, Index = index + 1 });
             return transactions;
         }
 
-        private List<HttpPacketList> GetHttpMessages(IEnumerable<FrameData> tcpFlow)
+        /// <summary>
+        /// Get the collection of HTTP messages for the given flow. Single flow 
+        /// can contain several messages if persistent HTTP mode is used.
+        /// </summary>
+        /// <param name="tcpFlow">Collection of flow's frames.</param>
+        /// <returns>A collection of HTTP messages.</returns>
+        private IEnumerable<HttpPacketList> GetHttpMessages(IEnumerable<FrameData> tcpFlow)
         {
-            List<HttpPacketList> Empty()
+            ICollection<HttpPacketList> Empty()
             {
                 return new List<HttpPacketList> { new HttpPacketList() };
             }
-            List<HttpPacketList> Accumulate(List<HttpPacketList> acc, (HttpPacket Packet, PosixTime Time) arg)
+            ICollection<HttpPacketList> Accumulate(ICollection<HttpPacketList> acc, (HttpPacket Packet, PosixTime Time) arg)
             {
                 if (arg.Packet.PacketType == HttpPacketType.Data)
                 {
@@ -159,7 +165,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         {
             var httpCache = CacheFactory.GetOrCreateCache<string, HttpObject>(m_ignite, HttpCacheName);
             var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName);
-            var frameCache = new FrameCacheCollection(m_ignite, FrameCacheNames, local:true);
+            var frameCache = CacheFactory.GetFrameCacheCollection(m_ignite, FrameCacheNames);
 
             var httpObjects = flowCache.GetLocalEntries()
                 .Where(f => String.Equals(f.Value.ServiceName, "www-http", StringComparison.InvariantCultureIgnoreCase))
@@ -174,7 +180,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
         class HttpPacketList : List<(HttpPacket Packet, PosixTime Timeval)>
         {
         }
-        struct HttpTransaction 
+        struct HttpConnection 
         {
             public HttpPacketList Request;
             public HttpPacketList Response;

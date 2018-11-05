@@ -106,5 +106,10 @@ namespace Tarzan.Nfx.Ignite
 
             return ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
         }
+
+        public static IFrameCacheCollection<FlowKey> GetFrameCacheCollection(IIgnite ignite, IEnumerable<string> frameCacheNames)
+        {
+            return new FrameCacheCollection(ignite, frameCacheNames);
+        }
     }
 }

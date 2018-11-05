@@ -3,6 +3,7 @@ using Apache.Ignite.Core.Cache;
 using Apache.Ignite.Core.Cache.Query;
 using Apache.Ignite.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Tarzan.Nfx.Model;
@@ -10,11 +11,15 @@ using Tarzan.Nfx.PacketDecoders;
 
 namespace Tarzan.Nfx.Ignite
 {
+    public interface IFrameCacheCollection<TREFKEY>
+    {
+         IEnumerable<ICacheEntry<FrameKey,FrameData>> GetFrames(TREFKEY referenceKey);    
+    }
     /// <summary>
     /// It represents a collection of frame caches and provides 
     /// operations for accessing individual frames or group of frames.
     /// </summary>
-    public class FrameCacheCollection
+    public class FrameCacheCollection : IFrameCacheCollection<FlowKey>
     {
         private readonly IIgnite m_ignite;
         /// <summary>
@@ -25,6 +30,8 @@ namespace Tarzan.Nfx.Ignite
         /// An array of compiled queries for all caches.
         /// </summary>
         private Func<int, IQueryCursor<ICacheEntry<FrameKey, FrameData>>>[] m_compiledQueries;
+
+        public IIgnite Ignite => m_ignite;
 
         /// <summary>
         /// Creates a new frame provider that searches for frames in the specified collection of caches.
