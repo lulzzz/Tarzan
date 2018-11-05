@@ -16,14 +16,15 @@ namespace Tarzan.Nfx.Ingest.Analyzers
 {
     public static class PacketCacheCollection 
     {
-        public static IEnumerable<(TcpPacket,PosixTime)> GetTcpPackets(this FrameCacheCollection frameCacheCollection, FlowKey flowKey)
+        public static IEnumerable<FrameData> GetOrderedPackets(this FrameCacheCollection frameCacheCollection, FlowKey flowKey)
         {
-            TcpPacket ParseTcpPacket(FrameData frame)
-            {
-                var packet = Packet.ParsePacket((LinkLayers)frame.LinkLayer, frame.Data);
-                return packet.Extract(typeof(TcpPacket)) as TcpPacket;
-            }
-            return frameCacheCollection.GetFrames(flowKey).OrderBy(f=>f.Value.Timestamp).Select(x=> (ParseTcpPacket(x.Value), PosixTime.FromUnixTimeMilliseconds(x.Value.Timestamp)));
+            return frameCacheCollection.GetFrames(flowKey).OrderBy(f=>f.Value.Timestamp).Select(f=>f.Value);
+        }
+        public static Conversation<IEnumerable<FrameData>> GetConversation(this FrameCacheCollection frameCache, FlowKey flowKey)
+        {
+            var upflowPackets = frameCache.GetOrderedPackets(flowKey);
+            var downflowPackets = frameCache.GetOrderedPackets(flowKey.SwapEndpoints());
+            return new Conversation<IEnumerable<FrameData>>(flowKey, upflowPackets, downflowPackets);
         }
     }
     public class HttpAnalyzer : IComputeAction
@@ -44,12 +45,13 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             HttpCacheName = httpCacheName;
         }
 
-        private HttpPacket ParseHttpPacket(Packet packet)
+        private HttpPacket ParseHttpPacket(FrameData frame)
         {
             try
             {
+                var packet = Packet.ParsePacket((LinkLayers)frame.LinkLayer, frame.Data);
                 var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
-                var stream = new KaitaiStream(tcpPacket.PayloadData ?? new byte[0]);
+                var stream = new KaitaiStream(tcpPacket?.PayloadData ?? new byte[0]);
                 var httpPacket = new HttpPacket(stream);
                 return httpPacket;
             }
@@ -59,7 +61,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             }
         }
 
-        public IEnumerable<Model.HttpObject> ExtractHttpObjects(Conversation<IEnumerable<(TcpPacket,PosixTime)>> conversation)
+        public IEnumerable<HttpObject> ExtractHttpObjects(Conversation<IEnumerable<FrameData>> conversation)
         {
             var transactions = GetHttpConnections(conversation);
 
@@ -106,15 +108,15 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             }
         }
 
-        private IEnumerable<HttpTransaction> GetHttpConnections(Conversation<IEnumerable<(TcpPacket, PosixTime)>> tcpConversation)
+        private IEnumerable<HttpTransaction> GetHttpConnections(Conversation<IEnumerable<FrameData>> tcpConversation)
         {
-            var requests = ParseHttpConnectionsInFlow(tcpConversation.Upflow);
-            var responses = ParseHttpConnectionsInFlow(tcpConversation.Downflow);
+            var requests = GetHttpMessages(tcpConversation.Upflow);
+            var responses = GetHttpMessages(tcpConversation.Downflow);
             var transactions = requests.Zip(responses, (request, response) => (Request: request, Response: response)).Select((item, index) => new HttpTransaction { Request = item.Request, Response = item.Response, Index = index + 1 });
             return transactions;
         }
 
-        private List<HttpPacketList> ParseHttpConnectionsInFlow(IEnumerable<(TcpPacket, PosixTime)> tcpFlow)
+        private List<HttpPacketList> GetHttpMessages(IEnumerable<FrameData> tcpFlow)
         {
             List<HttpPacketList> Empty()
             {
@@ -132,10 +134,10 @@ namespace Tarzan.Nfx.Ingest.Analyzers
                 }
                 return acc;
             }
-            return tcpFlow.Select(p => (Packet: ParseHttpPacket(p.Item1), Time: p.Item2)).Aggregate(Empty(), Accumulate);
+            return tcpFlow.Select(f => (Packet: ParseHttpPacket(f), PosixTime.FromUnixTimeMilliseconds(f.Timestamp))).Aggregate(Empty(), Accumulate);
         }
 
-        private static (string Username,string Password) ExtractCredentials(string authorization)
+        private (string Username,string Password) ExtractCredentials(string authorization)
         {
             if (authorization == null) return (null, null);
 
@@ -153,13 +155,6 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             return (null, null);
         }
 
-        Conversation<IEnumerable<(TcpPacket,PosixTime)>> GetHttpConversation(FrameCacheCollection frameCache, FlowKey flowKey)
-        {
-            var upflowPackets = frameCache.GetTcpPackets(flowKey);
-            var downflowPackets = frameCache.GetTcpPackets(flowKey.SwapEndpoints());
-            return new Conversation<IEnumerable<(TcpPacket,PosixTime)>>(flowKey, upflowPackets, downflowPackets);
-        }
-
         void IComputeAction.Invoke()
         {
             var httpCache = CacheFactory.GetOrCreateCache<string, HttpObject>(m_ignite, HttpCacheName);
@@ -169,14 +164,14 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             var httpObjects = flowCache.GetLocalEntries()
                 .Where(f => String.Equals(f.Value.ServiceName, "www-http", StringComparison.InvariantCultureIgnoreCase))
                 .Where(f => f.Key.SourcePort > f.Key.DestinationPort)
-                .Select(f => GetHttpConversation(frameCache, f.Key))
+                .Select(f => frameCache.GetConversation(f.Key))
                 .SelectMany(c => ExtractHttpObjects(c))
                 .Select(x => KeyValuePair.Create(x.ObjectName, x));
 
             httpCache.PutAll(httpObjects);
         }
 
-        public class HttpPacketList : List<(HttpPacket Packet, PosixTime Timeval)>
+        class HttpPacketList : List<(HttpPacket Packet, PosixTime Timeval)>
         {
         }
         struct HttpTransaction 
