@@ -42,7 +42,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
             {
                 var httpFlow = flow.Select(x => (x.Key, ParseHttpPacket(x.Packet)));
                 foreach(var msg in httpFlow)
-                    Console.WriteLine($"{msg.Key}: {msg.Item2}");
+                    Console.WriteLine($"{msg.Key}: {msg.Item2.PacketType}");
             }
         }
     }

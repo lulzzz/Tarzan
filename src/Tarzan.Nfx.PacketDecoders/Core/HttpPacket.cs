@@ -52,7 +52,7 @@ namespace Tarzan.Nfx.Packets.Core
             {
                 if (m_request != null) return HttpPacketType.Request;
                 if (m_response != null) return HttpPacketType.Response;
-                return (m_body != null) ? HttpPacketType.Data : HttpPacketType.Empty;
+                return (m_body?.Bytes.Length > 0) ? HttpPacketType.Data : HttpPacketType.Empty;
             }
         }
 
