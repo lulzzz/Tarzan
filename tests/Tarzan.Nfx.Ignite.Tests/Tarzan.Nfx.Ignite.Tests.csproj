@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <Authors>Ondrej Rysavy</Authors>
+    <Company>Brno University of Technology</Company>
   </PropertyGroup>
 
   <ItemGroup>

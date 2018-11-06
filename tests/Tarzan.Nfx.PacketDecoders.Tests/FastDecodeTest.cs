@@ -28,6 +28,7 @@ namespace PacketDecodersTests
             var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
                         group packet by packet.Key;
             var result = flows.ToList();
+            Assert.True(result.Count > 0);
         }
 
       
@@ -43,10 +44,6 @@ namespace PacketDecodersTests
             }
             device.Close();
             return packetList;
-        }
-
-
-
-       
+        } 
     }
 }

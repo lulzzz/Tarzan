@@ -8,6 +8,13 @@
     <Deterministic>false</Deterministic>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Authors>Ondrej Rysavy</Authors>
+    <Company>Brno University of Technology</Company>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;1705</NoWarn>
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

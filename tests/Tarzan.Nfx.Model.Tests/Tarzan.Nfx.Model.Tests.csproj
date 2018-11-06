@@ -5,6 +5,9 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <StartupObject>Tarzan.Nfx.Model.Tests.Benchmark</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.3</LangVersion>
+    <Authors>Ondrej Rysavy</Authors>
+    <Company>Brno University of Technology</Company>
   </PropertyGroup>
 
   <ItemGroup>

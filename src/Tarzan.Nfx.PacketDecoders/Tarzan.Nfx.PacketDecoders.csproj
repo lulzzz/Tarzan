@@ -5,19 +5,12 @@
     <PackageId>Netdx.PacketDecoders</PackageId>
     <AssemblyName>Tarzan.Nfx.PacketDecoders</AssemblyName>
     <RootNamespace>Tarzan.Nfx.PacketDecoders</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Authors>Ondrej Rysavy</Authors>
-    <Company>FIT BUT</Company>
+    <Company>Brno University of Technology</Company>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>7.3</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.3</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Kaitai\" />
     <Folder Include="IoT\" />
@@ -32,9 +25,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
   </ItemGroup>
-  <!--
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(ProjectDir)$(OutDir)*.dll&quot; &quot;$(SolutionDir)out\server\&quot;&#xD;&#xA;copy &quot;$(ProjectDir)$(OutDir)*.json&quot; &quot;$(SolutionDir)out\server\&quot;" />
-  </Target>
-  -->
 </Project>
