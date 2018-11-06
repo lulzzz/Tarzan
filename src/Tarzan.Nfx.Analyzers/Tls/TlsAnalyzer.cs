@@ -34,7 +34,7 @@ namespace Tarzan.Nfx.Ingest.Analyzers
             TlsCacheName = tlsCacheName;
         }
 
-        private TlsRecord ParseTlsPacket(FrameData frame)
+        private TlsPacket ParseTlsPacket(FrameData frame)
         {
             throw new NotImplementedException();
         }

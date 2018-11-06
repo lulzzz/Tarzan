@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Kaitai\" />
     <Folder Include="IoT\" />
     <Folder Include="Common\" />
   </ItemGroup>

@@ -1,5 +1,5 @@
 meta:
-  id: tls_record
+  id: tls_packet
   endian: be
   license: MIT
 seq:
@@ -13,7 +13,7 @@ seq:
   - id: length
     type: u2
 
-  - id: body 
+  - id: fragment
     size: length
     type:
       switch-on: content_type
@@ -23,8 +23,15 @@ seq:
         'tls_content_type::handshake': tls_handshake
         'tls_content_type::application_data': tls_application_data
         _ : tls_encrypted_message
-
 types:
+  tls_version:
+    seq:
+      - id: major
+        type: u1
+
+      - id: minor
+        type: u1
+
   tls_change_cipher_spec:
     seq:
       - id: change_message
@@ -43,18 +50,17 @@ types:
         
   tls_handshake:
     seq:
-      - id: handshake_type
+      - id: msg_type
         type: u1
         enum: tls_handshake_type
-         
-      # this is a workaround for missing u3 type   
-      - id: body_length
+      - id: length 
         type: tls_length
-
+        if: msg_type.to_i < 32
       - id: body
-        size: _parent.length-4
+        size: length.value
+        if: msg_type.to_i < 32
         type:
-          switch-on: handshake_type
+          switch-on: msg_type
           cases:
             'tls_handshake_type::hello_request' : tls_empty
             'tls_handshake_type::client_hello': tls_client_hello
@@ -66,8 +72,10 @@ types:
             'tls_handshake_type::certificate_verify': tls_certificate_verify
             'tls_handshake_type::client_key_exchange': tls_client_key_exchange
             'tls_handshake_type::finished': tls_finished
-            _ : tls_encrypted_message    
-  
+      - id: encrypted_msg
+        size-eos: true
+
+
   tls_length:
     seq:
       - id: hlen
@@ -76,7 +84,7 @@ types:
         type: u2
     instances:
       value: 
-        value: (llen + hlen << 16)
+        value: (llen + (hlen << 16))
     
   tls_empty:
     seq:
@@ -138,8 +146,8 @@ types:
       - id: session_id
         type: session_id
     
-      - id: cipher_suites
-        type: cipher_suites
+      - id: cipher_suite
+        type: cipher_suite
     
       - id: compression_methods
         type: compression_methods
@@ -171,8 +179,8 @@ types:
 
   tls_client_key_exchange: 
     seq:
-      - id: tls_premaster_secret
-        type: tls_pre_master_secret
+      - id: exchange_keys
+        size-eos: true
         
   tls_pre_master_secret:
     seq:
@@ -181,15 +189,7 @@ types:
       
       - id: secret
         size: secret_length
-        
-  tls_version:
-    seq:
-      - id: major
-        type: u1
-
-      - id: minor
-        type: u1
-
+      
   random:
     seq:
       - id: gmt_unix_time
@@ -210,12 +210,16 @@ types:
     seq:
       - id: len
         type: u2
-
       - id: cipher_suite_list
         type: u2
         repeat: expr
         repeat-expr: len/2
 
+  cipher_suite:
+    seq:
+      - id: cipher_id
+        type: u2
+        
   compression_methods:
     seq:
       - id: len
@@ -305,5 +309,3 @@ enums:
     15: certificate_verify
     16: client_key_exchange
     20: finished
-    
-          

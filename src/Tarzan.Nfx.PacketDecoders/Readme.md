@@ -16,15 +16,31 @@ var snmp = new Snmp(new KaitaiStream(app.Bytes));
 
 
 ## Compile Decoders
-The Kaitai Struct compiler needs to be installed on the system in order to recompile parsers:
+The Kaitai Struct Compiler needs to be installed on the system in order to recompile parsers. 
+Kaitai is available from http://kaitai.io/#download. 
 
-* To recompile DLMS parsers:
-```
-Kaitai/dlms# kaitai-struct-compiler -t csharp --dotnet-namespace Netdx.Packets.Industrial -d ../../Industrial/dlms *.ksy
-```
 
+* To recompile BASE Internet protocols:
+```
+Kaitai/base# kaitai-struct-compiler -t csharp --dotnet-namespace Tarzan.Nfx.Packets.Base -d ../../Base *.ksy
+```
 
 * To recompile common internet protocols
 ```
-Kaitai/common# kaitai-struct-compiler -t csharp --dotnet-namespace Netdx.Packets.Common -d ../../Common *.ksy
+Kaitai/common# kaitai-struct-compiler -t csharp --dotnet-namespace Tarzan.Nfx.Packets.Common -d ../../Common *.ksy
+```
+
+* To recompile common internet protocols
+```
+Kaitai/core# kaitai-struct-compiler -t csharp --dotnet-namespace Tarzan.Nfx.Packets.Core -d ../../Core *.ksy
+```
+
+* To recompile DLMS parsers:
+```
+Kaitai/dlms# kaitai-struct-compiler -t csharp --dotnet-namespace Tarzan.Nfx.Packets.Industrial -d ../../Industrial/Dlms *.ksy
+```
+
+* To recompile IoT parsers:
+```
+Kaitai/iot# kaitai-struct-compiler -t csharp --dotnet-namespace Tarzan.Nfx.Packets.IoT -d ../../IoT *.ksy
 ```

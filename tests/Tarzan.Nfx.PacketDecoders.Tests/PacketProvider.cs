@@ -10,7 +10,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
 {
     public class PacketProvider
     {
-        static string GetFullPath(string resourcePath)
+        public static string GetFullPath(string resourcePath)
         {
             var location = typeof(HttpDecodeTest).GetTypeInfo().Assembly.Location;
             var dirPath = Path.GetDirectoryName(location);
