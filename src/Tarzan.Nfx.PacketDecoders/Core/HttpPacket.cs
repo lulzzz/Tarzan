@@ -6,7 +6,27 @@ using System.Text;
 
 namespace Tarzan.Nfx.Packets.Core
 {
-    public enum HttpPacketType { Request, Response, Data }
+    /// <summary>
+    /// Defines possible HTTP packets
+    /// </summary>
+    public enum HttpPacketType {
+        /// <summary>
+        /// Empty HTTP Packet created from the zero byte payload. 
+        /// </summary>
+        Empty,
+        /// <summary>
+        /// HTTP Request packet, it contains a valid Request line and header.
+        /// </summary>
+        Request,
+        /// <summary>
+        /// HTTP Response pakcet, it contains a valid response line and header.
+        /// </summary>
+        Response,
+        /// <summary>
+        /// HTTP Data packet, that is a packet without header but containing data bytes. 
+        /// It represents both request data or response data.
+        /// </summary>
+        Data }
     /// <summary>
     /// Implements Http packet parser. Limitation: it does not parse body of HTTP packet. 
     /// </summary>
@@ -32,7 +52,7 @@ namespace Tarzan.Nfx.Packets.Core
             {
                 if (m_request != null) return HttpPacketType.Request;
                 if (m_response != null) return HttpPacketType.Response;
-                return HttpPacketType.Data;
+                return (m_body != null) ? HttpPacketType.Data : HttpPacketType.Empty;
             }
         }
 
