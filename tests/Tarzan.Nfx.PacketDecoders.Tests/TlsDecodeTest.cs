@@ -1,10 +1,12 @@
 ﻿using Kaitai;
 using PacketDotNet;
+using PacketDotNet.MiscUtil.Conversion;
 using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Tarzan.Nfx.Model;
@@ -93,7 +95,17 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
         {
             var path = PacketProvider.GetFullPath(filename);
             var bytes = File.ReadAllBytes(path);
-            var tlsPacket = new SslPacket(new KaitaiStream(bytes));
+            var sslPacket = new SslPacket(new KaitaiStream(bytes));
+            switch(sslPacket.Record.Message)
+            {
+                case SslPacket.SslClientHello clientHello:
+                    foreach(var suite in clientHello.CipherSpecs.Entries)
+                    {
+                        var suiteNumber = (uint)EndianBitConverter.Big.ToUInt16(suite.CipherBytes, 1) + (suite.CipherBytes[0] << 16);
+                        var suiteName1 = (TlsCipherSuite)suiteNumber;
+                    }
+                    break;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Tarzan.Nfx.Packets.Common
 {
-    public enum TlsCipherSuite : ushort
+    public enum TlsCipherSuite : uint
     {
         TLS_NULL_WITH_NULL_NULL = 0x0000,
         TLS_RSA_WITH_NULL_MD5 = 0x0001, // RFC5246
@@ -336,6 +336,16 @@ namespace Tarzan.Nfx.Packets.Common
         TLS_ECDHE_ECDSA_WITH_AES_128_CCM = 0xC0AC,   // [RFC-mcgrew-tls-aes-ccm-ecc-08]
         TLS_ECDHE_ECDSA_WITH_AES_256_CCM = 0xC0AD,   // [RFC-mcgrew-tls-aes-ccm-ecc-08]
         TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 = 0xC0AE,  // [RFC-mcgrew-tls-aes-ccm-ecc-08]
-        TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8 = 0xC0AF // [RFC-mcgrew-tls-aes-ccm-ecc-08]
+        TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8 = 0xC0AF, // [RFC-mcgrew-tls-aes-ccm-ecc-08]
+
+        // SSL2 Cipher suites
+        SSL2_RC4_128_WITH_MD5 = 0x010080,
+        SSL2_RC4_128_EXPORT40_WITH_MD5 = 0x020080,
+        SSL2_RC2_CBC_128_CBC_WITH_MD5 = 0x030080,
+        SSL2_RC2_CBC_128_CBC_EXPORT_WITH_MD5 = 0x040080,
+        SSL2_IDEA_128_CBC_WITH_MD5 = 0x050080,
+        SSL2_DES_64_CBC_WITH_MD5 = 0x060040,
+        SSL2_DES_192_EDE3_CBC_WITH_MD5 = 0x0700c0,
+        SSL2_RC4_64_WITH_MD5 = 0x080080
     }
 }
