@@ -1,0 +1,5 @@
+MQ Telemetry Transport Protocol, Ping Response
+    Header Flags: 0xd0, Message Type: Ping Response
+        1101 .... = Message Type: Ping Response (13)
+        .... 0000 = Reserved: 0
+    Msg Len: 0

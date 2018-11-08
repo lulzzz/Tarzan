@@ -1,0 +1,7 @@
+MQ Telemetry Transport Protocol, Connect Ack
+    Header Flags: 0x20, Message Type: Connect Ack
+        0010 .... = Message Type: Connect Ack (2)
+        .... 0000 = Reserved: 0
+    Msg Len: 2
+    Reserved: Not set
+    Return Code: Connection Accepted (0)

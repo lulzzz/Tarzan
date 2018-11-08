@@ -1,0 +1,10 @@
+MQ Telemetry Transport Protocol, Publish Message
+    Header Flags: 0x31, Message Type: Publish Message, QoS Level: At most once delivery (Fire and Forget), Retain
+        0011 .... = Message Type: Publish Message (3)
+        .... 0... = DUP Flag: Not set
+        .... .00. = QoS Level: At most once delivery (Fire and Forget) (0)
+        .... ...1 = Retain: Set
+    Msg Len: 48
+    Topic Length: 11
+    Topic: SampleTopic
+    Message: Hello from the Paho blocking client

@@ -1,0 +1,5 @@
+MQ Telemetry Transport Protocol, Disconnect Req
+    Header Flags: 0xe0, Message Type: Disconnect Req
+        1110 .... = Message Type: Disconnect Req (14)
+        .... 0000 = Reserved: 0
+    Msg Len: 0

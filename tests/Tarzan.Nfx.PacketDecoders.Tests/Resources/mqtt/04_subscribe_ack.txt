@@ -1,0 +1,7 @@
+MQ Telemetry Transport Protocol, Subscribe Ack
+    Header Flags: 0x90, Message Type: Subscribe Ack
+        1001 .... = Message Type: Subscribe Ack (9)
+        .... 0000 = Reserved: 0
+    Msg Len: 3
+    Message Identifier: 1
+    Granted QoS: At most once delivery (Fire and Forget) (0)

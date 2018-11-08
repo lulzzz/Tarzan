@@ -1,0 +1,11 @@
+MQ Telemetry Transport Protocol, Subscribe Request
+    Header Flags: 0x82, Message Type: Subscribe Request, QoS Level: At least once delivery (Acknowledged deliver)
+        1000 .... = Message Type: Subscribe Request (8)
+        .... 0... = DUP Flag: Not set
+        .... .01. = QoS Level: At least once delivery (Acknowledged deliver) (1)
+        .... ...0 = Reserved: 0
+    Msg Len: 16
+    Message Identifier: 1
+    Topic Length: 11
+    Topic: SampleTopic
+    Requested QoS: At most once delivery (Fire and Forget) (0)
