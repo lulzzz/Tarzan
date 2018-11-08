@@ -15,6 +15,9 @@ using Tarzan.Nfx.Packets.Core;
 
 namespace Tarzan.Nfx.Ingest.Analyzers
 {
+    /// <summary>
+    /// Extract (meta)information from the SSL/TLS communication.
+    /// </summary>
     public class TlsAnalyzer : IComputeAction
     {
         [InstanceResource]
