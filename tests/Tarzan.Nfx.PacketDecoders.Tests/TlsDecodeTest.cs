@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Packets.Common;
@@ -67,6 +68,24 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
             var path = PacketProvider.GetFullPath(filename);
             var bytes = File.ReadAllBytes(path);
             var tlsPacket = new TlsPacket(new KaitaiStream(bytes));
+
+            switch(tlsPacket.Fragment)
+            {
+                case TlsPacket.TlsHandshake handshake:
+                    switch (handshake.Body)
+                    {
+                        case TlsPacket.TlsCertificate tlscert:
+                             var x509cert = new X509Certificate2(tlscert.Certificates.First().Body);
+                            break;
+                    }
+                    break;
+                case TlsPacket.TlsClientHello clientHello:
+                    foreach(var suite in clientHello.CipherSuites.CipherSuiteList)
+                    {
+                        Console.WriteLine($"{(TlsCipherSuite)suite}");
+                    } 
+                    break;
+            }
         }
         [Theory]
         [InlineData(@"Resources\ssl\ssl2_client_hello.raw")]

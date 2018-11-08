@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="IoT\" />
-    <Folder Include="Common\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MurmurHash.NETStandard" Version="1.0.0" />
