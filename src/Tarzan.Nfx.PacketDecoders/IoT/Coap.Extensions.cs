@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.Packets.IoT
         ServerError = 5
     }
     
-    public partial class Coap
+    public partial class CoapPacket
     {
 
         /// <summary>

@@ -1,17 +1,26 @@
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
 using Kaitai;
-using System;
 using System.Collections.Generic;
 
 namespace Tarzan.Nfx.Packets.IoT
 {
-    public partial class Coap : KaitaiStruct
+
+    /// <summary>
+    /// The Constrained Application Protocol (CoAP) is a specialized web transfer protocol for use with constrained 
+    /// nodes and constrained networks in the Internet of Things. 
+    /// The protocol is designed for machine-to-machine (M2M) applications such as smart energy and building automation.
+    /// 
+    /// More information can be found at: http://coap.technology/
+    /// and https://tools.ietf.org/html/rfc7252
+    /// </summary>
+    public partial class CoapPacket : KaitaiStruct
     {
-        public static Coap FromFile(string fileName)
+        public static CoapPacket FromFile(string fileName)
         {
-            return new Coap(new KaitaiStream(fileName));
+            return new CoapPacket(new KaitaiStream(fileName));
         }
+
 
         public enum CoapMessageType
         {
@@ -69,15 +78,13 @@ namespace Tarzan.Nfx.Packets.IoT
             ProxyScheme = 39,
             Size1 = 60,
         }
-
-        public Coap(KaitaiStream io, KaitaiStruct parent = null, Coap root = null) : base(io)
+        public CoapPacket(KaitaiStream p__io, KaitaiStruct p__parent = null, CoapPacket p__root = null) : base(p__io)
         {
-            m_parent = parent;
-            m_root = root ?? this;
-            _parse();
+            m_parent = p__parent;
+            m_root = p__root ?? this;
+            _read();
         }
-
-        private void _parse()
+        private void _read()
         {
             _version = m_io.ReadBitsInt(2);
             _type = ((CoapMessageType) m_io.ReadBitsInt(2));
@@ -89,10 +96,12 @@ namespace Tarzan.Nfx.Packets.IoT
             if (M_Io.IsEof == false) {
                 _options = new List<Option>();
                 {
+                    var i = 0;
                     Option M_;
                     do {
                         M_ = new Option(m_io, this, m_root);
                         _options.Add(M_);
+                        i++;
                     } while (!( ((M_.IsPayloadMarker) || (M_Io.IsEof)) ));
                 }
             }
@@ -100,7 +109,12 @@ namespace Tarzan.Nfx.Packets.IoT
         }
 
         /// <summary>
-        /// Each option instance in a message specifies the Option Number of the defined CoAP option, the length of the Option Value, and the Option Value itself. Option nunber is expressed as delta. Both option length and delta values uses packing. Option is represented as  4 bits for regular values from 0-12. Values 13 and 14 informs that  option length is provided in extra bytes. The same holds for delta. 
+        /// Each option instance in a message specifies the Option Number of the
+        /// defined CoAP option, the length of the Option Value, and the Option
+        /// Value itself. Option nunber is expressed as delta.
+        /// Both option length and delta values uses packing. Option is represented as 
+        /// 4 bits for regular values from 0-12. Values 13 and 14 informs that 
+        /// option length is provided in extra bytes. The same holds for delta. 
         /// </summary>
         public partial class Option : KaitaiStruct
         {
@@ -109,18 +123,17 @@ namespace Tarzan.Nfx.Packets.IoT
                 return new Option(new KaitaiStream(fileName));
             }
 
-            public Option(KaitaiStream io, Coap parent = null, Coap root = null) : base(io)
+            public Option(KaitaiStream p__io, CoapPacket p__parent = null, CoapPacket p__root = null) : base(p__io)
             {
-                m_parent = parent;
-                m_root = root;
-                _parse();
-            }
-
-            private void _parse()
-            {
+                m_parent = p__parent;
+                m_root = p__root;
                 f_delta = false;
                 f_length = false;
                 f_isPayloadMarker = false;
+                _read();
+            }
+            private void _read()
+            {
                 _optDelta = m_io.ReadBitsInt(4);
                 _optLen = m_io.ReadBitsInt(4);
                 m_io.AlignToByte();
@@ -146,7 +159,7 @@ namespace Tarzan.Nfx.Packets.IoT
                 {
                     if (f_delta)
                         return _delta;
-                    _delta = (int) ((OptDelta == 13 ? (OptDeltaExtraU1 + 13) : (OptDelta == 14 ? (OptDeltaExtraU2 + 269) : (int)(OptDelta == 15 ? 0 : OptDelta))));
+                    _delta = (int) ((OptDelta == 13 ? (OptDeltaExtraU1 + 13) : (OptDelta == 14 ? (OptDeltaExtraU2 + 269) : (OptDelta == 15 ? 0 : OptDelta))));
                     f_delta = true;
                     return _delta;
                 }
@@ -159,7 +172,7 @@ namespace Tarzan.Nfx.Packets.IoT
                 {
                     if (f_length)
                         return _length;
-                    _length = (int) ((OptLen == 13 ? (OptLenExtraU1 + 13) : (OptLen == 14 ? (OptLenExtraU2 + 269) : (int)(OptLen == 15 ? 0 : OptLen))));
+                    _length = (int) ((OptLen == 13 ? (OptLenExtraU1 + 13) : (OptLen == 14 ? (OptLenExtraU2 + 269) : (OptLen == 15 ? 0 : OptLen))));
                     f_length = true;
                     return _length;
                 }
@@ -179,22 +192,22 @@ namespace Tarzan.Nfx.Packets.IoT
             }
             private ulong _optDelta;
             private ulong _optLen;
-            private byte _optDeltaExtraU1;
-            private ushort _optDeltaExtraU2;
-            private byte _optLenExtraU1;
-            private ushort _optLenExtraU2;
+            private byte? _optDeltaExtraU1;
+            private ushort? _optDeltaExtraU2;
+            private byte? _optLenExtraU1;
+            private ushort? _optLenExtraU2;
             private byte[] _value;
-            private Coap m_root;
-            private Coap m_parent;
-            public ulong OptDelta { get { return _optDelta; } }
-            public ulong OptLen { get { return _optLen; } }
-            public byte OptDeltaExtraU1 { get { return _optDeltaExtraU1; } }
-            public ushort OptDeltaExtraU2 { get { return _optDeltaExtraU2; } }
-            public byte OptLenExtraU1 { get { return _optLenExtraU1; } }
-            public ushort OptLenExtraU2 { get { return _optLenExtraU2; } }
+            private CoapPacket m_root;
+            private CoapPacket m_parent;
+            public int OptDelta { get { return (int)_optDelta; } }
+            public int OptLen { get { return (int)_optLen; } }
+            public byte? OptDeltaExtraU1 { get { return _optDeltaExtraU1; } }
+            public ushort? OptDeltaExtraU2 { get { return _optDeltaExtraU2; } }
+            public byte? OptLenExtraU1 { get { return _optLenExtraU1; } }
+            public ushort? OptLenExtraU2 { get { return _optLenExtraU2; } }
             public byte[] Value { get { return _value; } }
-            public Coap M_Root { get { return m_root; } }
-            public Coap M_Parent { get { return m_parent; } }
+            public CoapPacket M_Root { get { return m_root; } }
+            public CoapPacket M_Parent { get { return m_parent; } }
         }
         private ulong _version;
         private CoapMessageType _type;
@@ -204,7 +217,7 @@ namespace Tarzan.Nfx.Packets.IoT
         private byte[] _token;
         private List<Option> _options;
         private byte[] _body;
-        private Coap m_root;
+        private CoapPacket m_root;
         private KaitaiStruct m_parent;
         public ulong Version { get { return _version; } }
         public CoapMessageType Type { get { return _type; } }
@@ -214,7 +227,7 @@ namespace Tarzan.Nfx.Packets.IoT
         public byte[] Token { get { return _token; } }
         public List<Option> Options { get { return _options; } }
         public byte[] Body { get { return _body; } }
-        public Coap M_Root { get { return m_root; } }
+        public CoapPacket M_Root { get { return m_root; } }
         public KaitaiStruct M_Parent { get { return m_parent; } }
     }
 }

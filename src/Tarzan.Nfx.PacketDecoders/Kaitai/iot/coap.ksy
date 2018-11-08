@@ -1,5 +1,5 @@
 meta:
-  id: coap
+  id: coap_packet
   title: Constrainted Application Protocol (CoAP)
   endian: be
 doc: |
