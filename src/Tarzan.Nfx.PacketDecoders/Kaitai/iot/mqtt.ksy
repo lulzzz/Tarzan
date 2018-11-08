@@ -1,5 +1,5 @@
 meta:
-  id: mqtt
+  id: mqtt_packet
   title: MQTT is a Client Server publish/subscribe messaging transport protocol
   xref: MQTT Version 3.1.1 (http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html)
   license: MIT
@@ -53,11 +53,11 @@ types:
         repeat-until: '(_ & 128) == 0'
     instances:
       value:
-        value: (bytes[0] & 127) 
-             + (bytes[1] & 127) * 128
-             + (bytes[2] & 127) * 128 * 128  
-             + (bytes[3] & 127) * 128 * 128 * 128 
-  
+        value: '(bytes[0] & 127) 
+                + (bytes.size > 1 ? (bytes[1] & 127) * 128 : 0)
+                + (bytes.size > 2 ? (bytes[2] & 127) * 128 * 128 : 0)
+                + (bytes.size > 3 ? (bytes[3] & 127) * 128 * 128 * 128  : 0)'
+
   mqtt_connect_flags:
     seq:
       - id: username
