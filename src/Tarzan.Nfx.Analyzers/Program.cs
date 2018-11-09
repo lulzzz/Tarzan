@@ -33,6 +33,7 @@ namespace Tarzan.Nfx.Analyzers
             commandLineApplication.Command(TrackFlowsCommand.Name, configuration: new TrackFlowsCommand(clusterOption).Configuration);
             commandLineApplication.Command(DetectServicesCommand.Name, configuration: new DetectServicesCommand(clusterOption).Configuration);
             commandLineApplication.Command(ExtractDnsCommand.Name, configuration: new ExtractDnsCommand(clusterOption).Configuration);
+            commandLineApplication.Command(ExtractTcpSTMCommand.Name, configuration: new ExtractTcpSTMCommand(clusterOption).Configuration);
 
             commandLineApplication.OnExecute(() => {
                 commandLineApplication.Error.WriteLine("Error: Command not specified!");

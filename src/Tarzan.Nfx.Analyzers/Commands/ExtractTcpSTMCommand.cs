@@ -4,17 +4,18 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tarzan.Nfx.Analyzers.Tcp;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.Analyzers.Commands
 {
-    class ExtractDnsCommand : AbstractCommand
+    class ExtractTcpSTMCommand : AbstractCommand
     {
         private static NLog.Logger m_logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public static string Name { get; private set; } = "Extract-Dns";
+        public static string Name { get; private set; } = "Extract-Tcp";
 
-        public ExtractDnsCommand(CommandOption clusterOption) : base(clusterOption)
+        public ExtractTcpSTMCommand(CommandOption clusterOption) : base(clusterOption)
         {
 
         }
@@ -45,20 +46,20 @@ namespace Tarzan.Nfx.Analyzers.Commands
             });
         }
 
-        private int ExecuteCommand(IIgnite ignite, List<string> flowCacheNames, List<string> packetCacheNames, string dnsOutCacheName)
+        private int ExecuteCommand(IIgnite ignite, List<string> flowCacheNames, List<string> packetCacheNames, string tcpOutCacheName)
         {
             var compute = ignite.GetCompute();
             m_logger.Info($"Compute cluster nodes: [{String.Join(",", compute.ClusterGroup.GetNodes().Select(n => n.Id.ToString()))}].");
 
             foreach (var flowCacheName in flowCacheNames)
             {
-                var dnsAnalyzer = new DnsExtractor(flowCacheName, packetCacheNames, dnsOutCacheName);
+                var tcpExtractor = new TcpSpaceTimeExtractor(flowCacheName, packetCacheNames, tcpOutCacheName);
                 m_logger.Info($"Source flow cache: {flowCacheName}.");
-                m_logger.Info($"Broadcasting compute action: {typeof(DnsExtractor).AssemblyQualifiedName}...");
-                compute.Broadcast(dnsAnalyzer);
+                m_logger.Info($"Broadcasting compute action: {typeof(TcpSpaceTimeExtractor).AssemblyQualifiedName}...");
+                compute.Broadcast(tcpExtractor);
                 m_logger.Info("Remote computation done.");
-                var dnsCache = ignite.GetOrCreateCache<string, DnsObject>(dnsOutCacheName);
-                m_logger.Info($"Found {dnsCache.GetSize()} dns objects.");
+                var tcpCache = ignite.GetOrCreateCache<FlowKey, TcpSpaceTimeModel>(tcpOutCacheName);
+                m_logger.Info($"Found {tcpCache.GetSize()} tcp objects.");
             }
             return 0;
         }
