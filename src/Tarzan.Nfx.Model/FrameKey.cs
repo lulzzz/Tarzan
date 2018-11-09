@@ -10,11 +10,20 @@ namespace Tarzan.Nfx.Model
     [Serializable]
     public class FrameKey : IBinarizable
     {
-        [QuerySqlField()]
+        public FrameKey()
+        {
+        }
+
+        public FrameKey(int frameNumber, int flowKeyHash)
+        {
+            FrameNumber = frameNumber;
+            FlowKeyHash = flowKeyHash;
+        }
+
+        [QuerySqlField(IsIndexed = true)]
         public int FrameNumber { get; set; }
 
-        [AffinityKeyMapped]
-        [QuerySqlField(IsIndexed=true)]
+        [QuerySqlField(IsIndexed = true)]
         public int FlowKeyHash { get; set; }
 
         public void ReadBinary(IBinaryReader reader)

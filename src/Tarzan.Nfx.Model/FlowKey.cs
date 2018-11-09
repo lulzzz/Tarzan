@@ -106,7 +106,7 @@ namespace Tarzan.Nfx.Model
             return Create((byte)protocol, sourceAddress.GetAddressBytes(), (ushort)sourcePort, destinationAddress.GetAddressBytes(), (ushort)destinationPort);
         }
 
-        public static unsafe bool Compare(FlowKey f1, FlowKey f2)
+        public static bool Compare(FlowKey f1, FlowKey f2)
         {
             return (f1 == f2 ) 
                 || (f1.FlowKeyHash == f2.FlowKeyHash) && Compare(f1.Bytes,f2.Bytes);

@@ -86,7 +86,7 @@ namespace Tarzan.Nfx.PcapLoader
                     Timestamp = rawCapture.Timeval.ToUnixTimeMilliseconds(),
                     Data = rawCapture.Data
                 };
-                var frameKey = new FrameKey { FrameNumber = frameIndex, FlowKeyHash = frameKeyProvider.GetKeyHash(frame) };
+                var frameKey = new FrameKey(frameIndex, frameKeyProvider.GetKeyHash(frame));
                 var storedFrame = await cache.GetAsync(frameKey);
                 if (storedFrame == null) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, null);
                 if (storedFrame != null && frame.Timestamp != storedFrame.Timestamp) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, storedFrame);

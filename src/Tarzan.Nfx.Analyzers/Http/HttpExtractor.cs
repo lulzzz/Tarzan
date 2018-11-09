@@ -14,7 +14,7 @@ using Tarzan.Nfx.Packets.Core;
 
 namespace Tarzan.Nfx.Analyzers
 {
-    public class HttpAnalyzer : IComputeAction
+    public class HttpExtractor : IComputeAction
     {
         [InstanceResource]
         protected readonly IIgnite m_ignite;
@@ -25,7 +25,7 @@ namespace Tarzan.Nfx.Analyzers
 
         public string HttpCacheName { get; }
 
-        public HttpAnalyzer(string flowCacheName, IEnumerable<string> frameCacheNames, string httpCacheName)
+        public HttpExtractor(string flowCacheName, IEnumerable<string> frameCacheNames, string httpCacheName)
         {
             FlowCacheName = flowCacheName;
             FrameCacheNames = frameCacheNames;

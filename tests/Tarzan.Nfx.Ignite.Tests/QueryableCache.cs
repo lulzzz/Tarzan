@@ -31,7 +31,7 @@ namespace Tarzan.Nfx.Ignite.Tests
             frames.Clear();
             for (var i = 1; i <= FRAMES_COUNT; i++)
             {
-                frames.Put(new FrameKey { FrameNumber = i, FlowKeyHash = 5678 }, new FrameData { Data = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, LinkLayer = LinkLayerType.Ethernet, Timestamp = 123456789 + 10 * i });
+                frames.Put(new FrameKey(i,5678), new FrameData { Data = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, LinkLayer = LinkLayerType.Ethernet, Timestamp = 123456789 + 10 * i });
             }
             Assert.Equal(FRAMES_COUNT, frames.GetSize());
         }
@@ -40,7 +40,7 @@ namespace Tarzan.Nfx.Ignite.Tests
         public void FrameCacheGet()
         {
             var frames = CacheFactory.GetOrCreateFrameCache(m_igniteFixture.Server.Ignite, "frames");
-            var frameData = frames.Get(new FrameKey { FrameNumber = 100, FlowKeyHash = 5678 });
+            var frameData = frames.Get(new FrameKey(100,5678));
             Assert.Equal(new FrameData { Data = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, LinkLayer = LinkLayerType.Ethernet, Timestamp = 123456789 + 1000 }, frameData);
         }
         [Fact, TestPriority(2)]

@@ -9,7 +9,7 @@ using System.Text;
 namespace Tarzan.Nfx.Analyzers.Tcp
 {
 
-    public class TcpSpaceTimeAnalyze : IComputeAction
+    public class TcpSpaceTimeAnalyzer : IComputeAction
     {
         [InstanceResource]
         protected readonly IIgnite m_ignite;

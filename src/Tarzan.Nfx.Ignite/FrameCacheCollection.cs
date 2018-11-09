@@ -71,8 +71,8 @@ namespace Tarzan.Nfx.Ignite
             var frameKeyProvider = new FrameKeyProvider();
             foreach (var compiledQuery in m_compiledQueries)
             {
-                var queryResult = compiledQuery(flowKey.FlowKeyHash);
-                foreach (var cacheEntry in queryResult)
+                var queryCursor = compiledQuery(flowKey.FlowKeyHash);
+                foreach (var cacheEntry in queryCursor)
                 {
                     var frameKey = frameKeyProvider.GetKey(cacheEntry.Value);
                     if (FlowKey.Compare(flowKey, frameKey))

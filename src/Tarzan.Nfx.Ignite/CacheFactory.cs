@@ -1,8 +1,10 @@
 ﻿using Apache.Ignite.Core;
 using Apache.Ignite.Core.Cache;
+using Apache.Ignite.Core.Cache.Affinity;
 using Apache.Ignite.Core.Cache.Configuration;
 using Apache.Ignite.Core.Client;
 using Apache.Ignite.Core.Client.Cache;
+using Apache.Ignite.Core.Cluster;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,8 +16,6 @@ namespace Tarzan.Nfx.Ignite
     {
         public static ICache<FrameKey, FrameData> GetOrCreateFrameCache(IIgnite ignite, string cacheName)
         {
-            return GetOrCreateCache<FrameKey, FrameData>(ignite, cacheName);
-            /*
             var cacheCfg = new CacheConfiguration()
             {
                 Name = cacheName,
@@ -27,35 +27,28 @@ namespace Tarzan.Nfx.Ignite
                     {
                         KeyType = typeof(FrameKey),
                         ValueType = typeof(FrameData),
-                    }
+                    },
                 }
             };
+            cacheCfg.KeyConfiguration = new CacheKeyConfiguration[]
+                {
+                    new CacheKeyConfiguration { TypeName =  typeof(FrameKey).FullName, AffinityKeyFieldName = nameof(FrameKey.FlowKeyHash)}
+                };
 
-            return ignite.GetOrCreateCache<FrameKey, FrameData>(cacheCfg);
-            */
+            var cache = ignite.GetOrCreateCache<FrameKey, FrameData>(cacheCfg);
+            return cache;
         }
 
         public static ICacheClient<FrameKey, FrameData> GetOrCreateFrameCache(IIgniteClient ignite, string cacheName)
         {
-            return GetOrCreateCache<FrameKey, FrameData>(ignite, cacheName);
-            /*
-            var cacheCfg = new CacheClientConfiguration()
+            void Extend(CacheClientConfiguration cfg)
             {
-                Name = cacheName,
-                CacheMode = CacheMode.Partitioned,
-                GroupName = typeof(FrameData).FullName,
-                QueryEntities = new[]
+                cfg.KeyConfiguration = new CacheKeyConfiguration[]
                 {
-                    new QueryEntity
-                    {
-                        KeyType = typeof(FrameKey),
-                        ValueType = typeof(FrameData),
-                    }
-                }
-            };
-
-            return ignite.GetOrCreateCache<FrameKey, FrameData>(cacheCfg);
-            */
+                    new CacheKeyConfiguration { TypeName =  typeof(FrameKey).FullName, AffinityKeyFieldName = nameof(FrameKey.FlowKeyHash)}
+                };
+            }
+            return GetOrCreateCache<FrameKey, FrameData>(ignite, cacheName, Extend);           
         }
 
         public static ICache<FlowKey, FlowData> GetOrCreateFlowCache(IIgnite ignite, string cacheName)
@@ -68,7 +61,7 @@ namespace Tarzan.Nfx.Ignite
             return GetOrCreateCache<FlowKey, FlowData>(ignite, cacheName);
         }
 
-        public static ICache<TKey, TData> GetOrCreateCache<TKey, TData>(IIgnite ignite, string cacheName)
+        public static ICache<TKey, TData> GetOrCreateCache<TKey, TData>(IIgnite ignite, string cacheName, Action<CacheConfiguration> extendConfigurationAction = null)
         {
             var cacheCfg = new CacheConfiguration()
             {
@@ -81,13 +74,14 @@ namespace Tarzan.Nfx.Ignite
                     {
                         KeyType = typeof(TKey),
                         ValueType = typeof(TData),
-                    }
+                    },                    
                 }
             };
-
-            return ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
+            extendConfigurationAction?.Invoke(cacheCfg);
+            var cache = ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
+            return cache;
         }
-        public static ICacheClient<TKey, TData> GetOrCreateCache<TKey, TData>(IIgniteClient ignite, string cacheName)
+        public static ICacheClient<TKey, TData> GetOrCreateCache<TKey, TData>(IIgniteClient ignite, string cacheName, Action<CacheClientConfiguration> extendConfigurationAction = null)
         {
             var cacheCfg = new CacheClientConfiguration()
             {
@@ -103,7 +97,7 @@ namespace Tarzan.Nfx.Ignite
                     }
                 }
             };
-
+            extendConfigurationAction?.Invoke(cacheCfg);
             return ignite.GetOrCreateCache<TKey, TData>(cacheCfg);
         }
 

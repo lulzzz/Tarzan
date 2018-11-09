@@ -16,7 +16,7 @@ using Tarzan.Nfx.Packets.Core;
 
 namespace Tarzan.Nfx.Analyzers
 {
-    public class DnsAnalyzer : IComputeAction
+    public class DnsExtractor : IComputeAction
     {
         [InstanceResource]
         protected readonly IIgnite m_ignite;
@@ -27,7 +27,7 @@ namespace Tarzan.Nfx.Analyzers
 
         public string DnsCacheName { get; }
 
-        public DnsAnalyzer(string flowCacheName, IEnumerable<string> frameCacheNames, string dnsCacheName)
+        public DnsExtractor(string flowCacheName, IEnumerable<string> frameCacheNames, string dnsCacheName)
         {
             FlowCacheName = flowCacheName;
             FrameCacheNames = frameCacheNames;
@@ -36,7 +36,7 @@ namespace Tarzan.Nfx.Analyzers
 
         public void Invoke()
         {
-            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} started.", null, null, nameof(DnsAnalyzer), "", null);
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} started.", null, null, nameof(DnsExtractor), "", null);
             var flowCache = CacheFactory.GetOrCreateFlowCache(m_ignite, FlowCacheName).AsCacheQueryable(local: true);            
             var frameCache = CacheFactory.GetFrameCacheCollection(m_ignite, FrameCacheNames);
             var dnsObjectCache = CacheFactory.GetOrCreateCache<string, DnsObject>(m_ignite, DnsCacheName);
@@ -48,7 +48,7 @@ namespace Tarzan.Nfx.Analyzers
                 var dnsObjects = Inspect(dnsFlow.Key, dnsFlow.Value, frames.Select(x => x.Value)).Select(x => KeyValuePair.Create(x.ObjectName, x)).ToList();
                 dnsObjectCache.PutAll(dnsObjects);
             }
-            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} completed.", null, null, nameof(DnsAnalyzer), "", null);
+            m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Info, $"Extracting DNS objects from {FlowCacheName} completed.", null, null, nameof(DnsExtractor), "", null);
         }
 
         private IEnumerable<DnsObject> Inspect(FlowKey flowKey, FlowData flowData, IEnumerable<FrameData> frames)
