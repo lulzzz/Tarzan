@@ -68,7 +68,7 @@ namespace Tarzan.Nfx.Analyzers.Tcp
                 {
                     Size = tcpPacket.PayloadData.Length * sizeMultiplier,
                     Offset = frameData.Timestamp - originTimestamp,
-                    TcpFlags = tcpPacket.AllFlags
+                    TcpFlags = (short)tcpPacket.AllFlags
                 };
             }
             return null;

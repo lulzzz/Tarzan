@@ -42,7 +42,7 @@ namespace Tarzan.Nfx.Analyzers.Tcp
         {
             public long Offset { get; set; }
             public int Size { get; set; }
-            public ushort TcpFlags { get; set; }
+            public short TcpFlags { get; set; }
 
             public bool Urg => (TcpFlags & PacketDotNet.TcpFields.TCPUrgMask) != 0; 
             public bool Ack => (TcpFlags & PacketDotNet.TcpFields.TCPAckMask) != 0;
@@ -65,14 +65,14 @@ namespace Tarzan.Nfx.Analyzers.Tcp
             {
                 Offset = reader.ReadLong(nameof(Offset));
                 Size = reader.ReadInt(nameof(Size));
-                TcpFlags = (ushort)reader.ReadInt(nameof(TcpFlags));
+                TcpFlags = reader.ReadShort(nameof(TcpFlags));
             }
 
             public void WriteBinary(IBinaryWriter writer)
             {
                 writer.WriteLong(nameof(Offset), Offset);
                 writer.WriteInt(nameof(Size), Size);
-                writer.WriteInt(nameof(TcpFields), TcpFlags);
+                writer.WriteShort(nameof(TcpFlags), TcpFlags);
             }
         }
     }
