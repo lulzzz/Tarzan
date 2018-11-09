@@ -44,14 +44,12 @@ namespace Tarzan.Nfx.Analyzers.Tcp
             public int Size { get; set; }
             public short TcpFlags { get; set; }
 
-            public bool Urg => (TcpFlags & PacketDotNet.TcpFields.TCPUrgMask) != 0; 
-            public bool Ack => (TcpFlags & PacketDotNet.TcpFields.TCPAckMask) != 0;
-            public bool Psh => (TcpFlags & PacketDotNet.TcpFields.TCPPshMask) != 0;
-            public bool Rst => (TcpFlags & PacketDotNet.TcpFields.TCPRstMask) != 0;
-            public bool Syn => (TcpFlags & PacketDotNet.TcpFields.TCPSynMask) != 0;
-            public bool ECN => (TcpFlags & PacketDotNet.TcpFields.TCPEcnMask) != 0;
-            public bool CWR => (TcpFlags & PacketDotNet.TcpFields.TCPCwrMask) != 0;
-            public bool Fin => (TcpFlags & PacketDotNet.TcpFields.TCPFinMask) != 0;
+            public bool Urg => (TcpFlags & 32) != 0; 
+            public bool Ack => (TcpFlags & 16) != 0;
+            public bool Psh => (TcpFlags & 8) != 0;
+            public bool Rst => (TcpFlags & 4) != 0;
+            public bool Syn => (TcpFlags & 2) != 0;
+            public bool Fin => (TcpFlags & 1) != 0;
 
             public void SetFlag(bool on, int MASK)
             {
