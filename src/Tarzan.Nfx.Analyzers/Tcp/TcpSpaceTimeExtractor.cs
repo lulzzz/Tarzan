@@ -20,6 +20,14 @@ namespace Tarzan.Nfx.Analyzers.Tcp
         [InstanceResource]
         protected readonly IIgnite m_ignite;
 
+
+        public TcpSpaceTimeExtractor(string flowCacheName, List<string> packetCacheNames, string tcpOutCacheName)
+        {
+            FlowCacheName = flowCacheName;
+            FrameCacheNames = packetCacheNames;
+            TcpSpaceTimeCacheName = tcpOutCacheName;
+        }
+
         public string FlowCacheName { get; }
 
         public IEnumerable<string> FrameCacheNames { get; }
