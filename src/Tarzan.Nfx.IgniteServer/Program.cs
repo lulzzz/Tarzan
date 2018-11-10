@@ -19,15 +19,16 @@ namespace Tarzan.Nfx.IgniteServer
         {
             SetupLogging();
             var commandLineApplication = new CommandLineApplication(true);
-
-            var configFileArgument = commandLineApplication.Option("-f|--config", "XML configuration file. If not file is specified then default configuration is used.", CommandOptionType.SingleValue);
-            var offheapArgument = commandLineApplication.Option("-h|--offheap", "Size of off-heap memory given in megabytes.", CommandOptionType.SingleValue);
-            var onheapArgument = commandLineApplication.Option("-g|--onheap", "Size of on-heap memory given in megabytes.", CommandOptionType.SingleValue);
-            var leaderNodeArgument = commandLineApplication.Option("-l|--leader", "Set this node as the leader of the cluster.", CommandOptionType.NoValue);
-            var serverPortArgument = commandLineApplication.Option("-p|--port", "Specifies port for Discovery Spi.", CommandOptionType.SingleValue);
-            var clusterEnpointArgument = commandLineApplication.Option("-c|--cluster", "Specifies IP address and port of a cluster node. Multiple nodes can be specified.", CommandOptionType.MultipleValue);
-            var consistentIdArgument = commandLineApplication.Option("-i|--consistentId", "Specifies as a consistent id of the node. This value is used in topology.", CommandOptionType.SingleValue);
-
+            commandLineApplication.Name = "Tarzan.Nfx.IgniteServer";
+            commandLineApplication.HelpOption("-?|-Help");
+            var configFileArgument = commandLineApplication.Option("-ConfigFile", "XML configuration file. If not file is specified then default configuration is used.", CommandOptionType.SingleValue);
+            var offheapArgument = commandLineApplication.Option("-Offheap", "Size of off-heap memory given in megabytes.", CommandOptionType.SingleValue);
+            var onheapArgument = commandLineApplication.Option("-Onheap", "Size of on-heap memory given in megabytes.", CommandOptionType.SingleValue);
+            var leaderNodeArgument = commandLineApplication.Option("-SetLeader", "Set this node as the leader of the cluster.", CommandOptionType.NoValue);
+            var serverPortArgument = commandLineApplication.Option("-SpiPort", "Specifies port for Discovery Spi.", CommandOptionType.SingleValue);
+            var clusterEnpointArgument = commandLineApplication.Option("-Cluster", "Specifies IP address and port of a cluster node. Multiple nodes can be specified.", CommandOptionType.MultipleValue);
+            var consistentIdArgument = commandLineApplication.Option("-ConsistentId", "Specifies as a consistent id of the node. This value is used in topology.", CommandOptionType.SingleValue);
+            var persistenceEnabled = commandLineApplication.Option("-PersistenceEnabled", "If set, it enables persistence mode.", CommandOptionType.NoValue);
             commandLineApplication.OnExecute(async () =>
             {
                 var configFile = configFileArgument.HasValue() ? configFileArgument.Value() : null;
@@ -39,6 +40,7 @@ namespace Tarzan.Nfx.IgniteServer
                     if (serverPortArgument.HasValue()) server.SetServerPort(Int32.Parse(serverPortArgument.Value()));
                     if (clusterEnpointArgument.HasValue()) server.SetClusterEnpoints(clusterEnpointArgument.Values);
                     if (consistentIdArgument.HasValue()) server.SetConsistentId(consistentIdArgument.Value());
+                    if (persistenceEnabled.HasValue()) server.SetPersistence(true);
                     await server.Run();
                 }
                 return 0;
