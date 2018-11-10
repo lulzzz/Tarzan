@@ -27,6 +27,13 @@
     <ProjectReference Include="..\..\src\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
   </ItemGroup>
 
+
+ <ItemGroup>
+    <None Update="SharpPcap.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Resources\" />
   </ItemGroup>
