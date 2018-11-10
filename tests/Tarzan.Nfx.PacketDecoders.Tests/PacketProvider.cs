@@ -14,7 +14,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
         {
             var location = typeof(HttpDecodeTest).GetTypeInfo().Assembly.Location;
             var dirPath = Path.GetDirectoryName(location);
-            return Path.Combine(dirPath, resourcePath);
+            return Path.Combine(dirPath, resourcePath.Replace('\\', Path.DirectorySeparatorChar));
         }
         public static IList<RawCapture> LoadPacketsFromResourceFolder(string filename)
         {
