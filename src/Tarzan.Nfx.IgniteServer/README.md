@@ -33,12 +33,15 @@ There are two predefined configuration files available in ```config``` folder:
 ## Examples
 
 * Runs the server locally with the specified amount of memory. It uses 1G of heap memory (for computation and queries) and 2G
-of off heap memory (data storage). It uses default seetings, e.g., Spi port will be forst available port starting from 47500.
+of off heap memory (data storage). It uses default seetings, e.g., the Spi port will be the first available port starting from 47500.
 ```
 dotnet Tarzan.Nfx.IgniteServer.dll  -Onheap 1024 -Offheap 2048
 ```
 
 ## Persistent Mode
-If the server is run in persistent mode, the situation is slightly more complicated and depends 
-whether the cluster is run for the first time or it is recovered. For running cluster with persitence 
+If the server is run in persistent mode, the situation is slightly more complicated and depends on 
+whether the cluster is run for the first time or it is resumed. It is because, for running cluster with persitence 
 enabled, Ignite needs to form a topology before the cluster is activated. 
+If the cluster is created for the first
+time, the cluster has to be activated when it reaches the required topology. The cluster records the topology information, 
+which is used when the cluster is resumed. 
