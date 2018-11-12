@@ -1,12 +1,27 @@
 # Detecting artifacts in Encrypted Communication
 
+The TLS communication is carried in a TCP session. 
+The TLS communication consists of initial handshake followed by data exchange.
+The data TLS communication is represented by a series of TLS records. 
+For HTTP the request is contained in a single TLS record, which may be split in 
+several TCP segments.
+ 
 
 The analysis of artifact secured in the encrypted communication is based on creating a behavioral model 
 of the communication. The features for creating the model are selected from information that characterizes
-the communication:
-* packet lengths
+the underlaying TCP communication:
+
+* number of packets in the conversations
+* total duration of the conversation
+* number of packets with the TCP PUSH flag set
+* average packet size for each direction
 * inter-arrival time between packets
-* ...
+
+Featresd related to TLS communicaton:
+* sizes of TLS records in bytes 
+* 
+
+
 
 In addition to these features, the TLS handshake messages provide some interesting information as plain text:
 
