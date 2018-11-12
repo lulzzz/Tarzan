@@ -5,11 +5,11 @@ PcapLoader is implemented as a client and performs a single operation of loading
 ## Usage
 The following commands load specified files to the Nfx Cluster.  
 ```
-dotnet Tarzan.Nfx.PcapLoader --cluster [IGNITE_CLUSTER_NODE] --mode [LOADER_MODE] --file [PCAP_FILES]
+dotnet Tarzan.Nfx.PcapLoader -Cluster [IGNITE_CLUSTER_NODE] -Mode [LOADER_MODE] -SourceFile [PCAP_FILES] -WriteTo [FRAME_CHACHE]
 ```
 
 ```
-dotnet Tarzan.Nfx.PcapLoader --cluster [IGNITE_CLUSTER_NODE] --mode [LOADER_MODE] --folder [PCAP_FOLDER]
+dotnet Tarzan.Nfx.PcapLoader -Cluster [IGNITE_CLUSTER_NODE] -Mode [LOADER_MODE] -SourceFolder [PCAP_FOLDER] -WriteTo [FRAME_CHACHE]
 ```
 
 The mandatory arguments have the following meaning:
@@ -25,9 +25,12 @@ It can be domain name or ip address optionally followed by port number. For inst
 
 * PCAP_FOLDER - a folder that contains PCAP files to be loaded to the NFX cluster.
 
-There are some other options:
+* FRAME_CACHE - a name of the cache used for storing loaded frames.
 
-* ```-s|--chunk``` - Specifies the size of processing block. Frames are loaded, processed and stored in the cache in chunks. The default value is 100. 
-            var chunkSizeArgument = commandLineApplication.Option("-s|--chunk", "A size of processing chunk. Packets are loaded and processed in chunks.", CommandOptionType.SingleValue);
+The optional parameters are as follows:
 
-* ```--disableProgressBar``` - By defalt the progress bar is shown, which may be not useful or wanted in some situations. This option disables showint the progress bar.
+* ```-ChunkSize``` - Specifies the size of processing block. Frames are loaded, processed and stored in chunks. The default value is 100.
+Depending on the hardware and cluster configuration the different value may lead to better (or poor) performance. 
+
+
+* ```-DisableProgressBar``` - By defalt the progress bar is shown, which may be not useful or wanted in some situations. This option disables showint the progress bar.
