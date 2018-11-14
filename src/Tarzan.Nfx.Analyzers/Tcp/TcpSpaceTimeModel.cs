@@ -51,14 +51,6 @@ namespace Tarzan.Nfx.Analyzers.Tcp
             public bool Syn => (TcpFlags & 2) != 0;
             public bool Fin => (TcpFlags & 1) != 0;
 
-            public void SetFlag(bool on, int MASK)
-            {
-                if (on)
-                    TcpFlags = (byte)(TcpFlags | MASK);
-                else
-                    TcpFlags = (byte)(TcpFlags & ~MASK);
-            }
-
             public void ReadBinary(IBinaryReader reader)
             {
                 Offset = reader.ReadLong(nameof(Offset));
