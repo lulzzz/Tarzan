@@ -17,12 +17,10 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
 {
     public class TlsDecodeTest
     {
-        private TlsPacket ParseTlsPacket(RawCapture frame)
+        private TlsPacket ParseTlsPacket(TcpPacket tcpPacket)
         {
             try
             {
-                var packet = Packet.ParsePacket(frame.LinkLayerType, frame.Data);
-                var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
                 if (tcpPacket?.PayloadData?.Length > 0)
                 {
                     return new TlsPacket(new KaitaiStream(tcpPacket.PayloadData));
@@ -35,19 +33,46 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
                 return null;
             }
         }
+        private TcpPacket ParseTcpPacket(RawCapture frame)
+        {
+            var packet = Packet.ParsePacket(frame.LinkLayerType, frame.Data);
+            var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
+            return tcpPacket;
+        }
 
+
+        string TcpFlags(TcpPacket packet)
+        {
+            var flags = new List<string>();
+            if(packet.Syn) flags.Add("SYN");
+            if(packet.Ack) flags.Add("ACK");
+            if(packet.Psh) flags.Add("PSH");
+            if(packet.Rst) flags.Add("RST");
+            if(packet.Fin) flags.Add("FIN");
+            return String.Join(',', flags);
+        }
         [Theory]
         [InlineData(@"Resources\ssl2.cap")]
-        public void LoadAndParsePacket(string filename)
+        [InlineData(@"Resources\https\https2-301-get.pcap")]
+        public void DecodeSSLCommunication(string filename)
         {
+            Console.WriteLine($"Test file={filename}:");
             var packets = PacketProvider.LoadPacketsFromResourceFolder(filename);
             var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
                         group packet by packet.Key;
             foreach (var flow in flows.Where(x=>IsTlsFlow(x.Key)))
             {
-                var tlsFLow = flow.Select(x => (x.Key, ParseTlsPacket(x.Packet)));
-                foreach (var msg in tlsFLow)
-                    Console.WriteLine($"{msg.Key}: {msg.Item2}");
+                Console.WriteLine($"{flow.Key}:");
+                foreach (var msg in flow)
+                {
+                    var tcpPacket = ParseTcpPacket(msg.Packet);
+                    var tlsPacket = ParseTlsPacket(tcpPacket);
+                    bool emptyTcp = (tcpPacket.PayloadData?.Length ?? 0) == 0;
+
+                    var flags = TcpFlags(tcpPacket);
+                    var tlsInfo = $"[TLS: Type={tlsPacket?.ContentType.ToString()}]";
+                    Console.WriteLine($"  {msg.Key}: {(!emptyTcp ? tlsInfo : "")} [TCP: PayloadSize={tcpPacket?.PayloadData?.Length}, Flags={flags}]");
+                }
             }
         }
 
@@ -107,5 +132,6 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
                     break;
             }
         }
+
     }
 }

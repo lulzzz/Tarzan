@@ -19,7 +19,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
         public static IList<RawCapture> LoadPacketsFromResourceFolder(string filename)
         {
             var packetList = new List<RawCapture>();
-            var device = new CaptureFileReaderDevice(GetFullPath(filename));
+            var device = new FastPcapFileReaderDevice(GetFullPath(filename));
             device.Open();
             RawCapture packet;
             while ((packet = device.GetNextPacket()) != null)
