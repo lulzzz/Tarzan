@@ -33,13 +33,12 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
                 return null;
             }
         }
-        private TcpPacket ParseTcpPacket(RawCapture frame)
+        private TcpPacket ParseTcpPacket(FrameData frame)
         {
-            var packet = Packet.ParsePacket(frame.LinkLayerType, frame.Data);
+            var packet = Packet.ParsePacket((LinkLayers)frame.LinkLayer, frame.Data);
             var tcpPacket = packet.Extract(typeof(TcpPacket)) as TcpPacket;
             return tcpPacket;
         }
-
 
         string TcpFlags(TcpPacket packet)
         {
@@ -56,9 +55,10 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
         [InlineData(@"Resources\https\https2-301-get.pcap")]
         public void DecodeSSLCommunication(string filename)
         {
+            var frameKeyProvider = new FrameKeyProvider();
             Console.WriteLine($"Test file={filename}:");
-            var packets = PacketProvider.LoadPacketsFromResourceFolder(filename);
-            var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
+            var packets = PacketProvider.LoadPacketsFromResourceFolder(filename).Select(p => new FrameData { Data = p.Data, LinkLayer = (LinkLayerType)p.LinkLayerType, Timestamp = 0 });
+            var flows = from packet in packets.Select(p => (Key: frameKeyProvider.GetKey(p), Packet: p))
                         group packet by packet.Key;
             foreach (var flow in flows.Where(x=>IsTlsFlow(x.Key)))
             {
