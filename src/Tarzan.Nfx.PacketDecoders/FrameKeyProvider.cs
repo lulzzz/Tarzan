@@ -20,7 +20,7 @@ namespace Tarzan.Nfx.PacketDecoders
         {
             if (frame.LinkLayer == LinkLayerType.Ethernet)
             {
-                return GetKey(frame.Data);
+                return GetKeyForEthernetFrame(frame.Data);
             }
             else
             {
@@ -39,7 +39,7 @@ namespace Tarzan.Nfx.PacketDecoders
         /// </summary>
         /// <param name="frameBytes">Bytes that contains Ethernet frame.</param>
         /// <returns><see cref="FlowKey"/> for the provided Ethernet frame.</returns>
-        public static FlowKey GetKey(byte[] frameBytes)
+        public static FlowKey GetKeyForEthernetFrame(byte[] frameBytes)
         {
             var etherType = EthernetFrame.GetEtherType(frameBytes);
             var etherPayload = EthernetFrame.GetPayloadBytes(frameBytes);

@@ -36,7 +36,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
         public void LoadAndParsePacket(string filename)
         {
             var packets = PacketProvider.LoadPacketsFromResourceFolder(filename);
-            var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKey(p.Data), Packet: p))
+            var flows = from packet in packets.Select(p => (Key: FrameKeyProvider.GetKeyForEthernetFrame(p.Data), Packet: p))
                         group packet by packet.Key;
             foreach(var flow in flows)
             {

@@ -35,7 +35,7 @@ namespace PacketDecodersTest
         {
             foreach (var p in _packets)
             {
-                var key = FrameKeyProvider.GetKey(p.Data);
+                var key = FrameKeyProvider.GetKeyForEthernetFrame(p.Data);
             }
         }
         [Benchmark]
