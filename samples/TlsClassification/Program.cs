@@ -9,6 +9,7 @@ using PacketDotNet;
 using PacketDotNet.MiscUtil.Conversion;
 using System.IO;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -138,6 +139,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 }
             return "SSL";
         }
+        private static string ByteString(byte[] bytes)
+        {
+            return String.Join('-', bytes.Select(x => x.ToString("X")));
+        }
         private static string TlsDescription(TlsPacket packet)
         {
             var sb = new StringBuilder();
@@ -151,13 +156,25 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     {
                         case TlsPacket.TlsHandshakeType.ClientHello:
                             var clientHello = handshake.Body as TlsPacket.TlsClientHello;
+                            sb.Append($"session-id: {ByteString(clientHello.SessionId.Sid)}, ");
                             sb.Append($"cipher-suites: [ {getCiphersString(clientHello.CipherSuites)} ] ");
                             break;
                         case TlsPacket.TlsHandshakeType.ServerHello:
                             var serverHello = handshake.Body as TlsPacket.TlsServerHello;
+                            sb.Append($"session-id: {ByteString(serverHello.SessionId.Sid)}, ");
                             sb.Append($"cipher-suite: {(TlsCipherSuite)serverHello.CipherSuite.CipherId} ");
                             break;
+                        case TlsPacket.TlsHandshakeType.Certificate:
+                            var certificate = handshake.Body as TlsPacket.TlsCertificate;
+                            var x509Certificates = certificate.Certificates.Select(x => new X509Certificate2(x.Body));
+                            sb.Append("certificates: [");
+                            sb.Append(String.Join(',', x509Certificates.Select(x => x.SubjectName.Name)));
+                            sb.Append("] ");
+                            break;
                     }
+
+
+
                     sb.Append("}}");
                     break;
                 case TlsPacket.TlsContentType.ApplicationData:
