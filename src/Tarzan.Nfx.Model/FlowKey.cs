@@ -69,22 +69,22 @@ namespace Tarzan.Nfx.Model
         public IPAddress DestinationIpAddress => new IPAddress(DestinationAddress.ToArray());
 
         public ProtocolType Protocol => (ProtocolType)Bytes[Fields.ProtocolPosition];
-        internal Span<byte> ProtocolByte => new Span<byte>(Bytes,Fields.ProtocolPosition, 1);
+        internal Span<byte> ProtocolByte => new Span<byte>(Bytes, Fields.ProtocolPosition, 1);
 
         public ProtocolFamily ProtocolFamily => (ProtocolFamily)Bytes[Fields.ProtocolFamilyPosition];
-         Span<byte> ProtocolFamilyByte => new Span<byte>(Bytes,Fields.ProtocolFamilyPosition, 1);
+        Span<byte> ProtocolFamilyByte => new Span<byte>(Bytes, Fields.ProtocolFamilyPosition, 1);
 
         public ReadOnlySpan<byte> SourceAddress => new Span<byte>(Bytes, Fields.SourceAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
-         Span<byte> SourceAddressBytes => new Span<byte>(Bytes, Fields.SourceAddressPosition, 16);
+        Span<byte> SourceAddressBytes => new Span<byte>(Bytes, Fields.SourceAddressPosition, 16);
 
         public ReadOnlySpan<byte> DestinationAddress => new Span<byte>(Bytes, Fields.DestinationAddressPosition, ProtocolFamily == ProtocolFamily.InterNetwork ? 4 : 16);
-         Span<byte> DestinationAddressBytes => new Span<byte>(Bytes, Fields.DestinationAddressPosition, 16);
+        Span<byte> DestinationAddressBytes => new Span<byte>(Bytes, Fields.DestinationAddressPosition, 16);
 
         public ushort SourcePort => BinaryPrimitives.ReadUInt16BigEndian(SourcePortBytes);
-         Span<byte> SourcePortBytes => new Span<byte>(Bytes, Fields.SourcePortPosition ,2);
+        Span<byte> SourcePortBytes => new Span<byte>(Bytes, Fields.SourcePortPosition, 2);
 
         public ushort DestinationPort => BinaryPrimitives.ReadUInt16BigEndian(DestinationPortBytes);
-         Span<byte> DestinationPortBytes => new Span<byte>(Bytes, Fields.DestinationPortPosition, 2);
+        Span<byte> DestinationPortBytes => new Span<byte>(Bytes, Fields.DestinationPortPosition, 2);
 
         public IPEndPoint SourceEndpoint => new IPEndPoint(new IPAddress(SourceAddress.ToArray()), SourcePort);
         public IPEndPoint DestinationEndpoint => new IPEndPoint(new IPAddress(DestinationAddress.ToArray()), DestinationPort);
@@ -98,7 +98,7 @@ namespace Tarzan.Nfx.Model
             destinationAddress.CopyTo(new Span<byte>(bytes, Fields.DestinationAddressPosition, 16));
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.SourcePortPosition, 2), sourcePort);
             BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(bytes, Fields.DestinationPortPosition, 2), destinationPort);
-            return new FlowKey(bytes);  
+            return new FlowKey(bytes);
         }
 
         public static FlowKey Create(ProtocolType protocol, IPAddress sourceAddress, int sourcePort, IPAddress destinationAddress, int destinationPort)
@@ -108,25 +108,33 @@ namespace Tarzan.Nfx.Model
 
         public static bool Compare(FlowKey f1, FlowKey f2)
         {
-            return (f1 == f2 ) 
-                || (f1.FlowKeyHash == f2.FlowKeyHash) && Compare(f1.Bytes,f2.Bytes);
+            return (f1 == f2)
+                || (f1.FlowKeyHash == f2.FlowKeyHash) && Compare(f1.Bytes, f2.Bytes);
         }
         private static unsafe bool Compare(Span<byte> bytes1, Span<byte> bytes2)
         {
-                fixed(byte* ref1 = bytes1)
-                fixed(byte* ref2 = bytes2)
-                {
-                    var ptr1 = (ulong*) ref1;
-                    var ptr2 = (ulong*) ref2;
-                    return ptr1[0] == ptr2[0] && ptr1[1] == ptr2[1] && ptr1[2] == ptr2[2] 
-                    && ptr1[3] == ptr2[3] && ptr1[4] == ptr2[4]; 
-                }
-            
+#if (LangVersion73)
+            fixed (byte* ref1 = bytes1)
+            fixed (byte* ref2 = bytes2)
+#else
+            fixed (byte* ref1 = &bytes1.GetPinnableReference())
+            fixed (byte* ref2 = &bytes2.GetPinnableReference())
+#endif
+            {
+                var ptr1 = (ulong*)ref1;
+                var ptr2 = (ulong*)ref2;
+                return ptr1[0] == ptr2[0] && ptr1[1] == ptr2[1] && ptr1[2] == ptr2[2]
+                && ptr1[3] == ptr2[3] && ptr1[4] == ptr2[4];
+            }
         }
 
         private static unsafe int GetHashCode(Span<byte> bytes)
         {
+#if LangVersion73
             fixed (byte* bytePtr = bytes)
+#else
+            fixed (byte* bytePtr = &bytes.GetPinnableReference())
+#endif
             {
                 var intPtr = (int*)bytePtr;
                 return (31 * (31 * (31 * (31 * (31 * (31 * (31 * (31 * (31 * intPtr[0] + intPtr[1]) + intPtr[2]) + intPtr[3]) + intPtr[4])

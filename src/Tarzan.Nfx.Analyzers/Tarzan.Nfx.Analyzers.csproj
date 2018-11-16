@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>7.2</LangVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>  
     <Deterministic>false</Deterministic>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

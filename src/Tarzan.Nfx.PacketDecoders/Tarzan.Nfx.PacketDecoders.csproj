@@ -5,7 +5,7 @@
     <PackageId>Netdx.PacketDecoders</PackageId>
     <AssemblyName>Tarzan.Nfx.PacketDecoders</AssemblyName>
     <RootNamespace>Tarzan.Nfx.PacketDecoders</RootNamespace>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>7.2</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Authors>Ondrej Rysavy</Authors>
     <Company>Brno University of Technology</Company>
