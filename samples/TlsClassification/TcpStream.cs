@@ -28,7 +28,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// <returns>The tcp packets.</returns>
         /// <param name="offset">Offset.</param>
         /// <param name="length">Length.</param>
-        public IEnumerable<(TSegment Packet, Range<long> Range)> GetSegments(long offset, int length)
+        public IEnumerable<(TSegment Segment, Range<long> Range)> GetSegments(long offset, int length)
         {
             // TODO: improve the code by not enumerate all the packets!
             var currentOffset = 0;

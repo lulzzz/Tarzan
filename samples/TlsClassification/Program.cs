@@ -8,6 +8,7 @@ using Tarzan.Nfx.Packets.Common;
 using PacketDotNet;
 using PacketDotNet.MiscUtil.Conversion;
 using System.IO;
+using System.Text;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -29,31 +30,51 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
                 foreach (var flow in flows.Where(x => IsTlsFlow(x.Key)))
                 {
-                    Console.WriteLine($"flow:");
+                    Console.WriteLine($"---");
+                    Console.WriteLine($"tls-flow:");
                     Console.WriteLine($"  key: '{flow.Key}'");
-                    Console.WriteLine($"  packets:");
+                    Console.WriteLine($"  records:");
 
                     byte[] getTcpPayload((int Number, TcpPacket Packet) p)
                     {
                         return p.Packet.PayloadData ?? new byte[0];
                     }
 
-                    var tcpStream = new TcpStream<(int Number, TcpPacket Packet)>(getTcpPayload, flow.Select(f => (f.Value.Number,ParseTcpPacket(f.Value.Packet))));
+                    var tcpStream = new TcpStream<(int Number, TcpPacket Packet)>(getTcpPayload, flow.Select(f => (f.Value.Number, ParseTcpPacket(f.Value.Packet))));
                     var tlsPackets = ParseTlsPacket(new KaitaiStream(tcpStream));
                     foreach (var tlsRecord in tlsPackets)
                     {
-                        Console.WriteLine($"TLS={TlsDescription(tlsRecord.Packet)}");
-                        foreach(var entry in tcpStream.GetSegments(tlsRecord.Offset, tlsRecord.Length))
+                        var tlsString = TlsDescription(tlsRecord.Packet);
+                        Console.WriteLine($"    - {tlsString}");
+                        Console.WriteLine($"      segments:");
+                        foreach (var entry in tcpStream.GetSegments(tlsRecord.Offset, tlsRecord.Length))
                         {
-                            var tcp = entry.Packet;
-                            var range = entry.Range;
-                            Console.WriteLine($"  TCP({tcp.Number}): Length={tcp.Packet.TotalPacketLength}, Payload Length={tcp.Packet.PayloadData?.Length ?? 0}, Flags={TcpFlags(tcp.Packet)}, range={range}");
+                            var tcpString = TcpDescription(entry);
+                            Console.WriteLine($"      - {tcpString}");
+                            var rangeString = TcpRangeString(entry.Range);
+                            Console.WriteLine($"        {rangeString}");
                         }
+                        Console.WriteLine();
                     }
                 }
             }
         }
 
+        private static string TcpRangeString(Range<long> range)
+        {
+            return $"range: {{ offset: {range.Min}, length: {(range.Max - range.Min) + 1} }}";
+        }
+
+        private static string TcpDescription(((int Number, TcpPacket Packet) Segment, Range<long> Range) entry)
+        {
+            var sb = new StringBuilder();
+            sb.Append($"tcp: {{ number: {entry.Segment.Number},");
+            sb.Append($"length: {entry.Segment.Packet.PayloadData?.Length ?? 0},");
+            sb.Append($"flags: '{TcpFlags(entry.Segment.Packet)}',");
+            sb.Append($"window: {entry.Segment.Packet.WindowSize}");
+            sb.Append("}");
+            return sb.ToString();
+        }
 
         private static void PrintUsage()
         {
@@ -104,22 +125,59 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             if(packet.Fin) flags.Add("FIN");
             return String.Join(',', flags);
         }
+        private static string GetTlsVersion(TlsPacket.TlsVersion tlsVersion)
+        {
+            if(tlsVersion.Major==3)
+                switch(tlsVersion.Minor)
+                {
+                case 0: return "SSLv3.0";
+                case 1: return "TLSv1.0";
+                case 2: return "TLSv1.1";
+                case 3: return "TLSv1.2";
+                case 4: return "TLSv1.3";
+                }
+            return "SSL";
+        }
         private static string TlsDescription(TlsPacket packet)
         {
-            switch(packet.ContentType)
+            var sb = new StringBuilder();
+            sb.Append($"tls: {{ version: {GetTlsVersion(packet.Version)}, ");
+            switch (packet.ContentType)
             {
                 case TlsPacket.TlsContentType.Handshake:
                     var handshake = packet.Fragment as TlsPacket.TlsHandshake;
-                    return $"TLSv1.2 Record Layer: Handshake Protocol: {handshake.MsgType}.";
+                    sb.Append($"protocol: Handshake-{handshake.MsgType}, ");
+                    switch(handshake.MsgType)
+                    {
+                        case TlsPacket.TlsHandshakeType.ClientHello:
+                            var clientHello = handshake.Body as TlsPacket.TlsClientHello;
+                            sb.Append($"cipher-suites: [ {getCiphersString(clientHello.CipherSuites)} ] ");
+                            break;
+                        case TlsPacket.TlsHandshakeType.ServerHello:
+                            var serverHello = handshake.Body as TlsPacket.TlsServerHello;
+                            sb.Append($"cipher-suite: {(TlsCipherSuite)serverHello.CipherSuite.CipherId} ");
+                            break;
+                    }
+                    sb.Append("}}");
+                    break;
                 case TlsPacket.TlsContentType.ApplicationData:
                     var appdata = packet.Fragment as TlsPacket.TlsApplicationData;
-                    return $"TLSv1.2 Record Layer: Application Data, Length={appdata.Body.Length}."; 
+                    sb.Append($"protocol: ApplicationData, ");
+                    sb.Append($"length: {appdata.Body.Length} }}");
+                    break;
                 case TlsPacket.TlsContentType.ChangeCipherSpec:
-                    return $"TLSv1.2 Record Layer: Change Cipher Spec Protocol.";
+                    sb.Append($"protocol: ChangeCipherSpec }}");
+                    break;
                 case TlsPacket.TlsContentType.Alert:
-                    return $"TLSv1.2 Record Layer: Alert.";
+                    sb.Append($"protocol: Alert }}");
+                    break;
             }
-            return $"TLSv1.2 Record Layer.";
+            return sb.ToString();
+        }
+
+        private static string getCiphersString(TlsPacket.CipherSuites cipherSuites)
+        {
+            return String.Join(',', cipherSuites.CipherSuiteList.Select(x => (TlsCipherSuite)x));
         }
     }
 }
