@@ -10,6 +10,7 @@ using PacketDotNet.MiscUtil.Conversion;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -141,8 +142,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
         private static string ByteString(byte[] bytes)
         {
-            return String.Join('-', bytes.Select(x => x.ToString("X")));
+            return String.Join("", bytes.Select(x => x.ToString("X")));
         }
+
+
         private static string TlsDescription(TlsPacket packet)
         {
             var sb = new StringBuilder();
@@ -157,11 +160,14 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                         case TlsPacket.TlsHandshakeType.ClientHello:
                             var clientHello = handshake.Body as TlsPacket.TlsClientHello;
                             sb.Append($"session-id: {ByteString(clientHello.SessionId.Sid)}, ");
+                            sb.Append($"random: {ByteString(clientHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suites: [ {getCiphersString(clientHello.CipherSuites)} ] ");
+                            sb.Append($"{getExtensionString(clientHello.Extensions)}");
                             break;
                         case TlsPacket.TlsHandshakeType.ServerHello:
                             var serverHello = handshake.Body as TlsPacket.TlsServerHello;
                             sb.Append($"session-id: {ByteString(serverHello.SessionId.Sid)}, ");
+                            sb.Append($"random: {ByteString(serverHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suite: {(TlsCipherSuite)serverHello.CipherSuite.CipherId} ");
                             break;
                         case TlsPacket.TlsHandshakeType.Certificate:
@@ -172,10 +178,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                             sb.Append("] ");
                             break;
                     }
-
-
-
-                    sb.Append("}}");
+                    sb.Append("}");
                     break;
                 case TlsPacket.TlsContentType.ApplicationData:
                     var appdata = packet.Fragment as TlsPacket.TlsApplicationData;
@@ -192,9 +195,21 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return sb.ToString();
         }
 
+        private static string getExtensionString(TlsPacket.Extensions extensions)
+        {
+            // server name
+
+            // application layer protocol negotiation
+
+
+            return String.Empty;
+        }
+
         private static string getCiphersString(TlsPacket.CipherSuites cipherSuites)
         {
             return String.Join(',', cipherSuites.CipherSuiteList.Select(x => (TlsCipherSuite)x));
         }
+
+       
     }
 }

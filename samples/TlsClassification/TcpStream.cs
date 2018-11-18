@@ -9,7 +9,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
     public class TcpStream<TSegment> : Stream
     {
         IList<TSegment> m_packets;
-        int m_currentPacket = 0;
+        int m_currentPacket = 0; 
         int m_offsetInPacketPayload = 0;
         int m_absolutePosition;
         int? m_length;
