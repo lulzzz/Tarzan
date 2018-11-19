@@ -237,9 +237,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
 
             // additional_data = seq_num + TLSCompressed.type + TLSCompressed.version + TLSCompressed.length;
+            // TLSCompressed.length = Length - recordIv.size - Mac.size
             var additionalData = ByteString.Combine(
                 BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(), 
-                new byte[] { 0x17, 0x03, 0x03, 0x01, 0xc7 - 8 });
+                new byte[] { 0x17, 0x03, 0x03, 0x01, 0xc7 - (8 + 16) });
 
             var plainBytes = TlsDecoder.DecryptAesGcm128(keyBlock.ClientWriteKey, nonce, cipherBytes.Slice(8), additionalData);
             Console.WriteLine(Encoding.ASCII.GetString(plainBytes));

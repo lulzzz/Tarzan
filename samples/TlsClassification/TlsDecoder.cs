@@ -271,7 +271,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             var gcm = new GcmBlockCipher(aes);
             var key = new KeyParameter(writeKeyBytes.ToArray());
 
-            gcm.Init(false, new AeadParameters(key, 16 * 8, nonceBytes.ToArray(), additionalData.ToArray()));
+            gcm.Init(false, new AeadParameters(key, 128, nonceBytes.ToArray(), additionalData.ToArray()));
 
             var outsize = gcm.GetOutputSize(encryptedBytes.Length);
             var plainBytes = new byte[outsize];
