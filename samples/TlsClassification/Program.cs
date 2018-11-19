@@ -6,11 +6,9 @@ using Tarzan.Nfx.PacketDecoders;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.Packets.Common;
 using PacketDotNet;
-using PacketDotNet.MiscUtil.Conversion;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -18,6 +16,12 @@ namespace Tarzan.Nfx.Samples.TlsClassification
     {
         static void Main(string[] args)
         {
+
+            TestDecryptTls();
+            return;
+
+
+
             if (args.Length != 2)
             {
                 PrintUsage();
@@ -140,11 +144,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 }
             return "SSL";
         }
-        private static string ByteString(byte[] bytes)
-        {
-            return String.Join("", bytes.Select(x => x.ToString("X")));
-        }
-
 
         private static string TlsDescription(TlsPacket packet)
         {
@@ -159,15 +158,15 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     {
                         case TlsPacket.TlsHandshakeType.ClientHello:
                             var clientHello = handshake.Body as TlsPacket.TlsClientHello;
-                            sb.Append($"session-id: {ByteString(clientHello.SessionId.Sid)}, ");
-                            sb.Append($"random: {ByteString(clientHello.Random.RandomBytes)}, ");
+                            sb.Append($"session-id: {ByteString.ByteArrayToString(clientHello.SessionId.Sid)}, ");
+                            sb.Append($"client-random: {ByteString.ByteArrayToString(clientHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suites: [ {getCiphersString(clientHello.CipherSuites)} ] ");
                             sb.Append($"{getExtensionString(clientHello.Extensions)}");
                             break;
                         case TlsPacket.TlsHandshakeType.ServerHello:
                             var serverHello = handshake.Body as TlsPacket.TlsServerHello;
-                            sb.Append($"session-id: {ByteString(serverHello.SessionId.Sid)}, ");
-                            sb.Append($"random: {ByteString(serverHello.Random.RandomBytes)}, ");
+                            sb.Append($"session-id: {ByteString.ByteArrayToString(serverHello.SessionId.Sid)}, ");
+                            sb.Append($"server-random: {ByteString.ByteArrayToString(serverHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suite: {(TlsCipherSuite)serverHello.CipherSuite.CipherId} ");
                             break;
                         case TlsPacket.TlsHandshakeType.Certificate:
@@ -183,7 +182,8 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case TlsPacket.TlsContentType.ApplicationData:
                     var appdata = packet.Fragment as TlsPacket.TlsApplicationData;
                     sb.Append($"protocol: ApplicationData, ");
-                    sb.Append($"length: {appdata.Body.Length} }}");
+                    sb.Append($"length: {appdata.Body.Length}, ");
+                    sb.Append($"content: {ByteString.ByteArrayToString(appdata.Body).Substring(0, 32)} }}");
                     break;
                 case TlsPacket.TlsContentType.ChangeCipherSpec:
                     sb.Append($"protocol: ChangeCipherSpec }}");
@@ -211,5 +211,39 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
 
        
+
+
+        static void TestDecryptTls()
+        {
+            ShaPrfAlgorithm.Test100();
+
+            var secret = "64e2d01fa9bd9e7da52377465b6ce5d6e2fe37517d54199ed4d2714b4741494c7a702f972fd8d23a94ef89d9f0c3a880";
+            var clientRandom = "029b68c172bc58b0463396de16b69a64f49109a1af6e8ce177aabd7323645693";
+            var serverRandom = "79b72bc1cb4465b284b8796b65b08a4b6d8d741b36b5d75634ce612345e6f744";
+            var cipherBytes = new Span<byte>(File.ReadAllBytes("encrypted.raw"));
+
+            var prf = new ShaPrfAlgorithm();
+            var keyBlockBytes = prf.GetSecretBytes(ByteString.StringToByteArray(secret),
+                                                 "key expansion",
+                                                 ByteString.Combine(ByteString.StringToByteArray(serverRandom), ByteString.StringToByteArray(clientRandom)), 40);
+            var keyBlock = new TlsKeyBlock(keyBlockBytes, 0, 16, 4);
+
+            var sequenceNumber = 1ul;
+
+            var fixedNonce = keyBlock.ClientIV.Slice(0, 4);
+            var recordNonce = cipherBytes.Slice(0, 8);
+
+            // nonce = client_iv + sequence_id
+            var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
+
+            // additional_data = seq_num + TLSCompressed.type + TLSCompressed.version + TLSCompressed.length;
+            var additionalData = ByteString.Combine(
+                BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(), 
+                new byte[] { 0x17, 0x03, 0x03, 0x01, 0xc7 - 8 });
+
+            var plainBytes = TlsDecoder.DecryptAesGcm128(keyBlock.ClientWriteKey, nonce, cipherBytes.Slice(8), additionalData);
+            Console.WriteLine(Encoding.ASCII.GetString(plainBytes));
+
+        }
     }
 }

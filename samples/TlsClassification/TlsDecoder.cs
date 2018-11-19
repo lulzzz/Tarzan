@@ -1,166 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Security.Authentication;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
 using Tarzan.Nfx.Packets.Common;
 
-namespace TlsClassification
+namespace Tarzan.Nfx.Samples.TlsClassification
 {
 
-    public abstract class PrfAlgorithm
-    {
-        public abstract byte[] GetSecretBytes(byte[] secret, string labelString, byte[] random, int requiredLength);
-        /// <summary>
-        /// Gets the A values, which means: A(i) = HMAC_hash(secret, A(i-1)), where A(0) = seed.
-        /// </summary>
-        /// <returns>The infinite collection of A(1),A(2),....</returns>
-        /// <param name="algo">Algo.</param>
-        /// <param name="seed">Seed.</param>
-        protected IEnumerable<byte[]> GetAValues(HashAlgorithm algo, byte[] seed)
-        {
-            var next = seed;
-            while (true)
-            {
-                next = algo.ComputeHash(next);
-                yield return next;
-            }
-        }
-
-        public static byte[] XorBytes(int requiredLength, byte[] md5bytes, byte[] shabytes)
-        {
-            // trim both arrays to required length
-            var resultBytes = new byte[requiredLength];
-
-            // compute XOR: pmd5bytes ^ pshabytes
-            for (var i = 0; i < requiredLength; i++)
-            {
-                resultBytes[i] = (byte)(md5bytes[i] ^ shabytes[i]);
-            }
-
-            return resultBytes;
-        }
-
-        public static byte[] Combine(params byte[][] arrays)
-        {
-            byte[] ret = new byte[arrays.Sum(x => x.Length)];
-            int offset = 0;
-            foreach (byte[] data in arrays)
-            {
-                Buffer.BlockCopy(data, 0, ret, offset, data.Length);
-                offset += data.Length;
-            }
-            return ret;
-        }
-    }
 
     /// <summary>
-    /// Implements Prf algorithm for TLSv1.1 (https://tools.ietf.org/html/rfc4346#section-5).
+    /// The decoder for TLS communication that can extract plain text from TLS communication 
+    /// if premaster secret is known. See https://sharkfesteurope.wireshark.org/assets/presentations17eu/15.pdf
     /// </summary>
-    public class Tls1PrfAlgorithm : PrfAlgorithm
-    {
-        public override byte[] GetSecretBytes(byte[] secret, string labelString, byte[] random, int requiredLength)
-        {
-            var label = Encoding.ASCII.GetBytes(labelString);
-            var key1 = new Span<byte>(secret).Slice(0, secret.Length / 2).ToArray();
-            var key2 = new Span<byte>(secret).Slice(secret.Length / 2, secret.Length / 2).ToArray();
-
-            var hmacMd5 = new HMACMD5(key1);
-            var hmacSha = new HMACSHA1(key2);
-
-            var md5iterations = (requiredLength / hmacMd5.HashSize) + 1;
-            var shaiterations = (requiredLength / hmacSha.HashSize) + 1;
-
-            var seed = Combine(label, random);
-
-            var md5byteArrays = GetAValues(hmacMd5, seed)
-                .Take(md5iterations)
-                .Select(a => hmacMd5.ComputeHash(Combine(a, seed)));
-
-            var md5bytes = Combine(md5byteArrays.ToArray());
-
-            var shaByteArrays = GetAValues(hmacSha, seed)
-                .Take(shaiterations)
-                .Select(a => hmacSha.ComputeHash(Combine(a, seed)));
-
-            var shabytes = Combine(shaByteArrays.ToArray());
-
-            byte[] resultBytes = XorBytes(requiredLength, md5bytes, shabytes);
-
-            // PRF(secret, label, random) = P_MD5(S1, label + random) XOR P_SHA1(S2, label + random);
-            return resultBytes;
-        }
-    }
-
-    public class TlsPrfSha256 : PrfAlgorithm
-    {
-        public override byte[] GetSecretBytes(byte[] secret, string labelString, byte[] random, int requiredLength)
-        {
-            var hmacSha256 = new HMACSHA256(secret);
-            var shaiterations = (requiredLength / hmacSha256.HashSize) + 1;
-            var label = Encoding.ASCII.GetBytes(labelString);
-            var seed = Combine(label, random);
-            var shaByteArrays = GetAValues(hmacSha256, seed)
-                .Take(shaiterations)
-                .Select(a => hmacSha256.ComputeHash(Combine(a, seed)));
-            var shabytes = new Span<byte>(Combine(shaByteArrays.ToArray())).Slice(0, requiredLength).ToArray();
-            return shabytes;
-        }
-    }
-    public class TlsSecurityParameters
-    {
-        public enum TlsCipherType { Stream, Block, Aead }
-        public enum TlsCommpressionMethod { Null }
-
-        public PrfAlgorithm PrfAlgorithm { get; set; }
-        public CipherAlgorithmType CipherAlgorithm { get; set; }
-        public TlsCipherType CipherType { get; set; }
-        public int EncodingKeyLength { get; set; }
-        public int BlockLength { get; set; }
-        public int FixedIVLength { get; set; }
-        public int RecordIVLength { get; set; }
-
-        public HashAlgorithmType MacAlgorithm { get; set; }
-        public int MacLength { get; set; }
-        public int MacKeyLength { get; set; }
-
-        public TlsCommpressionMethod CommpressionMethod { get; set; }
-
-        public int KeyMaterialSize => MacKeyLength * 2
-                                    + EncodingKeyLength * 2
-                                    + FixedIVLength * 2;
-    }
-    public class TlsKeyBlock  
-    {
-        private readonly byte[] bytes;
-        readonly int macSize;
-        readonly int keySize;
-        readonly int ivSize;
-
-        public TlsKeyBlock(byte[] bytes, int macSize, int keySize, int ivSize)
-        {
-            this.ivSize = ivSize;
-            this.keySize = keySize;
-            this.macSize = macSize;
-            this.bytes = bytes;
-        }
-        public Span<byte> ClientWriteMacSecret => new Span<byte>(bytes).Slice(0, macSize);
-        public Span<byte> ServerWriteMacSecret => new Span<byte>(bytes).Slice(macSize, macSize);
-        public Span<byte> ClientWriteKey => new Span<byte>(bytes).Slice(macSize + macSize, keySize);
-        public Span<byte> ServerWriteKey => new Span<byte>(bytes).Slice(macSize + macSize + keySize, keySize);
-        public Span<byte> ClientIV => new Span<byte>(bytes).Slice(macSize + macSize + keySize + keySize, ivSize);
-        public Span<byte> ServerIV => new Span<byte>(bytes).Slice(macSize + macSize + keySize + keySize + ivSize, ivSize);
-    }
-
-
     public class TlsDecoder
     {
-        public byte[] MasterSecret { get; }
-        public byte[] ClientRandom { get; }
-        public byte[] ServerRandom { get; }
+        public byte[] MasterSecret { get; set;  }
+        public byte[] ClientRandom { get; set;  }
+        public byte[] ServerRandom { get; set;  }
 
+
+        public TlsDecoder()
+        {
+
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TlsClassification.TlsDecoder"/> class.
         /// </summary>
@@ -175,9 +41,8 @@ namespace TlsClassification
         }
 
 
-        public TlsSecurityParameters GetSecurityParameters(SslProtocols version, TlsCipherSuite suite)
+        public static TlsSecurityParameters GetSecurityParameters(SslProtocols version, TlsCipherSuite suite)
         {
-            // TODO: get block/stream cipher name from suite:
             var suiteString = suite.ToString();
 
             var cipherAlgorithm = GetCipherAlgorithm(suiteString);
@@ -199,27 +64,63 @@ namespace TlsClassification
             };
         }
 
-        private int GetRecordVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
+        /// <summary>
+        /// Gets the length of the initialization vector carried explicitly in the record (usually 8 bytes).
+        /// </summary>
+        public static int GetRecordVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
         {
-            throw new NotImplementedException();
+            if (cipherType == TlsSecurityParameters.TlsCipherType.Stream) return 0;
+
+            switch(cipherAlgorithm)
+            {
+                case CipherAlgorithmType.Rc4: return 0;
+                case CipherAlgorithmType.TripleDes: return 8;
+                case CipherAlgorithmType.Aes128: 
+                case CipherAlgorithmType.Aes192: 
+                case CipherAlgorithmType.Aes256: return 8;
+                default: return 0;
+            }
         }
 
-        private int GetFixedVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
+        /// <summary>
+        /// Gets the length of the fixed part of the initialization vector. This is usually computed 
+        /// from the premaster key. Default is 4 bytes.
+        /// </summary>
+        public static int GetFixedVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
         {
-            throw new NotImplementedException();
+            if (cipherType == TlsSecurityParameters.TlsCipherType.Stream) return 0;
+
+            switch (cipherAlgorithm)
+            {
+                case CipherAlgorithmType.Rc4: return 0;
+                case CipherAlgorithmType.TripleDes: return 4;
+                case CipherAlgorithmType.Aes128:
+                case CipherAlgorithmType.Aes192:
+                case CipherAlgorithmType.Aes256: return 4;
+                default: return 0;
+            }
         }
 
-        private PrfAlgorithm GetPrfAlgorithm(SslProtocols version)
+        public static PrfAlgorithm GetPrfAlgorithm(SslProtocols version, HashAlgorithmType hash = HashAlgorithmType.None)
         {
-            throw new NotImplementedException();
+            if (version == SslProtocols.Tls11)
+                return new LegacyPrfAlgorithm();
+            if (version == SslProtocols.Tls12)
+            {
+                if (hash != HashAlgorithmType.None)
+                    return new ShaPrfAlgorithm(KeyedHashAlgorithm.Create(hash.ToString()));
+                else
+                    return new ShaPrfAlgorithm();
+            }
+            return null;
         }
 
-        private int GetMacLength(HashAlgorithmType hashAlgorithm)
+        public static int GetMacLength(HashAlgorithmType hashAlgorithm)
         {
             switch(hashAlgorithm)
             {
-                case HashAlgorithmType.Md5: return 128 / 8;
-                case HashAlgorithmType.Sha1: return 160 / 8;
+                case HashAlgorithmType.Md5: return 16;
+                case HashAlgorithmType.Sha1: return 20;
                 case HashAlgorithmType.Sha256: return 256 / 8;
                 case HashAlgorithmType.Sha384: return 384 / 8;
                 case HashAlgorithmType.Sha512: return 512 / 8;
@@ -227,12 +128,12 @@ namespace TlsClassification
             }
         }
 
-        private int GetMacKeyLength(HashAlgorithmType hashAlgorithm)
+        public static int GetMacKeyLength(HashAlgorithmType hashAlgorithm)
         {
             return GetMacLength(hashAlgorithm);
         }
 
-        private int GetBlockLength(CipherAlgorithmType cipherAlgorithm)
+        public static int GetBlockLength(CipherAlgorithmType cipherAlgorithm)
         {
             switch (cipherAlgorithm)
             {
@@ -247,7 +148,7 @@ namespace TlsClassification
             }
         }
 
-        private int GetEncodingKeyLength(CipherAlgorithmType cipherAlgorithm)
+        public static int GetEncodingKeyLength(CipherAlgorithmType cipherAlgorithm)
         {
             switch(cipherAlgorithm)
             {
@@ -262,7 +163,7 @@ namespace TlsClassification
             }
         }
 
-        private HashAlgorithmType GetHashAlgorithm(string suiteString)
+        public static HashAlgorithmType GetHashAlgorithm(string suiteString)
         {
             if (suiteString.Contains("MD5"))    return HashAlgorithmType.Md5;
             if (suiteString.Contains("SHA256")) return HashAlgorithmType.Sha256;
@@ -272,7 +173,7 @@ namespace TlsClassification
             return HashAlgorithmType.None;
         }
 
-        private CipherAlgorithmType GetCipherAlgorithm(string cipherString)
+        public static CipherAlgorithmType GetCipherAlgorithm(string cipherString)
         {
             if (cipherString.Contains("WITH_NULL")) return CipherAlgorithmType.Null;
             if (cipherString.Contains("WITH_AES_128")) return CipherAlgorithmType.Aes128;
@@ -286,12 +187,35 @@ namespace TlsClassification
             return CipherAlgorithmType.None;
         }
 
-        private TlsSecurityParameters.TlsCipherType GetCipherType(string cipherString)
+        /// <summary>
+        /// Gets the type of the cipher.
+        /// </summary>
+        /// <returns>The cipher type.</returns>
+        /// <param name="cipherString">Cipher string.</param>
+        /// <remarks>
+        /// 
+        /// Two major modes are used in TLSv1.2:
+        /// 
+        /// In CBC mode, you encrypt a block of data by taking the current plaintext 
+        /// block and exclusive-oring that with the previous ciphertext block (or IV), 
+        /// and then sending the result of that through the block cipher; 
+        /// the output of the block cipher is the ciphertext block.
+        /// 
+        /// GCM mode provides both privacy (encryption) and integrity. To provide encryption, 
+        /// GCM maintains a counter; for each block of data, it sends the current value of 
+        /// the counter through the block cipher. Then, it takes the output of the block cipher, 
+        /// and exclusive or's that with the plaintext to form the ciphertext.
+        /// 
+        /// CCM is CBC-MAC mode that provides both authentication and confidentiality.
+        /// CCM uses 16-octet authentication tag while CCM_8 uses shorter, 8-octet tag.
+        /// </remarks>
+        public static TlsSecurityParameters.TlsCipherType GetCipherType(string cipherString)
         {
             // Block (RFC5246-6.2.3.2): CBC
             if (cipherString.Contains("CBC")) return TlsSecurityParameters.TlsCipherType.Block;
 
             // AEAD (RFC5246-6.2.3.3): CCM, GCM
+            if (cipherString.Contains("CCM_8")) return TlsSecurityParameters.TlsCipherType.Aead;
             if (cipherString.Contains("CCM")) return TlsSecurityParameters.TlsCipherType.Aead;
             if (cipherString.Contains("GCM")) return TlsSecurityParameters.TlsCipherType.Aead;
 
@@ -303,12 +227,58 @@ namespace TlsClassification
         {
 
             // key_block = PRF(SecurityParameters.master_secret, "key expansion",
-            //   SecurityParameters.server_random + SecurityParameters.client_random);
+            // SecurityParameters.server_random + SecurityParameters.client_random);
             var bytes = securityParameters.PrfAlgorithm.GetSecretBytes(MasterSecret, "key expansion",
-                                                                       PrfAlgorithm.Combine(ServerRandom, ClientRandom),
+                                                                       ByteString.Combine(ServerRandom, ClientRandom),
                                                                        securityParameters.KeyMaterialSize);
                                                                        
             return new TlsKeyBlock(bytes, securityParameters.MacKeyLength, securityParameters.EncodingKeyLength, securityParameters.FixedIVLength);
+        }
+
+
+        /// <summary>
+        /// Decodes the AES-CCM encrypted data according to RFC6655
+        /// (https://tools.ietf.org/html/rfc6655).
+        /// </summary>
+        /// <returns>The decoded plain text or null.</returns>
+        /// <param name="keyBytes">Key bytes.</param>
+        /// <param name="initializationVector">Initialization vector.</param>
+        /// <param name="sequenceNumber">Sequence number.</param>
+        /// <param name="cipherBytes">Cipher text.</param>
+        public static byte[] DecodeAesCcm128(Span<byte> keyBytes, Span<byte> nonceBytes, Span<byte> encryptedBytes, Span<byte> additionalData)
+        {
+            var aes = new AesLightEngine();
+            var ccm = new CcmBlockCipher(aes);
+            var key = new KeyParameter(keyBytes.ToArray());
+
+            ccm.Init(false, new AeadParameters(key, 16 * 8, nonceBytes.ToArray(), additionalData.ToArray()));
+
+            var outsize = ccm.GetOutputSize(encryptedBytes.Length);
+            var plainBytes = new byte[outsize];
+            var outBytes = ccm.ProcessBytes(encryptedBytes.ToArray(), 0, encryptedBytes.Length, plainBytes, 0);
+
+            outBytes += ccm.DoFinal(plainBytes, outBytes);
+            return plainBytes;
+        }
+        /// <summary>
+        /// Decodes the AES-GCM encrypted data according to RFC5288 and RFC5264.
+        /// (https://tools.ietf.org/html/rfc5288, https://tools.ietf.org/html/rfc5246#page-24).
+        /// </summary>
+        public static byte[] DecryptAesGcm128(Span<byte> writeKeyBytes, Span<byte> nonceBytes, Span<byte> encryptedBytes, Span<byte> additionalData)
+        {
+
+            var aes = new AesEngine();
+            var gcm = new GcmBlockCipher(aes);
+            var key = new KeyParameter(writeKeyBytes.ToArray());
+
+            gcm.Init(false, new AeadParameters(key, 16 * 8, nonceBytes.ToArray(), additionalData.ToArray()));
+
+            var outsize = gcm.GetOutputSize(encryptedBytes.Length);
+            var plainBytes = new byte[outsize];
+            var outBytes = gcm.ProcessBytes(encryptedBytes.ToArray(), 0, encryptedBytes.Length, plainBytes, 0);
+            // finally check MAC:
+            outBytes += gcm.DoFinal(plainBytes, outBytes);
+            return plainBytes;
         }
     }
 }

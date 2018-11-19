@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
+    <RootNamespace>Tarzan.Nfx.Samples.TlsClassification</RootNamespace>
   </PropertyGroup>
 
 
@@ -11,4 +12,10 @@
     <ProjectReference Include="..\..\src\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.4" />
+  </ItemGroup>
 </Project>
