@@ -347,3 +347,4 @@ tarzan-ingest/packets/Dotnet/Tarzan.Nfx.Ingest/bin/Debug/netcoreapp2.0/Tarzan.Nf
 *.classname1
 .DS_Store
 samples/TlsClassification/https_01.yaml
+*.raw

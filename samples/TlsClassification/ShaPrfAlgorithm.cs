@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -35,10 +36,28 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             this.hashAlgorithm = new HMACSHA256();
         }
 
+        public ShaPrfAlgorithm(HashAlgorithmType hashAlgorithmType)
+        {
+            switch(hashAlgorithmType)
+            {
+                case HashAlgorithmType.Sha1:
+                    this.hashAlgorithm = new HMACSHA1();
+                    break;
+
+                case HashAlgorithmType.Sha384:
+                    this.hashAlgorithm = new HMACSHA384();
+                    break;
+                case HashAlgorithmType.Sha512:
+                    this.hashAlgorithm = new HMACSHA512();
+                    break;
+                default:
+                    this.hashAlgorithm = new HMACSHA256();
+                    break;
+            }
+        }
         public ShaPrfAlgorithm(KeyedHashAlgorithm hashAlgorithm)
         {
             this.hashAlgorithm = hashAlgorithm;
-
         }
 
         public override byte[] GetSecretBytes(byte[] secret, string labelString, byte[] random, int requiredLength)

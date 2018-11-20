@@ -23,8 +23,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             }
             if (String.Equals("extract", args[0], StringComparison.InvariantCultureIgnoreCase))
             {
+                var filepath = args[1];
                 var frameKeyProvider = new FrameKeyProvider();
-                var secretMap = TlsMasterSecretMap.LoadFromFile(Path.ChangeExtension(args[1], "key"));
+                var secretMap = TlsMasterSecretMap.LoadFromFile(Path.ChangeExtension(filepath, "key"));
                 var packets = FastPcapFileReaderDevice.ReadAll(args[1]);
                 var flows = from packet in packets.Select((p, i) => (Key: frameKeyProvider.GetKey(p), Value: (Number: i, Packet: p)))
                             group packet by packet.Key;
@@ -70,16 +71,19 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
                     }
                     tlsDecoder.MasterSecret = ByteString.StringToByteArray(secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom)));
-                    var tlsSecurityParameters = TlsDecoder.GetSecurityParameters(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite);
+                    var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString());
                     tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
 
-                    foreach(var item in clientData.Select((d,i) => (Data: d,Index: i + 1)))
+                    foreach (var (name, dataset, tlskeys) in new[] { (Name: "client", Data: clientData, Keys:tlsDecoder.KeyBlock.GetClientKeys()), 
+                        (Name: "server", Data: serverData, Keys:tlsDecoder.KeyBlock.GetServerKeys()) })
                     {
-                        tlsDecoder.DecryptApplicationData(true, item.Data, (ulong)item.Index);
+                        foreach (var (data, index) in dataset.Select((d, i) => (Data: d, Index: i + 1)))
+                        {
+                            var plainBytes = tlsDecoder.DecryptApplicationData(tlskeys, data, (ulong)index);
+                            File.WriteAllBytes($"{filepath}-{name}-{index}.raw", plainBytes);
+                        }
                     }
-
                 }
-
             }
         }
 
@@ -162,7 +166,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
         private static string TlsDescription(TlsPacket packet, TlsDecoder decoder, TlsMasterSecretMap secretMap, List<TlsPacket.TlsApplicationData> dataPackets)
         {
-            var version = TlsDecoder.GetSslProtocolVersion(packet.Version.Major, packet.Version.Minor);
+            var version = TlsSecurityParameters.GetSslProtocolVersion(packet.Version.Major, packet.Version.Minor);
             var sb = new StringBuilder();
             sb.Append($"tls: {{ version: {version.ToString()}, ");
             switch (packet.ContentType)
@@ -217,11 +221,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return sb.ToString();
         }
 
-
-        private static void PrintDecryptedContent(TlsDecoder decoder, ulong sequenceNumber, TlsPacket.TlsApplicationData appdata)
-        {
-            decoder.DecryptApplicationData(true, appdata, sequenceNumber);
-        }
 
         private static string getExtensionString(TlsPacket.Extensions extensions)
         {
