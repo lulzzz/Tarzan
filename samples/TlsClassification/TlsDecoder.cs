@@ -1,5 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Collections;
+using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -11,21 +12,52 @@ using Tarzan.Nfx.Packets.Common;
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
 
-
     /// <summary>
     /// The decoder for TLS communication that can extract plain text from TLS communication 
     /// if premaster secret is known. See https://sharkfesteurope.wireshark.org/assets/presentations17eu/15.pdf
     /// </summary>
     public class TlsDecoder
     {
-        public byte[] MasterSecret { get; set;  }
-        public byte[] ClientRandom { get; set;  }
-        public byte[] ServerRandom { get; set;  }
+        /// <summary>
+        /// Gets or sets the master secret.
+        /// </summary>
+        /// <value>The master secret.</value>
+        public byte[] MasterSecret { get; set; }
+        /// <summary>
+        /// Gets or sets the client random.
+        /// </summary>
+        /// <value>The client random.</value>
+        public byte[] ClientRandom { get; set; }
+        /// <summary>
+        /// Gets or sets the server random.
+        /// </summary>
+        /// <value>The server random.</value>
+        public byte[] ServerRandom { get; set; }
+        /// <summary>
+        /// Gets or sets the protocol version.
+        /// </summary>
+        /// <value>The protocol version.</value>
+        public SslProtocols ProtocolVersion { get; set; }
+        /// <summary>
+        /// Gets or sets the cipher suite.
+        /// </summary>
+        /// <value>The cipher suite.</value>
+        public TlsCipherSuite CipherSuite { get; set; }
 
+        /// <summary>
+        /// Gets or sets the security parameters.
+        /// </summary>
+        /// <value>The security parameters.</value>
+        public TlsSecurityParameters SecurityParameters { get; set; }
+
+        /// <summary>
+        /// Gets the key block.
+        /// </summary>
+        /// <value>The key block.</value>
+        public TlsKeyBlock KeyBlock { get; private set;}
 
         public TlsDecoder()
         {
-
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TlsClassification.TlsDecoder"/> class.
@@ -65,7 +97,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
 
         /// <summary>
-        /// Gets the length of the initialization vector carried explicitly in the record (usually 8 bytes).
+        /// Gets the length in bits of the initialization vector carried explicitly in the record (usually 8 bytes which is 64bits).
         /// </summary>
         public static int GetRecordVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
         {
@@ -74,17 +106,17 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             switch(cipherAlgorithm)
             {
                 case CipherAlgorithmType.Rc4: return 0;
-                case CipherAlgorithmType.TripleDes: return 8;
+                case CipherAlgorithmType.TripleDes: return 64;
                 case CipherAlgorithmType.Aes128: 
                 case CipherAlgorithmType.Aes192: 
-                case CipherAlgorithmType.Aes256: return 8;
+                case CipherAlgorithmType.Aes256: return 64;
                 default: return 0;
             }
         }
 
         /// <summary>
-        /// Gets the length of the fixed part of the initialization vector. This is usually computed 
-        /// from the premaster key. Default is 4 bytes.
+        /// Gets the length in bits of the fixed part of the initialization vector. This is usually computed 
+        /// from the premaster key. Default is 32 bits.
         /// </summary>
         public static int GetFixedVectorLength(CipherAlgorithmType cipherAlgorithm, TlsSecurityParameters.TlsCipherType cipherType)
         {
@@ -93,10 +125,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             switch (cipherAlgorithm)
             {
                 case CipherAlgorithmType.Rc4: return 0;
-                case CipherAlgorithmType.TripleDes: return 4;
+                case CipherAlgorithmType.TripleDes: return 32;
                 case CipherAlgorithmType.Aes128:
                 case CipherAlgorithmType.Aes192:
-                case CipherAlgorithmType.Aes256: return 4;
+                case CipherAlgorithmType.Aes256: return 32;
                 default: return 0;
             }
         }
@@ -115,15 +147,20 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return null;
         }
 
+        /// <summary>
+        /// Gets the length in bits of the mac for the specified hash algorithm.
+        /// </summary>
+        /// <returns>The mac length.</returns>
+        /// <param name="hashAlgorithm">Hash algorithm.</param>
         public static int GetMacLength(HashAlgorithmType hashAlgorithm)
         {
             switch(hashAlgorithm)
             {
-                case HashAlgorithmType.Md5: return 16;
-                case HashAlgorithmType.Sha1: return 20;
-                case HashAlgorithmType.Sha256: return 256 / 8;
-                case HashAlgorithmType.Sha384: return 384 / 8;
-                case HashAlgorithmType.Sha512: return 512 / 8;
+                case HashAlgorithmType.Md5: return 128;
+                case HashAlgorithmType.Sha1: return 160;
+                case HashAlgorithmType.Sha256: return 256;
+                case HashAlgorithmType.Sha384: return 384;
+                case HashAlgorithmType.Sha512: return 512;
                 default: return 0;
             }
         }
@@ -133,6 +170,12 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return GetMacLength(hashAlgorithm);
         }
 
+        /// <summary>
+        /// Gets the length in bits of the block cipher. For stream 
+        /// cipher the value is equal to 1 (case of RC4).
+        /// </summary>
+        /// <returns>The block length.</returns>
+        /// <param name="cipherAlgorithm">Cipher algorithm.</param>
         public static int GetBlockLength(CipherAlgorithmType cipherAlgorithm)
         {
             switch (cipherAlgorithm)
@@ -148,6 +191,11 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             }
         }
 
+        /// <summary>
+        /// Gets the length in bits of the encoding key for cipher algorithm.
+        /// </summary>
+        /// <returns>The encoding key length.</returns>
+        /// <param name="cipherAlgorithm">Cipher algorithm.</param>
         public static int GetEncodingKeyLength(CipherAlgorithmType cipherAlgorithm)
         {
             switch(cipherAlgorithm)
@@ -162,6 +210,8 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 default: return 128;
             }
         }
+
+
 
         public static HashAlgorithmType GetHashAlgorithm(string suiteString)
         {
@@ -185,6 +235,24 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             if (cipherString.Contains("WITH_RC4")) return CipherAlgorithmType.Rc4;
             if (cipherString.Contains("WITH_3DES")) return CipherAlgorithmType.TripleDes;
             return CipherAlgorithmType.None;
+        }
+
+        internal static SslProtocols GetSslProtocolVersion(int major, int minor)
+        {
+            switch(major)
+            {
+                case 2: return SslProtocols.Ssl2;
+                case 3:
+                    switch(minor)
+                    {
+                        case 0: return SslProtocols.Ssl3;
+                        case 1: return SslProtocols.Tls;
+                        case 2: return SslProtocols.Tls11;
+                        case 3: return SslProtocols.Tls12;
+                    }
+                    break;
+            }
+            return SslProtocols.None;
         }
 
         /// <summary>
@@ -223,16 +291,16 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return TlsSecurityParameters.TlsCipherType.Stream;
         }
 
-        public TlsKeyBlock GetTlsKeyBlock(TlsSecurityParameters securityParameters)
+        public void InitializeKeyBlock(TlsSecurityParameters securityParameters)
         {
-
+            SecurityParameters = securityParameters;
             // key_block = PRF(SecurityParameters.master_secret, "key expansion",
             // SecurityParameters.server_random + SecurityParameters.client_random);
             var bytes = securityParameters.PrfAlgorithm.GetSecretBytes(MasterSecret, "key expansion",
                                                                        ByteString.Combine(ServerRandom, ClientRandom),
                                                                        securityParameters.KeyMaterialSize);
                                                                        
-            return new TlsKeyBlock(bytes, securityParameters.MacKeyLength, securityParameters.EncodingKeyLength, securityParameters.FixedIVLength);
+            KeyBlock = new TlsKeyBlock(bytes, securityParameters.MacKeyLength, securityParameters.EncodingKeyLength, securityParameters.FixedIVLength);
         }
 
 
@@ -251,7 +319,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             var ccm = new CcmBlockCipher(aes);
             var key = new KeyParameter(keyBytes.ToArray());
 
-            ccm.Init(false, new AeadParameters(key, 16 * 8, nonceBytes.ToArray(), additionalData.ToArray()));
+            ccm.Init(false, new AeadParameters(key, 128, nonceBytes.ToArray(), additionalData.ToArray()));
 
             var outsize = ccm.GetOutputSize(encryptedBytes.Length);
             var plainBytes = new byte[outsize];
@@ -279,6 +347,31 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             // finally check MAC:
             outBytes += gcm.DoFinal(plainBytes, outBytes);
             return plainBytes;
+        }
+
+
+        public byte[] DecryptApplicationData(bool clientWrite, TlsPacket.TlsApplicationData applicationData, ulong sequenceNumber)
+        {
+            if (KeyBlock == null) throw new InvalidOperationException($"KeyBlock not initialized. Please, call {nameof(InitializeKeyBlock)} first.");
+            var writeKey = clientWrite ? KeyBlock.ClientWriteKey : KeyBlock.ServerWriteKey;
+
+            var fixedNonce = clientWrite ? KeyBlock.ClientIV.Slice(0, SecurityParameters.FixedIVLength / 8) : KeyBlock.ServerIV.Slice(0, SecurityParameters.FixedIVLength / 8);
+            var content = new Span<byte>(applicationData.Body);
+
+            var macLength = SecurityParameters.MacLength / 8;
+            var recordNonceLength = SecurityParameters.RecordIVLength / 8;
+            var recordNonce = content.Slice(0, recordNonceLength);
+
+            var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
+
+            var additionalData = ByteString.Combine(
+                BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(),
+                new byte[] { (byte)applicationData.M_Parent.ContentType,
+                applicationData.M_Parent.Version.Major,
+                applicationData.M_Parent.Version.Minor }, 
+                BitConverter.GetBytes(applicationData.M_Parent.Length - (recordNonceLength + macLength)).Reverse().ToArray()
+            );
+            return DecryptAesGcm128(writeKey, nonce, content.Slice(recordNonceLength), additionalData);
         }
     }
 }

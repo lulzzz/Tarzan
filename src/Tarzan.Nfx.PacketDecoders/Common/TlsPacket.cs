@@ -124,14 +124,14 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _gmtUnixTime = m_io.ReadU4be();
+                _randomTime = m_io.ReadBytes(4);
                 _randomBytes = m_io.ReadBytes(28);
             }
-            private uint _gmtUnixTime;
+            private byte[] _randomTime;
             private byte[] _randomBytes;
             private TlsPacket m_root;
             private KaitaiStruct m_parent;
-            public uint GmtUnixTime { get { return _gmtUnixTime; } }
+            public byte[] RandomTime { get { return _randomTime; } }
             public byte[] RandomBytes { get { return _randomBytes; } }
             public TlsPacket M_Root { get { return m_root; } }
             public KaitaiStruct M_Parent { get { return m_parent; } }

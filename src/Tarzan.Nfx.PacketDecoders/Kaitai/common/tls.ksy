@@ -192,8 +192,8 @@ types:
       
   random:
     seq:
-      - id: gmt_unix_time
-        type: u4
+      - id: random_time
+        size: 4
 
       - id: random_bytes
         size: 28

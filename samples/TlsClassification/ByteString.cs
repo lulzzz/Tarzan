@@ -19,6 +19,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
         public static string ByteArrayToString(byte[] ba)
         {
+            if (ba == null) return null;
             StringBuilder hex = new StringBuilder(ba.Length * 2);
             foreach (byte b in ba)
                 hex.AppendFormat("{0:x2}", b);
@@ -26,6 +27,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
         public static byte[] StringToByteArray(String hex)
         {
+            if (hex == null) return null;
             int NumberChars = hex.Length;
             byte[] bytes = new byte[NumberChars / 2];
             for (int i = 0; i < NumberChars; i += 2)

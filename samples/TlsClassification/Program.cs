@@ -17,11 +17,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         static void Main(string[] args)
         {
 
-            TestDecryptTls();
-            return;
-
-
-
             if (args.Length != 2)
             {
                 PrintUsage();
@@ -29,40 +24,73 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             if (String.Equals("extract", args[0], StringComparison.InvariantCultureIgnoreCase))
             {
                 var frameKeyProvider = new FrameKeyProvider();
-
+                var secretMap = TlsMasterSecretMap.LoadFromFile(Path.ChangeExtension(args[1], "key"));
                 var packets = FastPcapFileReaderDevice.ReadAll(args[1]);
                 var flows = from packet in packets.Select((p, i) => (Key: frameKeyProvider.GetKey(p), Value: (Number: i, Packet: p)))
                             group packet by packet.Key;
 
-                foreach (var flow in flows.Where(x => IsTlsFlow(x.Key)))
+                var conversations = GetConversations(flows);
+
+                foreach (var conv in conversations)
                 {
-                    Console.WriteLine($"---");
-                    Console.WriteLine($"tls-flow:");
-                    Console.WriteLine($"  key: '{flow.Key}'");
-                    Console.WriteLine($"  records:");
 
-                    byte[] getTcpPayload((int Number, TcpPacket Packet) p)
+                    var tlsDecoder = new TlsDecoder();
+                    var clientData = new List<TlsPacket.TlsApplicationData>();
+                    var serverData = new List<TlsPacket.TlsApplicationData>();
+                    foreach (var flow in new[] { (Key: conv.Key, Value: conv.Value.UpFlow, AppRecords : clientData),
+                                                 (Key: conv.Key.SwapEndpoints(), Value: conv.Value.DownFlow, AppRecords : serverData) })
                     {
-                        return p.Packet.PayloadData ?? new byte[0];
-                    }
+                        Console.WriteLine($"---");
+                        Console.WriteLine($"tls-flow:");
+                        Console.WriteLine($"  key: '{flow.Key}'");
+                        Console.WriteLine($"  records:");
 
-                    var tcpStream = new TcpStream<(int Number, TcpPacket Packet)>(getTcpPayload, flow.Select(f => (f.Value.Number, ParseTcpPacket(f.Value.Packet))));
-                    var tlsPackets = ParseTlsPacket(new KaitaiStream(tcpStream));
-                    foreach (var tlsRecord in tlsPackets)
-                    {
-                        var tlsString = TlsDescription(tlsRecord.Packet);
-                        Console.WriteLine($"    - {tlsString}");
-                        Console.WriteLine($"      segments:");
-                        foreach (var entry in tcpStream.GetSegments(tlsRecord.Offset, tlsRecord.Length))
+                        byte[] getTcpPayload((int Number, TcpPacket Packet) p)
                         {
-                            var tcpString = TcpDescription(entry);
-                            Console.WriteLine($"      - {tcpString}");
-                            var rangeString = TcpRangeString(entry.Range);
-                            Console.WriteLine($"        {rangeString}");
+                            return p.Packet.PayloadData ?? new byte[0];
                         }
-                        Console.WriteLine();
+
+                        var tcpStream = new TcpStream<(int Number, TcpPacket Packet)>(getTcpPayload, flow.Value.Select(f => (f.Number, ParseTcpPacket(f.Packet))));
+                        var tlsPackets = ParseTlsPacket(new KaitaiStream(tcpStream));
+
+                        foreach (var tlsRecord in tlsPackets)
+                        {
+                            var tlsString = TlsDescription(tlsRecord.Packet, tlsDecoder, secretMap,  flow.AppRecords);
+                            Console.WriteLine($"    - {tlsString}");
+                            Console.WriteLine($"      segments:");
+                            foreach (var entry in tcpStream.GetSegments(tlsRecord.Offset, tlsRecord.Length))
+                            {
+                                var tcpString = TcpDescription(entry);
+                                Console.WriteLine($"      - {tcpString}");
+                                var rangeString = TcpRangeString(entry.Range);
+                                Console.WriteLine($"        {rangeString}");
+                            }
+                            Console.WriteLine();
+                        }
+
                     }
+                    tlsDecoder.MasterSecret = ByteString.StringToByteArray(secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom)));
+                    var tlsSecurityParameters = TlsDecoder.GetSecurityParameters(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite);
+                    tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
+
+                    foreach(var item in clientData.Select((d,i) => (Data: d,Index: i + 1)))
+                    {
+                        tlsDecoder.DecryptApplicationData(true, item.Data, (ulong)item.Index);
+                    }
+
                 }
+
+            }
+        }
+
+        private static IEnumerable<KeyValuePair<FlowKey, (IEnumerable<(int Number, FrameData Packet)> UpFlow, IEnumerable<(int Number, FrameData Packet)> DownFlow)>> GetConversations(IEnumerable<IGrouping<FlowKey, (FlowKey Key, (int Number, FrameData Packet) Value)>> flows)
+        {
+            var flowDictionary = flows.ToDictionary(x => x.Key);
+            foreach(var key in flowDictionary.Keys.Where(key => key.SourcePort > key.DestinationPort))
+            {
+                var upflow = flowDictionary[key].Select(f => f.Value);
+                var downflow = flowDictionary[key.SwapEndpoints()].Select(f => f.Value);
+                yield return KeyValuePair.Create(key, (upflow,downflow));
             }
         }
 
@@ -131,24 +159,12 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             if(packet.Fin) flags.Add("FIN");
             return String.Join(',', flags);
         }
-        private static string GetTlsVersion(TlsPacket.TlsVersion tlsVersion)
-        {
-            if(tlsVersion.Major==3)
-                switch(tlsVersion.Minor)
-                {
-                case 0: return "SSLv3.0";
-                case 1: return "TLSv1.0";
-                case 2: return "TLSv1.1";
-                case 3: return "TLSv1.2";
-                case 4: return "TLSv1.3";
-                }
-            return "SSL";
-        }
 
-        private static string TlsDescription(TlsPacket packet)
+        private static string TlsDescription(TlsPacket packet, TlsDecoder decoder, TlsMasterSecretMap secretMap, List<TlsPacket.TlsApplicationData> dataPackets)
         {
+            var version = TlsDecoder.GetSslProtocolVersion(packet.Version.Major, packet.Version.Minor);
             var sb = new StringBuilder();
-            sb.Append($"tls: {{ version: {GetTlsVersion(packet.Version)}, ");
+            sb.Append($"tls: {{ version: {version.ToString()}, ");
             switch (packet.ContentType)
             {
                 case TlsPacket.TlsContentType.Handshake:
@@ -162,12 +178,17 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                             sb.Append($"client-random: {ByteString.ByteArrayToString(clientHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suites: [ {getCiphersString(clientHello.CipherSuites)} ] ");
                             sb.Append($"{getExtensionString(clientHello.Extensions)}");
+                            decoder.ClientRandom = ByteString.Combine(clientHello.Random.RandomTime,clientHello.Random.RandomBytes);
+
                             break;
                         case TlsPacket.TlsHandshakeType.ServerHello:
                             var serverHello = handshake.Body as TlsPacket.TlsServerHello;
                             sb.Append($"session-id: {ByteString.ByteArrayToString(serverHello.SessionId.Sid)}, ");
                             sb.Append($"server-random: {ByteString.ByteArrayToString(serverHello.Random.RandomBytes)}, ");
                             sb.Append($"cipher-suite: {(TlsCipherSuite)serverHello.CipherSuite.CipherId} ");
+                            decoder.ServerRandom = ByteString.Combine(serverHello.Random.RandomTime,serverHello.Random.RandomBytes);
+                            decoder.CipherSuite = (TlsCipherSuite)serverHello.CipherSuite.CipherId;
+                            decoder.ProtocolVersion = version;
                             break;
                         case TlsPacket.TlsHandshakeType.Certificate:
                             var certificate = handshake.Body as TlsPacket.TlsCertificate;
@@ -184,6 +205,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     sb.Append($"protocol: ApplicationData, ");
                     sb.Append($"length: {appdata.Body.Length}, ");
                     sb.Append($"content: {ByteString.ByteArrayToString(appdata.Body).Substring(0, 32)} }}");
+                    dataPackets.Add(appdata);
                     break;
                 case TlsPacket.TlsContentType.ChangeCipherSpec:
                     sb.Append($"protocol: ChangeCipherSpec }}");
@@ -193,6 +215,12 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     break;
             }
             return sb.ToString();
+        }
+
+
+        private static void PrintDecryptedContent(TlsDecoder decoder, ulong sequenceNumber, TlsPacket.TlsApplicationData appdata)
+        {
+            decoder.DecryptApplicationData(true, appdata, sequenceNumber);
         }
 
         private static string getExtensionString(TlsPacket.Extensions extensions)
@@ -211,6 +239,8 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
 
        
+
+
 
 
         static void TestDecryptTls()
