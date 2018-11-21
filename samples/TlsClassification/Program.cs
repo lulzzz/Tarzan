@@ -9,6 +9,8 @@ using PacketDotNet;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -16,6 +18,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
     {
         static void Main(string[] args)
         {
+
+            TlsCipherSuiteName.Test();
+
 
             if (args.Length != 2)
             {
@@ -271,9 +276,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(), 
                 new byte[] { 0x17, 0x03, 0x03, 0x01, 0xc7 - (8 + 16) });
 
-            var plainBytes = TlsDecoder.DecryptAesGcm128(keyBlock.ClientWriteKey, nonce, cipherBytes.Slice(8), additionalData);
-            Console.WriteLine(Encoding.ASCII.GetString(plainBytes));
-
+            var gsm = new GcmBlockCipher(new AesEngine());
+            var plainBytes = TlsDecoder.DecryptAead(gsm ,keyBlock.ClientWriteKey, nonce, cipherBytes.Slice(8), additionalData);
+            Console.WriteLine(Encoding.ASCII.GetString(plainBytes)); 
         }
     }
 }

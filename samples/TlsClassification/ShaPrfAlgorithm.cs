@@ -36,18 +36,19 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             this.hashAlgorithm = new HMACSHA256();
         }
 
-        public ShaPrfAlgorithm(HashAlgorithmType hashAlgorithmType)
+        public ShaPrfAlgorithm(string hashAlgorithmType)
         {
             switch(hashAlgorithmType)
             {
-                case HashAlgorithmType.Sha1:
+                case "SHA":
+                case "SHA1":
                     this.hashAlgorithm = new HMACSHA1();
                     break;
 
-                case HashAlgorithmType.Sha384:
+                case "SHA384":
                     this.hashAlgorithm = new HMACSHA384();
                     break;
-                case HashAlgorithmType.Sha512:
+                case "SHA512":
                     this.hashAlgorithm = new HMACSHA512();
                     break;
                 default:

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -85,43 +86,15 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             KeyBlock = new TlsKeyBlock(bytes, securityParameters.MacKeyLength, securityParameters.EncodingKeyLength, securityParameters.FixedIVLength);
         }
 
-
-        /// <summary>
-        /// Decodes the AES-CCM encrypted data according to RFC6655
-        /// (https://tools.ietf.org/html/rfc6655).
-        /// </summary>
-        /// <returns>The decoded plain text or null.</returns>
-        /// <param name="keyBytes">Key bytes.</param>
-        /// <param name="initializationVector">Initialization vector.</param>
-        /// <param name="sequenceNumber">Sequence number.</param>
-        /// <param name="cipherBytes">Cipher text.</param>
-        public static byte[] DecodeAesCcm128(Span<byte> keyBytes, Span<byte> nonceBytes, Span<byte> encryptedBytes, Span<byte> additionalData)
-        {
-            var aes = new AesLightEngine();
-            var ccm = new CcmBlockCipher(aes);
-            var key = new KeyParameter(keyBytes.ToArray());
-
-            ccm.Init(false, new AeadParameters(key, 128, nonceBytes.ToArray(), additionalData.ToArray()));
-
-            var outsize = ccm.GetOutputSize(encryptedBytes.Length);
-            var plainBytes = new byte[outsize];
-            var outBytes = ccm.ProcessBytes(encryptedBytes.ToArray(), 0, encryptedBytes.Length, plainBytes, 0);
-
-            outBytes += ccm.DoFinal(plainBytes, outBytes);
-            return plainBytes;
-        }
         /// <summary>
         /// Decodes the AES-GCM encrypted data according to RFC5288 and RFC5264.
         /// (https://tools.ietf.org/html/rfc5288, https://tools.ietf.org/html/rfc5246#page-24).
         /// </summary>
-        public static byte[] DecryptAesGcm128(Span<byte> writeKeyBytes, Span<byte> nonceBytes, Span<byte> encryptedBytes, Span<byte> additionalData)
+        public static byte[] DecryptAead(IAeadBlockCipher gcm, Span<byte> writeKeyBytes, Span<byte> nonceBytes, Span<byte> encryptedBytes, Span<byte> additionalData)
         {
+            var writeKey = new KeyParameter(writeKeyBytes.ToArray());
 
-            var aes = new AesEngine();
-            var gcm = new GcmBlockCipher(aes);
-            var key = new KeyParameter(writeKeyBytes.ToArray());
-
-            gcm.Init(false, new AeadParameters(key, 128, nonceBytes.ToArray(), additionalData.ToArray()));
+            gcm.Init(false, new AeadParameters(writeKey, 128, nonceBytes.ToArray(), additionalData.ToArray()));
 
             var outsize = gcm.GetOutputSize(encryptedBytes.Length);
             var plainBytes = new byte[outsize];
@@ -131,12 +104,40 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return plainBytes;
         }
 
+        /// <summary>
+        /// Decrypts bytes using the block cipher and CBC methods (https://tools.ietf.org/html/rfc2246#section-6.2.3.2).
+        /// </summary>
+        /// <returns>The block.</returns>
+        /// <param name="writeKey">Write key.</param>
+        /// <param name="initializationVector">Nonce, which stands for .</param>
+        /// <param name="macKey">Span.</param>
+        public static byte[] DecryptBlock(IBlockCipher cbc, HMAC hmac, Span<byte> writeKey, Span<byte> initializationVector, Span<byte> macKey, Span<byte> encryptedBytes)
+        {
+            //  block-ciphered struct {
+            //    opaque content[TLSCompressed.length];
+            //    opaque MAC[CipherSpec.hash_size];
+            //    uint8 padding[GenericBlockCipher.padding_length];
+            //    uint8 padding_length;
+            //  } GenericBlockCipher;
+            // first decrypt:
+            var blockSize = cbc.GetBlockSize();
+            cbc.Init(false, new ParametersWithIV(new KeyParameter(writeKey.ToArray()), initializationVector.ToArray()));
+            var outputBuffer = new byte[encryptedBytes.Length];
+            var encryptedBytesArray = encryptedBytes.ToArray();
+            for (var block = 0; block < encryptedBytes.Length / blockSize; block++) 
+                cbc.ProcessBlock(encryptedBytesArray, block * blockSize, outputBuffer, blockSize * blockSize);
+            // check padding:
+            var paddingLen = outputBuffer[outputBuffer.Length - 1];
+            var contentLen = encryptedBytes.Length - (paddingLen + (hmac.HashSize / 8));
+
+            return new Span<byte>(outputBuffer).Slice(0, contentLen).ToArray();
+        }
 
         public byte[] DecryptApplicationData(TlsKeys tlsKeys, TlsPacket.TlsApplicationData applicationData, ulong sequenceNumber)
         {
             if (KeyBlock == null) throw new InvalidOperationException($"KeyBlock not initialized. Please, call {nameof(InitializeKeyBlock)} first.");
             var writeKey = tlsKeys.EncodingKey;
-
+            var mackKey = tlsKeys.MacKey;
             var fixedNonce = new Span<byte>(tlsKeys.IV).Slice(0, SecurityParameters.FixedIVLength / 8);
 
             var content = new Span<byte>(applicationData.Body);
@@ -148,13 +149,101 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
 
             var additionalData = ByteString.Combine(
-                BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(),
-                new byte[] { (byte)applicationData.M_Parent.ContentType,
-                applicationData.M_Parent.Version.Major,
-                applicationData.M_Parent.Version.Minor }, 
-                BitConverter.GetBytes((ushort)(applicationData.Body.Length - (recordNonceLength + macLength))).Reverse().ToArray()
-            );
-            return DecryptAesGcm128(writeKey, nonce, content.Slice(recordNonceLength), additionalData);
+                    BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(),
+                    new byte[] { (byte)applicationData.M_Parent.ContentType,
+                                       applicationData.M_Parent.Version.Major,
+                                       applicationData.M_Parent.Version.Minor },
+                    BitConverter.GetBytes((ushort)(applicationData.Body.Length - (recordNonceLength + macLength))).Reverse().ToArray()
+                );
+
+            if (this.SecurityParameters.CipherType == TlsCipherType.Aead)
+            {
+                var aead = CreateAeadCipher(SecurityParameters.CipherMode, CreateBlockCipher(SecurityParameters.CipherAlgorithm.ToString().ToUpperInvariant()));
+                return DecryptAead(aead, writeKey, nonce, content.Slice(recordNonceLength), additionalData);
+            }
+            if (this.SecurityParameters.CipherType == TlsCipherType.Block)
+            {
+                var cbc = CreateBlockCipher(SecurityParameters.CipherMode, CreateBlockCipher(SecurityParameters.CipherAlgorithm.ToString().ToUpperInvariant()));
+                var mac = CreateHMacAlgorithm(SecurityParameters.MacAlgorithm);
+                return DecryptBlock(cbc, mac, writeKey, fixedNonce, mackKey, content.Slice(recordNonceLength));
+            }
+            if (this.SecurityParameters.CipherType == TlsCipherType.Stream)
+            {
+                throw new NotImplementedException();
+            }
+            throw new NotSupportedException($"Decrypting {CipherSuite.ToString()} is not supported.");
+        }
+
+        private HMAC CreateHMacAlgorithm(string macAlgorithm)
+        {
+            switch(macAlgorithm)
+            {
+                case "SHA":
+                case "SHA1":
+                    return new HMACSHA1();
+                case "SHA256":
+                    return new HMACSHA256();
+                case "SHA384":
+                    return new HMACSHA384();
+                case "SHA512":
+                    return new HMACSHA512();
+                case "MD5":
+                    return new HMACMD5();
+            }
+            return new HMACSHA1();
+        }
+
+        private IBlockCipher CreateBlockCipher(TlsCipherMode cipherMode, IBlockCipher blockCipher)
+        {
+            switch (cipherMode)
+            {
+                case TlsCipherMode.CBC:
+                    return new CbcBlockCipher(blockCipher);
+            }
+            return null;
+        }
+        private IAeadBlockCipher CreateAeadCipher(TlsCipherMode cipherMode, IBlockCipher blockCipher)
+        {
+            switch(cipherMode)
+            {
+                case TlsCipherMode.CCM_8:
+                case TlsCipherMode.CCM:
+                    return new CcmBlockCipher(blockCipher);
+                case TlsCipherMode.GCM:
+                    return new GcmBlockCipher(blockCipher);
+            }
+            return null;
+        }
+
+        private IBlockCipher CreateBlockCipher(string cipherAlgorithm)
+        {
+            switch (cipherAlgorithm)
+            {
+                case "AES128":
+                case "AES256":
+                case "AES":
+                    return new AesEngine();
+                case "DES":
+                    return new DesEngine();
+                case "RC2":
+                    return new RC2Engine();
+                case "IDEA":
+                    return new IdeaEngine();
+                case "CAMELLIA128":
+                    return new CamelliaEngine();
+
+            }
+            return null;
+        }
+
+        private IStreamCipher CreateStreamCipher(string cipherAlgorithm)
+        {
+            switch (cipherAlgorithm)
+            {
+                case "RC4":
+                    return new RC4Engine();
+            }
+            return null;
         }
     }
 }
