@@ -40,7 +40,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         {
             switch(hashAlgorithmType)
             {
-                case "SHA":
                 case "SHA1":
                     this.hashAlgorithm = new HMACSHA1();
                     break;
@@ -51,6 +50,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case "SHA512":
                     this.hashAlgorithm = new HMACSHA512();
                     break;
+                case "SHA":
                 default:
                     this.hashAlgorithm = new HMACSHA256();
                     break;

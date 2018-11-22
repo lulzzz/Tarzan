@@ -160,7 +160,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                         sp.MacLength = GetMacLength(cipherSuiteName.MacAlgorithm);
                         sp.FixedIVLength = GetBlockLength(cipherSuiteName.BlockCipher);  
                         sp.RecordIVLength = 0;
-                        sp.PrfHashAlgorithm = (protocolVersion == SslProtocols.Tls12) ? cipherSuiteName.MacAlgorithm : "SHA256";
+                        sp.PrfHashAlgorithm = cipherSuiteName.MacAlgorithm;
                         break;
                     }
             }

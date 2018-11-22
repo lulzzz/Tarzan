@@ -134,13 +134,16 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// <param name="macKey">Span.</param>
         public static byte[] DecryptBlock(IBlockCipher cbc, HMAC hmac, Span<byte> writeKey, Span<byte> initializationVector, Span<byte> macKey, Span<byte> encryptedBytes)
         {
+            //  opaque IV[SecurityParameters.record_iv_length];  ???
             //  block-ciphered struct {
             //    opaque content[TLSCompressed.length];
-            //    opaque MAC[CipherSpec.hash_size];
+            //    opaque MAC[SecurityParameters.mac_length];
             //    uint8 padding[GenericBlockCipher.padding_length];
             //    uint8 padding_length;
             //  } GenericBlockCipher;
             // first decrypt:
+            //
+
             var blockSize = cbc.GetBlockSize();
             cbc.Init(false, new ParametersWithIV(new KeyParameter(writeKey.ToArray()), initializationVector.ToArray()));
             var outputBuffer = new byte[encryptedBytes.Length];
@@ -149,9 +152,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 cbc.ProcessBlock(encryptedBytesArray, block * blockSize, outputBuffer, block * blockSize);
             // check padding:
             var paddingLen = outputBuffer[outputBuffer.Length - 1];
-            var contentLen = encryptedBytes.Length - (1 + paddingLen + (hmac.HashSize / 8));
+            var contentLen = encryptedBytes.Length - (1 + paddingLen + (hmac.HashSize / 8)) - blockSize;
 
-            return new Span<byte>(outputBuffer).Slice(0, contentLen).ToArray();
+            return new Span<byte>(outputBuffer).Slice(blockSize, contentLen).ToArray();
         }
 
         public byte[] DecryptApplicationData(TlsKeys tlsKeys, TlsPacket.TlsApplicationData applicationData, ulong sequenceNumber)
