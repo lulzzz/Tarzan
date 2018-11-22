@@ -19,7 +19,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         static void Main(string[] args)
         {
 
-            TlsCipherSuiteName.Test();
+            //TlsCipherSuiteName.Test();
 
 
             if (args.Length != 2)
@@ -76,7 +76,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
                     }
                     tlsDecoder.MasterSecret = ByteString.StringToByteArray(secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom)));
-                    var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString());
+                    var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString(), tlsDecoder.Compression);
                     tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
 
                     foreach (var (name, dataset, tlskeys) in new[] { (Name: "client", Data: clientData, Keys:tlsDecoder.KeyBlock.GetClientKeys()), 
@@ -85,7 +85,11 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                         foreach (var (data, index) in dataset.Select((d, i) => (Data: d, Index: i + 1)))
                         {
                             var plainBytes = tlsDecoder.DecryptApplicationData(tlskeys, data, (ulong)index);
-                            File.WriteAllBytes($"{filepath}-{name}-{index}.raw", plainBytes);
+                            if (tlsDecoder.Compression == TlsPacket.CompressionMethods.Deflate)
+                            {
+                                plainBytes = tlsDecoder.Decompress(plainBytes);
+                            }
+                            File.WriteAllBytes($"{filepath}-{tlsDecoder.CipherSuite}-{name}-{index}.txt", plainBytes);
                         }
                     }
                 }
@@ -129,7 +133,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         private static IEnumerable<(long Offset, int Length, TlsPacket Packet)> ParseTlsPacket(KaitaiStream kaitaiStream)
         {
             var packets = new List<(long Offset, int Length, TlsPacket Packet)>();
-            try
+            //try
             {
                 while (!kaitaiStream.IsEof)
                 {
@@ -139,9 +143,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     packets.Add((tlsOffset, (int)tlsLength, tlsPacket));
                 }
             }
-            catch (Exception e)
+            //catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+            //    Console.Error.WriteLine(e);
             }
             return packets;
         }
@@ -198,6 +202,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                             decoder.ServerRandom = ByteString.Combine(serverHello.Random.RandomTime,serverHello.Random.RandomBytes);
                             decoder.CipherSuite = (TlsCipherSuite)serverHello.CipherSuite.CipherId;
                             decoder.ProtocolVersion = version;
+                            decoder.Compression = serverHello.CompressionMethod;
                             break;
                         case TlsPacket.TlsHandshakeType.Certificate:
                             var certificate = handshake.Body as TlsPacket.TlsCertificate;
@@ -227,8 +232,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
 
 
-        private static string getExtensionString(TlsPacket.Extensions extensions)
+        private static string getExtensionString(TlsPacket.TlsExtensions extensions)
         {
+            
             // server name
 
             // application layer protocol negotiation
@@ -239,7 +245,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
         private static string getCiphersString(TlsPacket.CipherSuites cipherSuites)
         {
-            return String.Join(',', cipherSuites.CipherSuiteList.Select(x => (TlsCipherSuite)x));
+            return String.Join(',', cipherSuites.Items.Select(x => (TlsCipherSuite)x));
         }
 
        

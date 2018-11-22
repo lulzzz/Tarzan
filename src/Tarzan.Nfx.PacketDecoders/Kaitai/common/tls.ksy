@@ -149,12 +149,15 @@ types:
       - id: cipher_suite
         type: cipher_suite
     
-      - id: compression_methods
-        type: compression_methods
+      - id: compression_method
+        type: u1
+        enum: compression_methods
     
+      - id: extensions_length
+        type: u2        
       - id: extensions
-        type: extensions
-        if: _io.eof == false
+        type: tls_extensions
+        size: extensions_length
   
   tls_client_hello:
     seq:
@@ -170,13 +173,20 @@ types:
       - id: cipher_suites
         type: cipher_suites
     
+      - id: compression_methods_length
+        type: u1
       - id: compression_methods
-        type: compression_methods
-    
+        type: u1
+        enum: compression_methods
+        repeat: expr
+        repeat-expr: compression_methods_length
+        
+      - id: extensions_length
+        type: u2        
       - id: extensions
-        type: extensions
-        if: _io.eof == false
-
+        type: tls_extensions
+        size: extensions_length
+                    
   tls_client_key_exchange: 
     seq:
       - id: exchange_keys
@@ -208,45 +218,33 @@ types:
 
   cipher_suites:
     seq:
-      - id: len
+      - id: length
         type: u2
-      - id: cipher_suite_list
+      - id: items
         type: u2
         repeat: expr
-        repeat-expr: len/2
+        repeat-expr: length/2
 
   cipher_suite:
     seq:
       - id: cipher_id
         type: u2
-        
-  compression_methods:
-    seq:
-      - id: len
-        type: u1
-
-      - id: bytes
-        size: len
-
-  extensions:
-    seq:
-      - id: len
-        type: u2
-
-      - id: extension_list
-        type: extension
+          
+  tls_extensions:
+    seq: 
+      - id: items
+        type: tls_extension
         repeat: eos
-
-  extension:
+  tls_extension:
     seq:
       - id: type
         type: u2
 
-      - id: len
+      - id: length
         type: u2
 
       - id: body
-        size: len
+        size: length
         type:
           switch-on: type
           cases:
@@ -309,3 +307,6 @@ enums:
     15: certificate_verify
     16: client_key_exchange
     20: finished
+  compression_methods:
+    0: null_compression
+    1: deflate

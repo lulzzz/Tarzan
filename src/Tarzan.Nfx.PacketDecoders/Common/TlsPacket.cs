@@ -35,6 +35,12 @@ namespace Tarzan.Nfx.Packets.Common
             ClientKeyExchange = 16,
             Finished = 20,
         }
+
+        public enum CompressionMethods
+        {
+            NullCompression = 0,
+            Deflate = 1,
+        }
         public TlsPacket(KaitaiStream p__io, KaitaiStruct p__parent = null, TlsPacket p__root = null) : base(p__io)
         {
             m_parent = p__parent;
@@ -260,7 +266,7 @@ namespace Tarzan.Nfx.Packets.Common
                 return new Sni(new KaitaiStream(fileName));
             }
 
-            public Sni(KaitaiStream p__io, TlsPacket.Extension p__parent = null, TlsPacket p__root = null) : base(p__io)
+            public Sni(KaitaiStream p__io, TlsPacket.TlsExtension p__parent = null, TlsPacket p__root = null) : base(p__io)
             {
                 m_parent = p__parent;
                 m_root = p__root;
@@ -281,11 +287,11 @@ namespace Tarzan.Nfx.Packets.Common
             private ushort _listLength;
             private List<ServerName> _serverNames;
             private TlsPacket m_root;
-            private TlsPacket.Extension m_parent;
+            private TlsPacket.TlsExtension m_parent;
             public ushort ListLength { get { return _listLength; } }
             public List<ServerName> ServerNames { get { return _serverNames; } }
             public TlsPacket M_Root { get { return m_root; } }
-            public TlsPacket.Extension M_Parent { get { return m_parent; } }
+            public TlsPacket.TlsExtension M_Parent { get { return m_parent; } }
         }
         public partial class TlsServerHello : KaitaiStruct
         {
@@ -306,27 +312,32 @@ namespace Tarzan.Nfx.Packets.Common
                 _random = new Random(m_io, this, m_root);
                 _sessionId = new SessionId(m_io, this, m_root);
                 _cipherSuite = new CipherSuite(m_io, this, m_root);
-                _compressionMethods = new CompressionMethods(m_io, this, m_root);
-                if (M_Io.IsEof == false) {
-                    _extensions = new Extensions(m_io, this, m_root);
-                }
+                _compressionMethod = ((TlsPacket.CompressionMethods) m_io.ReadU1());
+                _extensionsLength = m_io.ReadU2be();
+                __raw_extensions = m_io.ReadBytes(ExtensionsLength);
+                var io___raw_extensions = new KaitaiStream(__raw_extensions);
+                _extensions = new TlsExtensions(io___raw_extensions, this, m_root);
             }
             private TlsVersion _version;
             private Random _random;
             private SessionId _sessionId;
             private CipherSuite _cipherSuite;
-            private CompressionMethods _compressionMethods;
-            private Extensions _extensions;
+            private CompressionMethods _compressionMethod;
+            private ushort _extensionsLength;
+            private TlsExtensions _extensions;
             private TlsPacket m_root;
             private TlsPacket.TlsHandshake m_parent;
+            private byte[] __raw_extensions;
             public TlsVersion Version { get { return _version; } }
             public Random Random { get { return _random; } }
             public SessionId SessionId { get { return _sessionId; } }
             public CipherSuite CipherSuite { get { return _cipherSuite; } }
-            public CompressionMethods CompressionMethods { get { return _compressionMethods; } }
-            public Extensions Extensions { get { return _extensions; } }
+            public CompressionMethods CompressionMethod { get { return _compressionMethod; } }
+            public ushort ExtensionsLength { get { return _extensionsLength; } }
+            public TlsExtensions Extensions { get { return _extensions; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
+            public byte[] M_RawExtensions { get { return __raw_extensions; } }
         }
         public partial class CipherSuites : KaitaiStruct
         {
@@ -343,21 +354,101 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _len = m_io.ReadU2be();
-                _cipherSuiteList = new List<ushort>((int) ((Len / 2)));
-                for (var i = 0; i < (Len / 2); i++)
+                _length = m_io.ReadU2be();
+                _items = new List<ushort>((int) ((Length / 2)));
+                for (var i = 0; i < (Length / 2); i++)
                 {
-                    _cipherSuiteList.Add(m_io.ReadU2be());
+                    _items.Add(m_io.ReadU2be());
                 }
             }
-            private ushort _len;
-            private List<ushort> _cipherSuiteList;
+            private ushort _length;
+            private List<ushort> _items;
             private TlsPacket m_root;
             private TlsPacket.TlsClientHello m_parent;
-            public ushort Len { get { return _len; } }
-            public List<ushort> CipherSuiteList { get { return _cipherSuiteList; } }
+            public ushort Length { get { return _length; } }
+            public List<ushort> Items { get { return _items; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsClientHello M_Parent { get { return m_parent; } }
+        }
+        public partial class TlsExtension : KaitaiStruct
+        {
+            public static TlsExtension FromFile(string fileName)
+            {
+                return new TlsExtension(new KaitaiStream(fileName));
+            }
+
+            public TlsExtension(KaitaiStream p__io, TlsPacket.TlsExtensions p__parent = null, TlsPacket p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _type = m_io.ReadU2be();
+                _length = m_io.ReadU2be();
+                switch (Type) {
+                case 0: {
+                    __raw_body = m_io.ReadBytes(Length);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new Sni(io___raw_body, this, m_root);
+                    break;
+                }
+                case 16: {
+                    __raw_body = m_io.ReadBytes(Length);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new Alpn(io___raw_body, this, m_root);
+                    break;
+                }
+                default: {
+                    _body = m_io.ReadBytes(Length);
+                    break;
+                }
+                }
+            }
+            private ushort _type;
+            private ushort _length;
+            private object _body;
+            private TlsPacket m_root;
+            private TlsPacket.TlsExtensions m_parent;
+            private byte[] __raw_body;
+            public ushort Type { get { return _type; } }
+            public ushort Length { get { return _length; } }
+            public object Body { get { return _body; } }
+            public TlsPacket M_Root { get { return m_root; } }
+            public TlsPacket.TlsExtensions M_Parent { get { return m_parent; } }
+            public byte[] M_RawBody { get { return __raw_body; } }
+        }
+        public partial class TlsExtensions : KaitaiStruct
+        {
+            public static TlsExtensions FromFile(string fileName)
+            {
+                return new TlsExtensions(new KaitaiStream(fileName));
+            }
+
+            public TlsExtensions(KaitaiStream p__io, KaitaiStruct p__parent = null, TlsPacket p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _items = new List<TlsExtension>();
+                {
+                    var i = 0;
+                    while (!m_io.IsEof) {
+                        _items.Add(new TlsExtension(m_io, this, m_root));
+                        i++;
+                    }
+                }
+            }
+            private List<TlsExtension> _items;
+            private TlsPacket m_root;
+            private KaitaiStruct m_parent;
+            public List<TlsExtension> Items { get { return _items; } }
+            public TlsPacket M_Root { get { return m_root; } }
+            public KaitaiStruct M_Parent { get { return m_parent; } }
         }
         public partial class TlsClientKeyExchange : KaitaiStruct
         {
@@ -407,33 +498,6 @@ namespace Tarzan.Nfx.Packets.Common
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket M_Parent { get { return m_parent; } }
         }
-        public partial class CompressionMethods : KaitaiStruct
-        {
-            public static CompressionMethods FromFile(string fileName)
-            {
-                return new CompressionMethods(new KaitaiStream(fileName));
-            }
-
-            public CompressionMethods(KaitaiStream p__io, KaitaiStruct p__parent = null, TlsPacket p__root = null) : base(p__io)
-            {
-                m_parent = p__parent;
-                m_root = p__root;
-                _read();
-            }
-            private void _read()
-            {
-                _len = m_io.ReadU1();
-                _bytes = m_io.ReadBytes(Len);
-            }
-            private byte _len;
-            private byte[] _bytes;
-            private TlsPacket m_root;
-            private KaitaiStruct m_parent;
-            public byte Len { get { return _len; } }
-            public byte[] Bytes { get { return _bytes; } }
-            public TlsPacket M_Root { get { return m_root; } }
-            public KaitaiStruct M_Parent { get { return m_parent; } }
-        }
         public partial class TlsCertificateVerify : KaitaiStruct
         {
             public static TlsCertificateVerify FromFile(string fileName)
@@ -465,7 +529,7 @@ namespace Tarzan.Nfx.Packets.Common
                 return new Alpn(new KaitaiStream(fileName));
             }
 
-            public Alpn(KaitaiStream p__io, TlsPacket.Extension p__parent = null, TlsPacket p__root = null) : base(p__io)
+            public Alpn(KaitaiStream p__io, TlsPacket.TlsExtension p__parent = null, TlsPacket p__root = null) : base(p__io)
             {
                 m_parent = p__parent;
                 m_root = p__root;
@@ -486,45 +550,11 @@ namespace Tarzan.Nfx.Packets.Common
             private ushort _extLen;
             private List<Protocol> _alpnProtocols;
             private TlsPacket m_root;
-            private TlsPacket.Extension m_parent;
+            private TlsPacket.TlsExtension m_parent;
             public ushort ExtLen { get { return _extLen; } }
             public List<Protocol> AlpnProtocols { get { return _alpnProtocols; } }
             public TlsPacket M_Root { get { return m_root; } }
-            public TlsPacket.Extension M_Parent { get { return m_parent; } }
-        }
-        public partial class Extensions : KaitaiStruct
-        {
-            public static Extensions FromFile(string fileName)
-            {
-                return new Extensions(new KaitaiStream(fileName));
-            }
-
-            public Extensions(KaitaiStream p__io, KaitaiStruct p__parent = null, TlsPacket p__root = null) : base(p__io)
-            {
-                m_parent = p__parent;
-                m_root = p__root;
-                _read();
-            }
-            private void _read()
-            {
-                _len = m_io.ReadU2be();
-                _extensionList = new List<Extension>();
-                {
-                    var i = 0;
-                    while (!m_io.IsEof) {
-                        _extensionList.Add(new Extension(m_io, this, m_root));
-                        i++;
-                    }
-                }
-            }
-            private ushort _len;
-            private List<Extension> _extensionList;
-            private TlsPacket m_root;
-            private KaitaiStruct m_parent;
-            public ushort Len { get { return _len; } }
-            public List<Extension> ExtensionList { get { return _extensionList; } }
-            public TlsPacket M_Root { get { return m_root; } }
-            public KaitaiStruct M_Parent { get { return m_parent; } }
+            public TlsPacket.TlsExtension M_Parent { get { return m_parent; } }
         }
         public partial class TlsPreMasterSecret : KaitaiStruct
         {
@@ -620,27 +650,39 @@ namespace Tarzan.Nfx.Packets.Common
                 _random = new Random(m_io, this, m_root);
                 _sessionId = new SessionId(m_io, this, m_root);
                 _cipherSuites = new CipherSuites(m_io, this, m_root);
-                _compressionMethods = new CompressionMethods(m_io, this, m_root);
-                if (M_Io.IsEof == false) {
-                    _extensions = new Extensions(m_io, this, m_root);
+                _compressionMethodsLength = m_io.ReadU1();
+                _compressionMethods = new List<CompressionMethods>((int) (CompressionMethodsLength));
+                for (var i = 0; i < CompressionMethodsLength; i++)
+                {
+                    _compressionMethods.Add(((TlsPacket.CompressionMethods) m_io.ReadU1()));
                 }
+                _extensionsLength = m_io.ReadU2be();
+                __raw_extensions = m_io.ReadBytes(ExtensionsLength);
+                var io___raw_extensions = new KaitaiStream(__raw_extensions);
+                _extensions = new TlsExtensions(io___raw_extensions, this, m_root);
             }
             private TlsVersion _version;
             private Random _random;
             private SessionId _sessionId;
             private CipherSuites _cipherSuites;
-            private CompressionMethods _compressionMethods;
-            private Extensions _extensions;
+            private byte _compressionMethodsLength;
+            private List<CompressionMethods> _compressionMethods;
+            private ushort _extensionsLength;
+            private TlsExtensions _extensions;
             private TlsPacket m_root;
             private TlsPacket.TlsHandshake m_parent;
+            private byte[] __raw_extensions;
             public TlsVersion Version { get { return _version; } }
             public Random Random { get { return _random; } }
             public SessionId SessionId { get { return _sessionId; } }
             public CipherSuites CipherSuites { get { return _cipherSuites; } }
-            public CompressionMethods CompressionMethods { get { return _compressionMethods; } }
-            public Extensions Extensions { get { return _extensions; } }
+            public byte CompressionMethodsLength { get { return _compressionMethodsLength; } }
+            public List<CompressionMethods> CompressionMethods { get { return _compressionMethods; } }
+            public ushort ExtensionsLength { get { return _extensionsLength; } }
+            public TlsExtensions Extensions { get { return _extensions; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
+            public byte[] M_RawExtensions { get { return __raw_extensions; } }
         }
         public partial class TlsServerHelloDone : KaitaiStruct
         {
@@ -960,55 +1002,6 @@ namespace Tarzan.Nfx.Packets.Common
             public byte[] VerifyData { get { return _verifyData; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
-        }
-        public partial class Extension : KaitaiStruct
-        {
-            public static Extension FromFile(string fileName)
-            {
-                return new Extension(new KaitaiStream(fileName));
-            }
-
-            public Extension(KaitaiStream p__io, TlsPacket.Extensions p__parent = null, TlsPacket p__root = null) : base(p__io)
-            {
-                m_parent = p__parent;
-                m_root = p__root;
-                _read();
-            }
-            private void _read()
-            {
-                _type = m_io.ReadU2be();
-                _len = m_io.ReadU2be();
-                switch (Type) {
-                case 0: {
-                    __raw_body = m_io.ReadBytes(Len);
-                    var io___raw_body = new KaitaiStream(__raw_body);
-                    _body = new Sni(io___raw_body, this, m_root);
-                    break;
-                }
-                case 16: {
-                    __raw_body = m_io.ReadBytes(Len);
-                    var io___raw_body = new KaitaiStream(__raw_body);
-                    _body = new Alpn(io___raw_body, this, m_root);
-                    break;
-                }
-                default: {
-                    _body = m_io.ReadBytes(Len);
-                    break;
-                }
-                }
-            }
-            private ushort _type;
-            private ushort _len;
-            private object _body;
-            private TlsPacket m_root;
-            private TlsPacket.Extensions m_parent;
-            private byte[] __raw_body;
-            public ushort Type { get { return _type; } }
-            public ushort Len { get { return _len; } }
-            public object Body { get { return _body; } }
-            public TlsPacket M_Root { get { return m_root; } }
-            public TlsPacket.Extensions M_Parent { get { return m_parent; } }
-            public byte[] M_RawBody { get { return __raw_body; } }
         }
         private TlsContentType _contentType;
         private TlsVersion _version;

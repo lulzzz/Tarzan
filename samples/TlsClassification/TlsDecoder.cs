@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography;
@@ -56,6 +58,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// </summary>
         /// <value>The key block.</value>
         public TlsKeyBlock KeyBlock { get; private set;}
+        public TlsPacket.CompressionMethods Compression { get; internal set; }
 
         public TlsDecoder()
         {
@@ -79,7 +82,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             SecurityParameters = securityParameters;
             // key_block = PRF(SecurityParameters.master_secret, "key expansion",
             // SecurityParameters.server_random + SecurityParameters.client_random);
-            var bytes = securityParameters.PrfAlgorithm.GetSecretBytes(MasterSecret, "key expansion",
+            var bytes = securityParameters.Prf.GetSecretBytes(MasterSecret, "key expansion",
                                                                        ByteString.Combine(ServerRandom, ClientRandom),
                                                                        securityParameters.KeyMaterialSize/8);
                                                                        
@@ -104,6 +107,24 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return plainBytes;
         }
 
+        public byte[] Decompress(byte[] plainBytes)
+        {
+            var ms = DecompressBytes(plainBytes);
+            return ms.ToArray();
+        }
+
+        private static MemoryStream DecompressBytes(byte[] input)
+        {
+            var output = new MemoryStream();
+
+            using (var compressStream = new MemoryStream(input))
+            using (var decompressor = new DeflateStream(compressStream, CompressionMode.Decompress))
+                decompressor.CopyTo(output);
+
+            output.Position = 0;
+            return output;
+        }
+
         /// <summary>
         /// Decrypts bytes using the block cipher and CBC methods (https://tools.ietf.org/html/rfc2246#section-6.2.3.2).
         /// </summary>
@@ -125,10 +146,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             var outputBuffer = new byte[encryptedBytes.Length];
             var encryptedBytesArray = encryptedBytes.ToArray();
             for (var block = 0; block < encryptedBytes.Length / blockSize; block++) 
-                cbc.ProcessBlock(encryptedBytesArray, block * blockSize, outputBuffer, blockSize * blockSize);
+                cbc.ProcessBlock(encryptedBytesArray, block * blockSize, outputBuffer, block * blockSize);
             // check padding:
             var paddingLen = outputBuffer[outputBuffer.Length - 1];
-            var contentLen = encryptedBytes.Length - (paddingLen + (hmac.HashSize / 8));
+            var contentLen = encryptedBytes.Length - (1 + paddingLen + (hmac.HashSize / 8));
 
             return new Span<byte>(outputBuffer).Slice(0, contentLen).ToArray();
         }

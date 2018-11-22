@@ -57,11 +57,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
     public enum TlsCipherType { Unknown, Stream, Block, Aead }
     public enum TlsCipherMode { Unknown, CBC, CCM, CCM_8,  GCM }
-    public enum TlsCommpressionMethod { Null }
 
     public class TlsSecurityParameters
     {
-        public PrfAlgorithm PrfAlgorithm { get; set; }
         public string CipherAlgorithm { get; set; }
         public TlsCipherType CipherType
         {
@@ -79,7 +77,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
 
         public TlsCipherMode CipherMode { get; set; }
+
         public int EncodingKeyLength { get; set; }
+
         public int FixedIVLength { get; set; }
         public int RecordIVLength { get; set; }
 
@@ -87,9 +87,11 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         public int MacLength { get; set; }
         public int MacKeyLength { get; set; }
 
+        public string PrfHashAlgorithm { get; set; }
+
         SslProtocols ProtocolVersion { get; set; }
 
-        public TlsCommpressionMethod CommpressionMethod { get; set; }
+        public TlsPacket.CompressionMethods CommpressionMethod { get; set; }
 
         /// <summary>
         /// Gets the size in bits of the key material.
@@ -106,22 +108,24 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 switch (this.ProtocolVersion)
                 {
                     case SslProtocols.Tls12:
-                        return new ShaPrfAlgorithm(this.MacAlgorithm);
+                        return new ShaPrfAlgorithm(this.PrfHashAlgorithm);
                     default:
                         return new LegacyPrfAlgorithm();
                 }
             }
         }
 
-        public static TlsSecurityParameters Create(SslProtocols protocolVersion, string cipherSuite)
+        public static TlsSecurityParameters Create(SslProtocols protocolVersion, string cipherSuite, TlsPacket.CompressionMethods compressionMethod = TlsPacket.CompressionMethods.NullCompression)
         {
             var cipherSuiteName = new TlsCipherSuiteName(cipherSuite);
             var sp = new TlsSecurityParameters();
-            sp.CipherAlgorithm = cipherSuiteName.MacAlgorithm;
+            sp.ProtocolVersion = protocolVersion;
+            sp.CipherAlgorithm = cipherSuiteName.BlockCipherName;
             sp.CipherMode = Enum.Parse<TlsCipherMode>(cipherSuiteName.BlockCipherMode, true);
-            sp.CommpressionMethod = TlsCommpressionMethod.Null;
+            sp.MacAlgorithm = String.Empty;
 
-            if (String.IsNullOrEmpty(cipherSuiteName.BlockCipherSize))
+            sp.CommpressionMethod = compressionMethod;
+             if (String.IsNullOrEmpty(cipherSuiteName.BlockCipherSize))
                 sp.EncodingKeyLength = GetEncodingKeyLength(cipherSuiteName.BlockCipherName);
             else
                 sp.EncodingKeyLength = Int32.Parse(cipherSuiteName.BlockCipherSize);
@@ -132,6 +136,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case TlsCipherMode.GCM:
                     {
                         sp.MacAlgorithm = String.Empty;
+                        sp.PrfHashAlgorithm = cipherSuiteName.MacAlgorithm;
                         sp.MacKeyLength = 0;
                         sp.MacLength = 16 * 8;
                         sp.FixedIVLength = 4 * 8;
@@ -141,6 +146,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case TlsCipherMode.CCM_8:
                     {
                         sp.MacAlgorithm = String.Empty;
+                        sp.PrfHashAlgorithm = cipherSuiteName.MacAlgorithm;
                         sp.MacKeyLength = 0;
                         sp.MacLength = 8 * 8;
                         sp.FixedIVLength = 4 * 8;
@@ -152,8 +158,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                         sp.MacAlgorithm = cipherSuiteName.MacAlgorithm;
                         sp.MacKeyLength = GetMacLength(cipherSuiteName.MacAlgorithm); // actually the same value as mac length
                         sp.MacLength = GetMacLength(cipherSuiteName.MacAlgorithm);
-                        sp.FixedIVLength = 8 * 8;   // this is what we want to generate by PRF as IV
+                        sp.FixedIVLength = GetBlockLength(cipherSuiteName.BlockCipher);  
                         sp.RecordIVLength = 0;
+                        sp.PrfHashAlgorithm = (protocolVersion == SslProtocols.Tls12) ? cipherSuiteName.MacAlgorithm : "SHA256";
                         break;
                     }
             }
@@ -274,17 +281,17 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// </summary>
         /// <returns>The block length.</returns>
         /// <param name="cipherAlgorithm">Cipher algorithm.</param>
-        public static int GetBlockLength(CipherAlgorithmType cipherAlgorithm)
+        public static int GetBlockLength(string cipherAlgorithm)
         {
-            switch (cipherAlgorithm)
+            switch (cipherAlgorithm.ToUpperInvariant())
             {
-                case CipherAlgorithmType.Aes128: return 128;
-                case CipherAlgorithmType.Aes192: return 192;
-                case CipherAlgorithmType.Aes256: return 256;
-                case CipherAlgorithmType.Des: return 64;
-                case CipherAlgorithmType.TripleDes: return 64;
-                case CipherAlgorithmType.Rc2: return 64;
-                case CipherAlgorithmType.Rc4: return 1;
+                case "AES": return 128;
+                case "CAMELLIA": return 128;
+                case "DES": return 64;
+                case "RC2": return 64;
+                case "3DES": return 64;
+                case "RC4": return 1;
+                case "IDEA": return 64;
                 default: return 128;
             }
         }

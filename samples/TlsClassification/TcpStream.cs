@@ -75,8 +75,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var targetBuffer = new Span<byte>(buffer, offset, count);
+            var remainingCount = count;
+            var targetBuffer = new Span<byte>(buffer, offset, remainingCount);
             var readCount = 0;
+
             while (m_currentPacket < m_packets.Count)
             {
                 var currentBuffer = new Span<byte>(getPayload(m_packets[m_currentPacket])).Slice(m_offsetInPacketPayload);
@@ -86,26 +88,26 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     m_currentPacket++;
                     continue;
                 }
-                if (currentBuffer.Length > count)
+                if (currentBuffer.Length > remainingCount)
                 {
-                    currentBuffer.Slice(0, count).CopyTo(targetBuffer);
-                    m_offsetInPacketPayload += count;
-                    m_absolutePosition += count;
-                    readCount += count;
-                    count = 0;
+                    currentBuffer.Slice(0, remainingCount).CopyTo(targetBuffer);
+                    m_offsetInPacketPayload += remainingCount;
+                    m_absolutePosition += remainingCount;
+                    readCount += remainingCount;
+                    remainingCount = 0;
                     break;
                 }
-                if (currentBuffer.Length == count)
+                if (currentBuffer.Length == remainingCount)
                 {
                     currentBuffer.CopyTo(targetBuffer);
                     m_offsetInPacketPayload = 0;
                     m_currentPacket++;
-                    m_absolutePosition += count;
-                    readCount += count;
-                    count = 0;
+                    m_absolutePosition += remainingCount;
+                    readCount += remainingCount;
+                    remainingCount = 0;
                     break;
                 }
-                if (currentBuffer.Length < count)
+                if (currentBuffer.Length < remainingCount)
                 {
                     // take the rest and move to the next packet...
                     currentBuffer.CopyTo(targetBuffer);
@@ -114,7 +116,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     m_offsetInPacketPayload = 0;
                     m_absolutePosition += currentBuffer.Length;
                     readCount += currentBuffer.Length;
-                    count -= currentBuffer.Length;
+                    remainingCount -= currentBuffer.Length;
                     continue;
                 }
             }

@@ -107,7 +107,7 @@ namespace Tarzan.Nfx.PacketDecoders.Tests
                     }
                     break;
                 case TlsPacket.TlsClientHello clientHello:
-                    foreach(var suite in clientHello.CipherSuites.CipherSuiteList)
+                    foreach(var suite in clientHello.CipherSuites.Items)
                     {
                         Console.WriteLine($"{(TlsCipherSuite)suite}");
                     } 
