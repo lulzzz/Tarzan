@@ -23,7 +23,28 @@ seq:
         'tls_content_type::handshake': tls_handshake
         'tls_content_type::application_data': tls_application_data
         _ : tls_encrypted_message
-types:
+  
+  
+  - id: finished    
+    type: tls_finished
+    if: 'content_type == tls_content_type::change_cipher_spec'
+    doc: | 
+           The finished message always follows ChangeCipherSpec and 
+           because the whole message is encrypted, it is not possible
+           to identify it by its content_type. 
+    
+types:  
+  tls_finished: 
+    seq:
+      - id: handshake_msg_type
+        contents: [0x16]  
+      - id: version
+        type: tls_version      
+      - id: length 
+        type: u2
+      - id: finished_bytes
+        size: length 
+        
   tls_version:
     seq:
       - id: major
@@ -46,8 +67,7 @@ types:
     seq:
       - id: body
         size-eos: true
-        
-        
+       
   tls_handshake:
     seq:
       - id: msg_type
@@ -55,14 +75,12 @@ types:
         enum: tls_handshake_type
       - id: length 
         type: tls_length
-        if: msg_type.to_i < 32
       - id: body
         size: length.value
-        if: msg_type.to_i < 32
         type:
           switch-on: msg_type
           cases:
-            'tls_handshake_type::hello_request' : tls_empty
+            'tls_handshake_type::hello_request' : tls_hello_request
             'tls_handshake_type::client_hello': tls_client_hello
             'tls_handshake_type::server_hello': tls_server_hello
             'tls_handshake_type::certificate': tls_certificate
@@ -71,11 +89,7 @@ types:
             'tls_handshake_type::server_hello_done': tls_server_hello_done
             'tls_handshake_type::certificate_verify': tls_certificate_verify
             'tls_handshake_type::client_key_exchange': tls_client_key_exchange
-            'tls_handshake_type::finished': tls_finished
-      - id: encrypted_msg
-        size-eos: true
-
-
+            
   tls_length:
     seq:
       - id: hlen
@@ -86,7 +100,7 @@ types:
       value: 
         value: (llen + (hlen << 16))
     
-  tls_empty:
+  tls_hello_request:
     seq:
       - id: empty
         size: 0
@@ -99,24 +113,19 @@ types:
 
   tls_certificate_verify:
     seq:
-      - id: empty
-        size: 0        
+      - id: signed_handshake_message
+        size-eos: true        
   
   tls_certificate_request:
     seq:
-      - id: empty
-        size: 0   
+      - id: request
+        size-eos: true   
   
   tls_server_key_exchange:
     seq:
-      - id: empty
-        size: 0      
-        
-  tls_finished:
-    seq:
-      - id: verify_data
-        size-eos: true         
-        
+      - id: server_key_exchange
+        size-eos: true      
+                
   tls_certificate:
     seq:
       - id: cert_length

@@ -249,11 +249,13 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     return new AesEngine();
                 case "DES":
                     return new DesEngine();
+                case "3DES":
+                    return new TripleDES();
                 case "RC2":
                     return new RC2Engine();
                 case "IDEA":
                     return new IdeaEngine();
-                case "CAMELLIA128":
+                case "CAMELLIA":
                     return new CamelliaEngine();
 
             }

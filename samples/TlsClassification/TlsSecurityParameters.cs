@@ -56,7 +56,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
     }
 
     public enum TlsCipherType { Unknown, Stream, Block, Aead }
-    public enum TlsCipherMode { Unknown, CBC, CCM, CCM_8,  GCM }
+    public enum TlsCipherMode { Unknown, CBC, EDE_CBC, CCM, CCM_8,  GCM }
 
     public class TlsSecurityParameters
     {

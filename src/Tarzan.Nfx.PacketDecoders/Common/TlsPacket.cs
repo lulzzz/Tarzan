@@ -84,6 +84,9 @@ namespace Tarzan.Nfx.Packets.Common
                 break;
             }
             }
+            if (ContentType == TlsContentType.ChangeCipherSpec) {
+                _finished = new TlsFinished(m_io, this, m_root);
+            }
         }
         public partial class ServerName : KaitaiStruct
         {
@@ -157,12 +160,12 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _empty = m_io.ReadBytes(0);
+                _request = m_io.ReadBytesFull();
             }
-            private byte[] _empty;
+            private byte[] _request;
             private TlsPacket m_root;
             private TlsPacket.TlsHandshake m_parent;
-            public byte[] Empty { get { return _empty; } }
+            public byte[] Request { get { return _request; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
         }
@@ -513,12 +516,12 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _empty = m_io.ReadBytes(0);
+                _signedHandshakeMessage = m_io.ReadBytesFull();
             }
-            private byte[] _empty;
+            private byte[] _signedHandshakeMessage;
             private TlsPacket m_root;
             private TlsPacket.TlsHandshake m_parent;
-            public byte[] Empty { get { return _empty; } }
+            public byte[] SignedHandshakeMessage { get { return _signedHandshakeMessage; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
         }
@@ -598,12 +601,12 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _empty = m_io.ReadBytes(0);
+                _serverKeyExchange = m_io.ReadBytesFull();
             }
-            private byte[] _empty;
+            private byte[] _serverKeyExchange;
             private TlsPacket m_root;
             private TlsPacket.TlsHandshake m_parent;
-            public byte[] Empty { get { return _empty; } }
+            public byte[] ServerKeyExchange { get { return _serverKeyExchange; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
         }
@@ -708,6 +711,30 @@ namespace Tarzan.Nfx.Packets.Common
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
         }
+        public partial class TlsHelloRequest : KaitaiStruct
+        {
+            public static TlsHelloRequest FromFile(string fileName)
+            {
+                return new TlsHelloRequest(new KaitaiStream(fileName));
+            }
+
+            public TlsHelloRequest(KaitaiStream p__io, TlsPacket.TlsHandshake p__parent = null, TlsPacket p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _empty = m_io.ReadBytes(0);
+            }
+            private byte[] _empty;
+            private TlsPacket m_root;
+            private TlsPacket.TlsHandshake m_parent;
+            public byte[] Empty { get { return _empty; } }
+            public TlsPacket M_Root { get { return m_root; } }
+            public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
+        }
         public partial class TlsEncryptedMessage : KaitaiStruct
         {
             public static TlsEncryptedMessage FromFile(string fileName)
@@ -756,30 +783,6 @@ namespace Tarzan.Nfx.Packets.Common
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket.TlsServerHello M_Parent { get { return m_parent; } }
         }
-        public partial class TlsEmpty : KaitaiStruct
-        {
-            public static TlsEmpty FromFile(string fileName)
-            {
-                return new TlsEmpty(new KaitaiStream(fileName));
-            }
-
-            public TlsEmpty(KaitaiStream p__io, TlsPacket.TlsHandshake p__parent = null, TlsPacket p__root = null) : base(p__io)
-            {
-                m_parent = p__parent;
-                m_root = p__root;
-                _read();
-            }
-            private void _read()
-            {
-                _empty = m_io.ReadBytes(0);
-            }
-            private byte[] _empty;
-            private TlsPacket m_root;
-            private TlsPacket.TlsHandshake m_parent;
-            public byte[] Empty { get { return _empty; } }
-            public TlsPacket M_Root { get { return m_root; } }
-            public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
-        }
         public partial class TlsHandshake : KaitaiStruct
         {
             public static TlsHandshake FromFile(string fileName)
@@ -796,90 +799,77 @@ namespace Tarzan.Nfx.Packets.Common
             private void _read()
             {
                 _msgType = ((TlsPacket.TlsHandshakeType) m_io.ReadU1());
-                if ((int)MsgType < 32) {
-                    _length = new TlsLength(m_io, this, m_root);
+                _length = new TlsLength(m_io, this, m_root);
+                switch (MsgType) {
+                case TlsPacket.TlsHandshakeType.HelloRequest: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsHelloRequest(io___raw_body, this, m_root);
+                    break;
                 }
-                if ((int)MsgType < 32) {
-                    switch (MsgType) {
-                    case TlsPacket.TlsHandshakeType.HelloRequest: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsEmpty(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.Certificate: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsCertificate(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.CertificateVerify: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsCertificateVerify(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.ServerKeyExchange: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsServerKeyExchange(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.ClientHello: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsClientHello(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.Finished: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsFinished(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.ClientKeyExchange: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsClientKeyExchange(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.ServerHello: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsServerHello(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.CertificateRequest: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsCertificateRequest(io___raw_body, this, m_root);
-                        break;
-                    }
-                    case TlsPacket.TlsHandshakeType.ServerHelloDone: {
-                        __raw_body = m_io.ReadBytes(Length.Value);
-                        var io___raw_body = new KaitaiStream(__raw_body);
-                        _body = new TlsServerHelloDone(io___raw_body, this, m_root);
-                        break;
-                    }
-                    default: {
-                        _body = m_io.ReadBytes(Length.Value);
-                        break;
-                    }
-                    }
+                case TlsPacket.TlsHandshakeType.Certificate: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsCertificate(io___raw_body, this, m_root);
+                    break;
                 }
-                _encryptedMsg = m_io.ReadBytesFull();
+                case TlsPacket.TlsHandshakeType.CertificateVerify: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsCertificateVerify(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.ServerKeyExchange: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsServerKeyExchange(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.ClientHello: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsClientHello(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.ClientKeyExchange: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsClientKeyExchange(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.ServerHello: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsServerHello(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.CertificateRequest: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsCertificateRequest(io___raw_body, this, m_root);
+                    break;
+                }
+                case TlsPacket.TlsHandshakeType.ServerHelloDone: {
+                    __raw_body = m_io.ReadBytes(Length.Value);
+                    var io___raw_body = new KaitaiStream(__raw_body);
+                    _body = new TlsServerHelloDone(io___raw_body, this, m_root);
+                    break;
+                }
+                default: {
+                    _body = m_io.ReadBytes(Length.Value);
+                    break;
+                }
+                }
             }
             private TlsHandshakeType _msgType;
             private TlsLength _length;
             private object _body;
-            private byte[] _encryptedMsg;
             private TlsPacket m_root;
             private TlsPacket m_parent;
             private byte[] __raw_body;
             public TlsHandshakeType MsgType { get { return _msgType; } }
             public TlsLength Length { get { return _length; } }
             public object Body { get { return _body; } }
-            public byte[] EncryptedMsg { get { return _encryptedMsg; } }
             public TlsPacket M_Root { get { return m_root; } }
             public TlsPacket M_Parent { get { return m_parent; } }
             public byte[] M_RawBody { get { return __raw_body; } }
@@ -986,7 +976,7 @@ namespace Tarzan.Nfx.Packets.Common
                 return new TlsFinished(new KaitaiStream(fileName));
             }
 
-            public TlsFinished(KaitaiStream p__io, TlsPacket.TlsHandshake p__parent = null, TlsPacket p__root = null) : base(p__io)
+            public TlsFinished(KaitaiStream p__io, TlsPacket p__parent = null, TlsPacket p__root = null) : base(p__io)
             {
                 m_parent = p__parent;
                 m_root = p__root;
@@ -994,19 +984,29 @@ namespace Tarzan.Nfx.Packets.Common
             }
             private void _read()
             {
-                _verifyData = m_io.ReadBytesFull();
+                _handshakeMsgType = m_io.EnsureFixedContents(new byte[] { 22 });
+                _version = new TlsVersion(m_io, this, m_root);
+                _length = m_io.ReadU2be();
+                _finishedBytes = m_io.ReadBytes(Length);
             }
-            private byte[] _verifyData;
+            private byte[] _handshakeMsgType;
+            private TlsVersion _version;
+            private ushort _length;
+            private byte[] _finishedBytes;
             private TlsPacket m_root;
-            private TlsPacket.TlsHandshake m_parent;
-            public byte[] VerifyData { get { return _verifyData; } }
+            private TlsPacket m_parent;
+            public byte[] HandshakeMsgType { get { return _handshakeMsgType; } }
+            public TlsVersion Version { get { return _version; } }
+            public ushort Length { get { return _length; } }
+            public byte[] FinishedBytes { get { return _finishedBytes; } }
             public TlsPacket M_Root { get { return m_root; } }
-            public TlsPacket.TlsHandshake M_Parent { get { return m_parent; } }
+            public TlsPacket M_Parent { get { return m_parent; } }
         }
         private TlsContentType _contentType;
         private TlsVersion _version;
         private ushort _length;
         private KaitaiStruct _fragment;
+        private TlsFinished _finished;
         private TlsPacket m_root;
         private KaitaiStruct m_parent;
         private byte[] __raw_fragment;
@@ -1014,6 +1014,13 @@ namespace Tarzan.Nfx.Packets.Common
         public TlsVersion Version { get { return _version; } }
         public ushort Length { get { return _length; } }
         public KaitaiStruct Fragment { get { return _fragment; } }
+
+        /// <summary>
+        /// The finished message always follow ChangeCipherSpec and 
+        /// because the whole message is encrypted, it is not possible
+        /// to identify it by its content_type. 
+        /// </summary>
+        public TlsFinished Finished { get { return _finished; } }
         public TlsPacket M_Root { get { return m_root; } }
         public KaitaiStruct M_Parent { get { return m_parent; } }
         public byte[] M_RawFragment { get { return __raw_fragment; } }
