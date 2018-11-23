@@ -162,42 +162,45 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         public byte[] DecryptApplicationData(TlsKeys tlsKeys, TlsPacket.TlsApplicationData applicationData, ulong sequenceNumber)
         {
             if (KeyBlock == null) throw new InvalidOperationException($"KeyBlock not initialized. Please, call {nameof(InitializeKeyBlock)} first.");
-            var writeKey = tlsKeys.EncodingKey;
-            var mackKey = tlsKeys.MacKey;
-            var fixedNonce = new Span<byte>(tlsKeys.IV).Slice(0, SecurityParameters.FixedIVLength / 8);
 
             var content = new Span<byte>(applicationData.Body);
-
-            var macLength = SecurityParameters.MacLength / 8;
-            var recordNonceLength = SecurityParameters.RecordIVLength / 8;
-            var recordNonce = content.Slice(0, recordNonceLength);
-
-            var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
-
-            var additionalData = ByteString.Combine(
+           
+            if (this.SecurityParameters.CipherType == TlsCipherType.Aead)
+            {
+                var macLength = SecurityParameters.MacLength / 8;
+                var recordNonceLength = SecurityParameters.RecordIVLength / 8;
+                var nonce = ComputeNonce(tlsKeys, content);
+                var additionalData = ByteString.Combine(
                     BitConverter.GetBytes(sequenceNumber).Reverse().ToArray(),
                     new byte[] { (byte)applicationData.M_Parent.ContentType,
-                                       applicationData.M_Parent.Version.Major,
-                                       applicationData.M_Parent.Version.Minor },
+                                                   applicationData.M_Parent.Version.Major,
+                                                   applicationData.M_Parent.Version.Minor },
                     BitConverter.GetBytes((ushort)(applicationData.Body.Length - (recordNonceLength + macLength))).Reverse().ToArray()
                 );
 
-            if (this.SecurityParameters.CipherType == TlsCipherType.Aead)
-            {
                 var aead = CreateAeadCipher(SecurityParameters.CipherMode, CreateBlockCipher(SecurityParameters.CipherAlgorithm.ToString().ToUpperInvariant()));
-                return DecryptAead(aead, writeKey, nonce, content.Slice(recordNonceLength), additionalData);
+                return DecryptAead(aead, tlsKeys.EncodingKey, nonce, content.Slice(recordNonceLength), additionalData);
             }
             if (this.SecurityParameters.CipherType == TlsCipherType.Block)
             {
                 var cbc = CreateBlockCipher(SecurityParameters.CipherMode, CreateBlockCipher(SecurityParameters.CipherAlgorithm.ToString().ToUpperInvariant()));
                 var mac = CreateHMacAlgorithm(SecurityParameters.MacAlgorithm);
-                return DecryptBlock(cbc, mac, writeKey, fixedNonce, mackKey, content.Slice(recordNonceLength));
+                return DecryptBlock(cbc, mac, tlsKeys.EncodingKey, tlsKeys.IV, tlsKeys.MacKey, content);
             }
             if (this.SecurityParameters.CipherType == TlsCipherType.Stream)
             {
                 throw new NotImplementedException();
             }
             throw new NotSupportedException($"Decrypting {CipherSuite.ToString()} is not supported.");
+        }
+
+        private Span<byte> ComputeNonce(TlsKeys tlsKeys, Span<byte> content)
+        {
+            var fixedNonce = new Span<byte>(tlsKeys.IV).Slice(0, SecurityParameters.FixedIVLength / 8);
+            var recordNonceLength = SecurityParameters.RecordIVLength / 8;
+            var recordNonce = content.Slice(0, recordNonceLength);
+            var nonce = ByteString.Combine(fixedNonce.ToArray(), recordNonce.ToArray());
+            return nonce;
         }
 
         private HMAC CreateHMacAlgorithm(string macAlgorithm)

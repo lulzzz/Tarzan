@@ -126,7 +126,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             sp.CommpressionMethod = compressionMethod;
             sp.EncodingKeyLength = GetEncodingKeyLength(cipherSuiteName.BlockCipherName, cipherSuiteName.BlockCipherSize);
 
-            if (IsStreamAlgorithm(cipherSuiteName))
+            if (IsStreamAlgorithm(cipherSuiteName.BlockCipherName))
             {
                 sp.CipherMode = TlsCipherMode.Unknown;
                 SetStreamCipher(cipherSuiteName, sp);
@@ -183,7 +183,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             }
         }
 
-        private static bool IsStreamAlgorithm(TlsCipherSuiteName cipherSuiteName)
+        private static bool IsStreamAlgorithm(string cipherSuiteName)
         {
             if (string.Equals(cipherSuiteName, "RC4"))
                 return true;
