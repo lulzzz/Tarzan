@@ -61,12 +61,15 @@ namespace Tarzan.Nfx.Samples.TlsClassification
     public class TlsSecurityParameters
     {
         public string CipherAlgorithm { get; set; }
+        public TlsCipherMode CipherMode { get; set; }
         public TlsCipherType CipherType
         {
             get
             {
+                if (IsStreamAlgorithm(this.CipherAlgorithm)) return TlsCipherType.Stream;
                 switch (CipherMode)
                 {
+                    case TlsCipherMode.EDE_CBC:
                     case TlsCipherMode.CBC: return TlsCipherType.Block;
                     case TlsCipherMode.CCM:
                     case TlsCipherMode.CCM_8:
@@ -75,8 +78,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 return TlsCipherType.Unknown;
             }
         }
-
-        public TlsCipherMode CipherMode { get; set; }
 
         public int EncodingKeyLength { get; set; }
 
@@ -117,19 +118,34 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
         public static TlsSecurityParameters Create(SslProtocols protocolVersion, string cipherSuite, TlsPacket.CompressionMethods compressionMethod = TlsPacket.CompressionMethods.NullCompression)
         {
-            var cipherSuiteName = new TlsCipherSuiteName(cipherSuite);
             var sp = new TlsSecurityParameters();
+            var cipherSuiteName = new TlsCipherSuiteName(cipherSuite);
+
             sp.ProtocolVersion = protocolVersion;
             sp.CipherAlgorithm = cipherSuiteName.BlockCipherName;
-            sp.CipherMode = Enum.Parse<TlsCipherMode>(cipherSuiteName.BlockCipherMode, true);
-            sp.MacAlgorithm = String.Empty;
-
             sp.CommpressionMethod = compressionMethod;
-             if (String.IsNullOrEmpty(cipherSuiteName.BlockCipherSize))
-                sp.EncodingKeyLength = GetEncodingKeyLength(cipherSuiteName.BlockCipherName);
-            else
-                sp.EncodingKeyLength = Int32.Parse(cipherSuiteName.BlockCipherSize);
+            sp.EncodingKeyLength = GetEncodingKeyLength(cipherSuiteName.BlockCipherName, cipherSuiteName.BlockCipherSize);
 
+            if (IsStreamAlgorithm(cipherSuiteName))
+            {
+                sp.CipherMode = TlsCipherMode.Unknown;
+                SetStreamCipher(cipherSuiteName, sp);
+            }
+            else
+            {
+                sp.CipherMode = Enum.Parse<TlsCipherMode>(cipherSuiteName.BlockCipherMode, true);
+                SetBlockCipher(cipherSuiteName, sp);
+            }
+            return sp;
+        }
+
+        private static void SetStreamCipher(TlsCipherSuiteName cipherSuiteName, TlsSecurityParameters sp)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void SetBlockCipher(TlsCipherSuiteName cipherSuiteName, TlsSecurityParameters sp)
+        {
             switch (sp.CipherMode)
             {
                 case TlsCipherMode.CCM:
@@ -153,56 +169,26 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                         sp.RecordIVLength = 8 * 8;
                         break;
                     }
+                case TlsCipherMode.EDE_CBC:
                 case TlsCipherMode.CBC:
                     {
                         sp.MacAlgorithm = cipherSuiteName.MacAlgorithm;
                         sp.MacKeyLength = GetMacLength(cipherSuiteName.MacAlgorithm); // actually the same value as mac length
                         sp.MacLength = GetMacLength(cipherSuiteName.MacAlgorithm);
-                        sp.FixedIVLength = GetBlockLength(cipherSuiteName.BlockCipher);  
+                        sp.FixedIVLength = GetBlockLength(cipherSuiteName.BlockCipherName);
                         sp.RecordIVLength = 0;
                         sp.PrfHashAlgorithm = cipherSuiteName.MacAlgorithm;
                         break;
                     }
             }
-            return sp;
         }
-    
 
-
-        /// <summary>
-        /// Gets the type of the cipher.
-        /// </summary>
-        /// <returns>The cipher type.</returns>
-        /// <param name="cipherString">Cipher string.</param>
-        /// <remarks>
-        /// 
-        /// Two major modes are used in TLSv1.2:
-        /// 
-        /// In CBC mode, you encrypt a block of data by taking the current plaintext 
-        /// block and exclusive-oring that with the previous ciphertext block (or IV), 
-        /// and then sending the result of that through the block cipher; 
-        /// the output of the block cipher is the ciphertext block.
-        /// 
-        /// GCM mode provides both privacy (encryption) and integrity. To provide encryption, 
-        /// GCM maintains a counter; for each block of data, it sends the current value of 
-        /// the counter through the block cipher. Then, it takes the output of the block cipher, 
-        /// and exclusive or's that with the plaintext to form the ciphertext.
-        /// 
-        /// CCM is CBC-MAC mode that provides both authentication and confidentiality.
-        /// CCM uses 16-octet authentication tag while CCM_8 uses shorter, 8-octet tag.
-        /// </remarks>
-        public static TlsCipherMode GetCipherMode(string cipherString)
+        private static bool IsStreamAlgorithm(TlsCipherSuiteName cipherSuiteName)
         {
-            // Block (RFC5246-6.2.3.2): CBC
-            if (cipherString.Contains("CBC")) return TlsCipherMode.CBC;
-
-            // AEAD (RFC5246-6.2.3.3): CCM, GCM
-            if (cipherString.Contains("CCM_8")) return TlsCipherMode.CCM_8;
-            if (cipherString.Contains("CCM")) return TlsCipherMode.CCM;
-            if (cipherString.Contains("GCM")) return TlsCipherMode.GCM;
-
-            // Stream (RFC5246-6.2.3.1): 
-            return TlsCipherMode.Unknown;
+            if (string.Equals(cipherSuiteName, "RC4"))
+                return true;
+            else
+                return false;
         }
 
         /// <summary>
@@ -242,20 +228,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             }
         }
 
-        public static PrfAlgorithm GetPrfAlgorithm(SslProtocols version, HashAlgorithmType hash = HashAlgorithmType.None)
-        {
-            if (version == SslProtocols.Tls11)
-                return new LegacyPrfAlgorithm();
-            if (version == SslProtocols.Tls12)
-            {
-                if (hash != HashAlgorithmType.None)
-                    return new ShaPrfAlgorithm(KeyedHashAlgorithm.Create(hash.ToString()));
-                else
-                    return new ShaPrfAlgorithm();
-            }
-            return null;
-        }
-
         /// <summary>
         /// Gets the length in bits of the mac for the specified hash algorithm.
         /// </summary>
@@ -290,7 +262,6 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case "DES": return 64;
                 case "RC2": return 64;
                 case "3DES": return 64;
-                case "RC4": return 1;
                 case "IDEA": return 64;
                 default: return 128;
             }
@@ -301,45 +272,25 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// </summary>
         /// <returns>The encoding key length.</returns>
         /// <param name="cipherAlgorithm">Cipher algorithm.</param>
-        public static int GetEncodingKeyLength(string cipherAlgorithm)
+        public static int GetEncodingKeyLength(string cipherAlgorithm, string length)
         {
+            if (length!=null && Int32.TryParse(length, out int keyLength))
+            {
+                return keyLength;
+            }
+            // length not explicitly specified:
             switch (cipherAlgorithm.ToUpperInvariant())
             {
-                case "AES128": return 128;
-                case "AES192": return 192;
-                case "AES256": return 256;
+                case "AES": return 128;
                 case "DES": return 64;
                 case "3DES": return 192;
                 case "RC2": return 64;
                 case "RC4": return 128;
                 case "IDEA": return 128;
                 case "CAMELLIA" : return 128;
+                case "SEED": 
                 default: return 128;
             }
-        }
-
-        public static HashAlgorithmType GetHashAlgorithm(string suiteString)
-        {
-            if (suiteString.Contains("MD5")) return HashAlgorithmType.Md5;
-            if (suiteString.Contains("SHA256")) return HashAlgorithmType.Sha256;
-            if (suiteString.Contains("SHA384")) return HashAlgorithmType.Sha384;
-            if (suiteString.Contains("SHA512")) return HashAlgorithmType.Sha512;
-            if (suiteString.Contains("SHA")) return HashAlgorithmType.Sha1;
-            return HashAlgorithmType.None;
-        }
-
-        public static CipherAlgorithmType GetCipherAlgorithm(string cipherString)
-        {
-            if (cipherString.Contains("WITH_NULL")) return CipherAlgorithmType.Null;
-            if (cipherString.Contains("WITH_AES_128")) return CipherAlgorithmType.Aes128;
-            if (cipherString.Contains("WITH_AES_192")) return CipherAlgorithmType.Aes192;
-            if (cipherString.Contains("WITH_AES_256")) return CipherAlgorithmType.Aes256;
-
-            if (cipherString.Contains("WITH_DES")) return CipherAlgorithmType.Des;
-            if (cipherString.Contains("WITH_RC2")) return CipherAlgorithmType.Rc2;
-            if (cipherString.Contains("WITH_RC4")) return CipherAlgorithmType.Rc4;
-            if (cipherString.Contains("WITH_3DES")) return CipherAlgorithmType.TripleDes;
-            return CipherAlgorithmType.None;
         }
 
         internal static SslProtocols GetSslProtocolVersion(int major, int minor)

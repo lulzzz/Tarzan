@@ -157,6 +157,8 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return new Span<byte>(outputBuffer).Slice(blockSize, contentLen).ToArray();
         }
 
+        
+
         public byte[] DecryptApplicationData(TlsKeys tlsKeys, TlsPacket.TlsApplicationData applicationData, ulong sequenceNumber)
         {
             if (KeyBlock == null) throw new InvalidOperationException($"KeyBlock not initialized. Please, call {nameof(InitializeKeyBlock)} first.");
@@ -222,7 +224,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             switch (cipherMode)
             {
                 case TlsCipherMode.CBC:
+                case TlsCipherMode.EDE_CBC:
                     return new CbcBlockCipher(blockCipher);
+                
             }
             return null;
         }
@@ -250,13 +254,15 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 case "DES":
                     return new DesEngine();
                 case "3DES":
-                    return new TripleDES();
+                    return new DesEdeEngine();
                 case "RC2":
                     return new RC2Engine();
                 case "IDEA":
                     return new IdeaEngine();
                 case "CAMELLIA":
                     return new CamelliaEngine();
+                case "SEED":
+                    return new SeedEngine();
 
             }
             return null;
