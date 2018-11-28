@@ -8,7 +8,7 @@ namespace Tarzan.Nfx.Model.Tests
         [Fact]
         public void CompareTest()
         {
-            Random random = new Random();
+            var random = new Random();
             var bytes1 = new byte[40];
             random.NextBytes(bytes1);
 
