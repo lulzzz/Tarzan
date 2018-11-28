@@ -25,6 +25,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             if (args.Length != 2)
             {
                 PrintUsage();
+                return;
             }
             if (String.Equals("extract", args[0], StringComparison.InvariantCultureIgnoreCase))
             {
