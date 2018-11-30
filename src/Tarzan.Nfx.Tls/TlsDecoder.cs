@@ -11,8 +11,9 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Tarzan.Nfx.Packets.Common;
+using Tarzan.Nfx.Utils;
 
-namespace Tarzan.Nfx.Samples.TlsClassification
+namespace Tarzan.Nfx.Tls
 {
 
     /// <summary>
@@ -58,7 +59,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// </summary>
         /// <value>The key block.</value>
         public TlsKeyBlock KeyBlock { get; private set;}
-        public TlsPacket.CompressionMethods Compression { get; internal set; }
+        public TlsPacket.CompressionMethods Compression { get;  set; }
 
         public TlsDecoder()
         {

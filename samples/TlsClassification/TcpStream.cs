@@ -6,6 +6,22 @@ using PacketDotNet;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
+
+    /// <summary>
+    /// Represents some metainformation about a generic packet.
+    /// </summary>
+    public struct PacketMeta
+    {
+        /// <summary>
+        /// A number of the packet in the collection.
+        /// </summary>
+        public int Number;
+        /// <summary>
+        /// A unix based timestamp of the packet.
+        /// </summary>
+        public long Timestamp;
+    }
+
     public class TcpStream<TSegment> : Stream
     {
         IList<TSegment> m_packets;
