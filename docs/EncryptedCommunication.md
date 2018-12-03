@@ -2,7 +2,7 @@
 The TLS communication is modeled around the conversation entity, which is a bidirectional flow. 
 
 ## Features
-The ```TlsConversation``` entity has the following fields:
+The ```TlsConversationModel``` entity has the following fields:
 
 | Field                 |  Type        | Description                    |
 | --------------------- | ------------ | ------------------------------ |
@@ -22,7 +22,7 @@ The ```TlsConversation``` entity has the following fields:
 | records               | tls_record[] |  |
 
 
-The ```TlsRecord``` entity has the following fields:
+The ```TlsRecordModel``` entity has the following fields:
 
 | Field                 |  Type         | Description                                              |
 | --------------------- | ------------- | -------------------------------------------------------- |
@@ -32,7 +32,7 @@ The ```TlsRecord``` entity has the following fields:
 | length                | int           | Length of the record.                                    |
 | segments              | tcp_segment[] | An array of TCP segments carrying data for the record.   |
 
-The ```TcpSegment``` entity has the following fields:
+The ```TcpSegmentModel``` entity has the following fields:
 
 | Field                 |  Type         | Description                                              |
 | --------------------- | ------------- | -------------------------------------------------------- |
@@ -74,13 +74,13 @@ In addition to these features, the TLS handshake messages provide some interesti
 * Version
 * Cipher suites
 * Extensions
-* 
 
 ## HTTP Artifact Identification
 
 
 ### Datasets
-The method is based on finding similaritites of encrypted HTTPS traffic with the corresponding plain HTTP communication.
+
+The method is based on finding similarities of encrypted HTTPS traffic with the corresponding plain HTTP communication.
 Thus to design the method, we need to have a dataset of HTTPS and corresponding HTTP messages.
 To get the HTTP plain communication for secured HTTPS communication we use use key logging feature of the web browser [https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Key_Log_Format]. Knowing master key enable to 
 see HTTP in Wireshark, for example.

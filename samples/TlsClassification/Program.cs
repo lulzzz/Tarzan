@@ -9,6 +9,8 @@ using Org.BouncyCastle.Crypto.Engines;
 using Tarzan.Nfx.Tls;
 using Tarzan.Nfx.Utils;
 using Tarzan.Nfx.Packets.Common;
+using System.Collections.Generic;
+using Tarzan.Nfx.Samples.TlsClassification.Writers;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -22,7 +24,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 return;
             }
 
-            var dataCtx = TlsConversationContext.CreateInMemory();
+            var modelContext = TlsConversationContext.CreateInMemory();
 
             if (String.Equals("extract", args[0], StringComparison.InvariantCultureIgnoreCase))
             {
@@ -32,35 +34,52 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 var packets = FastPcapFileReaderDevice.ReadAll(args[1]);
                 var flows = from packet in packets.Select((p, i) => (Key: frameKeyProvider.GetKey(p), Value: (Nunber: i, Packet: p)))
                             group packet by packet.Key;
-                var flowDict = flows.ToDictionary(x=>x.Key, x=>x.Select(y=>y.Value));
-                var conversations = TcpStreamConversation.CreateConversations(flowDict);
+
+                var conversations = TcpStreamConversation.CreateConversations(flows.ToDictionary(x => x.Key, x => x.Select(y => y.Value)));
 
                 foreach (var conversation in conversations)
                 {
-                    var processor = new TlsConversationProcessor(dataCtx);
+                    var modelBuilder = new TlsConversationModelBuilder(modelContext);
+                    var decoderBuilder = new TlsDecoderBuilder();
+                    var processor = new TlsSessionProcessor(modelBuilder, decoderBuilder);
                     processor.ProcessConversation(conversation);
 
-                    var tlsDecoder = processor.Decoder;
+
+                    var model = modelBuilder.ToModel();
+                    modelContext.SaveChanges();
+                    
+
+                    var tlsDecoder = decoderBuilder.ToDecoder();
                     tlsDecoder.MasterSecret = ByteString.StringToByteArray(secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom)));
                     var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString(), tlsDecoder.Compression);
                     tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
 
-                    var convKeyString = conversation.ConversationKey.ToString().Replace('>', '_').Replace(':', '_');
-                    var clientKeys = tlsDecoder.KeyBlock.GetClientKeys();
-                    foreach (var clientData in processor.ClientDataRecords.Select((x,i)=>(Data: x, Seqnum: i+1)))
-                    {
-                        DumpApplicationData($"{convKeyString}-client-{clientData.Seqnum}", clientData.Data, (ulong)clientData.Seqnum, clientKeys, tlsDecoder);
-                    }
-                    var serverKeys = tlsDecoder.KeyBlock.GetServerKeys();
-                    foreach (var serverData in processor.ServerDataRecords.Select((x, i) => (Data: x, Seqnum: i+1)))
-                    {
-                        DumpApplicationData($"{convKeyString}-server-{serverData.Seqnum}", serverData.Data, (ulong)serverData.Seqnum, serverKeys, tlsDecoder);
-                    }
+                    // USE TLS DECODER
+                    DumpConversationContent(tlsDecoder, conversation, processor.ClientDataRecords, processor.ServerDataRecords);
                 }
+                CsvFeatureWriter.WriteCsv(Path.ChangeExtension(filepath, "csv"), modelContext);
+            }
+
+            
+
+        }
+
+        private static void DumpConversationContent(TlsDecoder tlsDecoder, TcpStreamConversation conversation, IEnumerable<TlsPacket.TlsApplicationData> clientDataRecords, IEnumerable<TlsPacket.TlsApplicationData> serverDataRecords)
+        {
+            var convKeyString = conversation.ConversationKey.ToString().Replace('>', '_').Replace(':', '_');
+            var clientKeys = tlsDecoder.KeyBlock.GetClientKeys();
+            foreach (var clientData in clientDataRecords.Select((x, i) => (Data: x, Seqnum: i + 1)))
+            {
+                DumpApplicationData(tlsDecoder, clientKeys, clientData.Data, (ulong)clientData.Seqnum, $"{convKeyString}-client-{clientData.Seqnum}");
+            }
+            var serverKeys = tlsDecoder.KeyBlock.GetServerKeys();
+            foreach (var serverData in serverDataRecords.Select((x, i) => (Data: x, Seqnum: i + 1)))
+            {
+                DumpApplicationData(tlsDecoder, serverKeys, serverData.Data, (ulong)serverData.Seqnum, $"{convKeyString}-server-{serverData.Seqnum}");
             }
         }
 
-        private static void DumpApplicationData(string filename, TlsPacket.TlsApplicationData tlsData, ulong seqNumber, TlsKeys tlsKeys, TlsDecoder tlsDecoder)
+        private static void DumpApplicationData(TlsDecoder tlsDecoder, TlsKeys tlsKeys, TlsPacket.TlsApplicationData tlsData, ulong seqNumber, string filename)
         {
             var plainBytes = tlsDecoder.DecryptApplicationData(tlsKeys, tlsData, seqNumber);
             if (tlsDecoder.Compression == TlsPacket.CompressionMethods.Deflate)

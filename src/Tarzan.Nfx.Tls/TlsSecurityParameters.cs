@@ -90,7 +90,7 @@ namespace Tarzan.Nfx.Tls
 
         public string PrfHashAlgorithm { get; set; }
 
-        SslProtocols ProtocolVersion { get; set; }
+        public SslProtocols ProtocolVersion { get; set; }
 
         public TlsPacket.CompressionMethods CommpressionMethod { get; set; }
 
@@ -116,6 +116,13 @@ namespace Tarzan.Nfx.Tls
             }
         }
 
+        /// <summary>
+        /// Creates the instance of <see cref="TlsSecurityParameters"/> class. This is the easiest way of creating the object. 
+        /// </summary>
+        /// <param name="protocolVersion">SSL/TLS version value.</param>
+        /// <param name="cipherSuite">String representation of the cipher suite. This will be parsed to extract necessary information for creating the new object.</param>
+        /// <param name="compressionMethod">The type of compression method used.</param>
+        /// <returns>A new <see cref="TlsSecurityParameters"/> object.</returns>
         public static TlsSecurityParameters Create(SslProtocols protocolVersion, string cipherSuite, TlsPacket.CompressionMethods compressionMethod = TlsPacket.CompressionMethods.NullCompression)
         {
             var sp = new TlsSecurityParameters();
@@ -196,7 +203,7 @@ namespace Tarzan.Nfx.Tls
         /// <summary>
         /// Gets the length in bits of the initialization vector carried explicitly in the record (usually 8 bytes which is 64bits).
         /// </summary>
-        public static int GetRecordVectorLength(CipherAlgorithmType cipherAlgorithm, TlsCipherType cipherType)
+        static int GetRecordVectorLength(CipherAlgorithmType cipherAlgorithm, TlsCipherType cipherType)
         {
             if (cipherType == TlsCipherType.Stream) return 0;
 
@@ -215,7 +222,7 @@ namespace Tarzan.Nfx.Tls
         /// Gets the length in bits of the fixed part of the initialization vector. This is usually computed 
         /// from the premaster key. Default is 32 bits.
         /// </summary>
-        public static int GetFixedVectorLength(CipherAlgorithmType cipherAlgorithm, TlsCipherType cipherType)
+        static int GetFixedVectorLength(CipherAlgorithmType cipherAlgorithm, TlsCipherType cipherType)
         {
             if (cipherType == TlsCipherType.Stream) return 0;
 
@@ -235,7 +242,7 @@ namespace Tarzan.Nfx.Tls
         /// </summary>
         /// <returns>The mac length.</returns>
         /// <param name="hashAlgorithm">Hash algorithm.</param>
-        public static int GetMacLength(string hashAlgorithm)
+        static int GetMacLength(string hashAlgorithm)
         {
             switch (hashAlgorithm.ToUpperInvariant())
             {
@@ -255,7 +262,7 @@ namespace Tarzan.Nfx.Tls
         /// </summary>
         /// <returns>The block length.</returns>
         /// <param name="cipherAlgorithm">Cipher algorithm.</param>
-        public static int GetBlockLength(string cipherAlgorithm)
+        static int GetBlockLength(string cipherAlgorithm)
         {
             switch (cipherAlgorithm.ToUpperInvariant())
             {
@@ -274,7 +281,7 @@ namespace Tarzan.Nfx.Tls
         /// </summary>
         /// <returns>The encoding key length.</returns>
         /// <param name="cipherAlgorithm">Cipher algorithm.</param>
-        public static int GetEncodingKeyLength(string cipherAlgorithm, string length)
+        static int GetEncodingKeyLength(string cipherAlgorithm, string length)
         {
             if (length!=null && Int32.TryParse(length, out int keyLength))
             {
