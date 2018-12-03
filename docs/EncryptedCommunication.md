@@ -27,19 +27,23 @@ The ```TlsRecord``` entity has the following fields:
 | Field                 |  Type         | Description                                              |
 | --------------------- | ------------- | -------------------------------------------------------- |
 | number                | int           | The number of the record in the TLS conversation.        |
+| direction             | TlsDirection  | The direction of the record, i.e., ClientServer, ServerClient. |
 | time_offset           | long          | Amount of ms since the beginning of the conversation.    |
 | length                | int           | Length of the record.                                    |
-| segments              | tcp_segment[] | An array of TCP segments carrying data for te=he record. |
+| segments              | tcp_segment[] | An array of TCP segments carrying data for the record.   |
 
 The ```TcpSegment``` entity has the following fields:
 
 | Field                 |  Type         | Description                                              |
 | --------------------- | ------------- | -------------------------------------------------------- |
-| number                | int           | Number of the TCP segment in the TLS conversation.       |
+| packet_number         | int           | Number of the TCP segment in the TLS conversation.       |
 | time_offset           | long          | Amount of ms since the beginning of the conversation.    |
 | length                | int           | Length of the TCP segment. |
 | flags                 | string        | Tcp flags. |
 | window                | int           | Tcp window size. |
+
+
+
 
 ## Notes
 
@@ -52,7 +56,7 @@ several TCP segments.
 
 The analysis of artifact secured in the encrypted communication is based on creating a behavioral model 
 of the communication. The features for creating the model are selected from information that characterizes
-the underlaying TCP communication:
+the underlying TCP communication:
 
 * number of packets in the conversations
 * total duration of the conversation
@@ -60,11 +64,10 @@ the underlaying TCP communication:
 * average packet size for each direction
 * inter-arrival time between packets
 
-Featresd related to TLS communicaton:
+Features related to TLS communication:
+
 * sizes of TLS records in bytes 
 * 
-
-
 
 In addition to these features, the TLS handshake messages provide some interesting information as plain text:
 

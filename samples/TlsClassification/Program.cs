@@ -22,7 +22,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                 return;
             }
 
-            var dataCtx = new TlsFlowContext();
+            var dataCtx = TlsConversationContext.CreateInMemory();
 
             if (String.Equals("extract", args[0], StringComparison.InvariantCultureIgnoreCase))
             {
@@ -37,7 +37,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
                 foreach (var conversation in conversations)
                 {
-                    var processor = new TlsConversationProcessor();
+                    var processor = new TlsConversationProcessor(dataCtx);
                     processor.ProcessConversation(conversation);
 
                     var tlsDecoder = processor.Decoder;
@@ -54,7 +54,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     var serverKeys = tlsDecoder.KeyBlock.GetServerKeys();
                     foreach (var serverData in processor.ServerDataRecords.Select((x, i) => (Data: x, Seqnum: i+1)))
                     {
-                        DumpApplicationData($"{convKeyString}-client-{serverData.Seqnum}", serverData.Data, (ulong)serverData.Seqnum, serverKeys, tlsDecoder);
+                        DumpApplicationData($"{convKeyString}-server-{serverData.Seqnum}", serverData.Data, (ulong)serverData.Seqnum, serverKeys, tlsDecoder);
                     }
                 }
             }

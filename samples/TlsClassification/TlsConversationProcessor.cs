@@ -15,23 +15,35 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         private IEnumerable<TlsPacket.TlsApplicationData> m_clientDataRecords;
         private IEnumerable<TlsPacket.TlsApplicationData> m_serverDataRecords;
 
-        private TlsDecoder m_tlsDecoder = new TlsDecoder();
-        private TlsFlowModelBuilder m_tlsModelBuilder = new TlsFlowModelBuilder();
+        private TlsDecoder m_tlsDecoder;
+        private TlsFlowModelBuilder m_tlsModelBuilder; 
+        private TlsConversationContext m_dbFlowContext;
+
+        public TlsConversationProcessor(TlsConversationContext dataCtx)
+        {
+            this.m_dbFlowContext = dataCtx;
+            this.m_tlsModelBuilder = new TlsFlowModelBuilder(dataCtx);
+            this.m_tlsDecoder = new TlsDecoder();
+        }
 
         public TlsDecoder Decoder { get => m_tlsDecoder; }
-        public TlsFlowModel FlowData { get => m_tlsModelBuilder.FlowData; }
+        public TlsConversationModel FlowData { get => m_tlsModelBuilder.FlowData; }
         public IEnumerable<TlsPacket.TlsApplicationData> ClientDataRecords { get => m_clientDataRecords; }
         public IEnumerable<TlsPacket.TlsApplicationData> ServerDataRecords { get => m_serverDataRecords; }
 
         public void ProcessConversation(TcpStreamConversation conversation)
         {
+            m_tlsModelBuilder.SetFlowKey(conversation.ConversationKey);
+
+
+
             var clientFlow = conversation.Upflow;
             var tlsClientRecordCollection = ParseTlsPacket(new KaitaiStream(clientFlow));
-            m_clientDataRecords = ProcessRecords(tlsClientRecordCollection, TlsDirection.ClientServer, clientFlow);
+            m_clientDataRecords = ProcessRecords(tlsClientRecordCollection, TlsDirection.ClientServer, clientFlow).ToList();
 
-            var serverFlow = conversation.Upflow;
-            var tlsServerRecordCollection = ParseTlsPacket(new KaitaiStream(clientFlow));
-            m_serverDataRecords = ProcessRecords(tlsServerRecordCollection, TlsDirection.ServerClient, clientFlow);
+            var serverFlow = conversation.Downflow;
+            var tlsServerRecordCollection = ParseTlsPacket(new KaitaiStream(serverFlow));
+            m_serverDataRecords = ProcessRecords(tlsServerRecordCollection, TlsDirection.ServerClient, serverFlow).ToList();
         }
 
         public IEnumerable<TlsPacket.TlsApplicationData> ProcessRecords(IEnumerable<(Range<long> Range, TlsPacket Packet)> tlsRecordCollection, 
@@ -94,6 +106,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     break;
                 case TlsPacket.TlsHandshakeType.ServerHello:
                     var serverHello = handshake.Body as TlsPacket.TlsServerHello;
+                    m_tlsDecoder.ProtocolVersion = TlsSecurityParameters.GetSslProtocolVersion(serverHello.Version.Major, serverHello.Version.Minor);
                     m_tlsDecoder.ServerRandom = ByteString.Combine(serverHello.Random.RandomTime, serverHello.Random.RandomBytes);
                     m_tlsDecoder.CipherSuite = (TlsCipherSuite)serverHello.CipherSuite.CipherId;
                     m_tlsDecoder.Compression = serverHello.CompressionMethod;

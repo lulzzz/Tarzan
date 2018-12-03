@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "TlsClassification": {
+      "commandName": "Project",
+      "commandLineArgs": "extract tls.pcap",
+      "workingDirectory": "C:\\Users\\Ondrej Rysavy\\Documents\\GitHub\\Tarzan\\samples\\TlsClassification\\Data"
+    }
+  }
+}
