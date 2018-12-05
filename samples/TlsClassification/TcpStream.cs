@@ -20,6 +20,11 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// A unix based timestamp of the packet.
         /// </summary>
         public long Timestamp;
+
+        public override string ToString()
+        {
+            return $"PacketMeta: Number={Number}, Timestamp={Timestamp}";
+        }
     }
 
     public class TcpStream<TSegment> : Stream

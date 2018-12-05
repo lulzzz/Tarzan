@@ -68,6 +68,18 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         public TimeSpan TimeOffset { get; set; }
         public int Length { get; set; }
         public List<TcpSegmentModel> Segments { get; set; }
+
+        /// <summary>
+        /// Computes the record id, which is composed of the packet id and the index of the record within the segment. 
+        /// For 99% of records this is always 0, but in certain cases there are two or more records within a single segment. 
+        /// </summary>
+        /// <param name="packetNumber"></param>
+        /// <param name="recordInPacketNumber"></param>
+        /// <returns></returns>
+        public static int ComputeRecordId(int packetNumber, int recordInPacketNumber)
+        {
+            return packetNumber << 4 + (recordInPacketNumber & 0xf);
+        }
     }
 
     public class TcpSegmentModel

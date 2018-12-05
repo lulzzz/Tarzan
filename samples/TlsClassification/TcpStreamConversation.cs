@@ -11,12 +11,12 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         {
         }
 
-        public static IEnumerable<TcpStreamConversation> CreateConversations(IDictionary<FlowKey, IEnumerable<(int Number, FrameData Packet)>> flowDictionary)
+        public static IEnumerable<TcpStreamConversation> CreateConversations(IDictionary<FlowKey, IEnumerable<(PacketMeta Meta, FrameData Packet)>> flowDictionary)
         {
             foreach (var key in flowDictionary.Keys.Where(key => key.SourcePort > key.DestinationPort))
             {
-                var upflow = MakeTcpStreamFromFrames(flowDictionary[key].OrderBy(f => f.Number));
-                var downflow = MakeTcpStreamFromFrames(flowDictionary[key.SwapEndpoints()].OrderBy(f => f.Number));
+                var upflow = MakeTcpStreamFromFrames(flowDictionary[key].OrderBy(f => f.Meta.Number));
+                var downflow = MakeTcpStreamFromFrames(flowDictionary[key.SwapEndpoints()].OrderBy(f => f.Meta.Number));
                 yield return new TcpStreamConversation(key, upflow, downflow);
             }
         }
@@ -33,9 +33,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             return p.Packet.PayloadData ?? new byte[0];
         }
 
-        private static TcpStream<(PacketMeta Meta, TcpPacket Packet)> MakeTcpStreamFromFrames(IEnumerable<(int Number, FrameData Frame)> frames)
+        private static TcpStream<(PacketMeta Meta, TcpPacket Packet)> MakeTcpStreamFromFrames(IEnumerable<(PacketMeta Meta, FrameData Frame)> frames)
         {
-            var packets = frames.Select(f => (new PacketMeta { Number = f.Number, Timestamp = f.Frame.Timestamp }, ParseTcpPacket(f.Frame)));
+            var packets = frames.Select(f => (f.Meta, ParseTcpPacket(f.Frame)));
             var tcpStream = new TcpStream<(PacketMeta NumberOffset, TcpPacket Packet)>(GetTcpPayload, packets);
             return tcpStream;
         }

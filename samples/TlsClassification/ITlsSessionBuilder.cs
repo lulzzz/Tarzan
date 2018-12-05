@@ -9,9 +9,14 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
     public struct TlsPacketContext
     {
-        public TlsDirection direction;
-        public PacketMeta recordMeta;
-        public IEnumerable<(PacketMeta Meta, TcpPacket Packet)> tcpPackets;
+        public TlsDirection Direction;
+        public PacketMeta Metadata;
+        public IEnumerable<(PacketMeta Meta, TcpPacket Packet)> TcpPackets;
+
+        public override string ToString()
+        {
+            return $"[TlsPacketContext direction={Direction}, meta={Metadata}]";
+        }
     }
     public interface ITlsSessionBuilder
     {

@@ -47,3 +47,4 @@ connection to the IP address retrieved by DNS is established. By simple reasonin
 # References
 
 * https://www.qosmos.com/products/protocol-expertise/
+* https://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet#Tools

@@ -10,7 +10,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification.Writers
 {
     class CsvFeatureWriter
     {
-        const int RecordCount = 10;
+        const int RecordCount = 5;
         const int SegmentCount = 5;
         public static void WriteCsv(string filename, TlsConversationContext modelContext)
         {

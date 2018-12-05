@@ -15,7 +15,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
         public string GetMasterSecret(string clientRandom)
         {
-
+            if (clientRandom == null) return null;
             if (m_dictionary.TryGetValue(clientRandom, out string value))
                 return value;
             else

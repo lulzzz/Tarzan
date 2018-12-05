@@ -6,6 +6,7 @@ using PacketDotNet;
 using Tarzan.Nfx.Tls;
 using Tarzan.Nfx.Utils;
 using System.Linq;
+using System;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -35,20 +36,26 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             ServerDataRecords = ProcessRecords(tlsServerRecordCollection, TlsDirection.ServerClient, serverFlow).ToList();
         }
 
+        public int GetRecordNumber(int packetNumber, int recordIndex)
+        {
+            return (packetNumber << 8) + (recordIndex % 256);
+        }
+        
+
         public IEnumerable<TlsPacket.TlsApplicationData> ProcessRecords(
             IEnumerable<(Range<long> Range, TlsPacket Packet)> tlsRecordCollection, 
             TlsDirection direction,
             TcpStream<(PacketMeta Meta, TcpPacket Packet)> tcpStream)
         {
-            foreach (var tlsRecord in tlsRecordCollection)
+            foreach (var (recordIndex, tlsRecord) in tlsRecordCollection.Select((x,i) => (Index: i, Value: x)))
             {
                 var tcpSegments = tcpStream.GetSegments(tlsRecord.Range.Min, (int)(tlsRecord.Range.Max - tlsRecord.Range.Min)).Select(s => s.Segment).ToList();
                 var first = tcpSegments.First();
                 var packetContext = new TlsPacketContext
                 {
-                    direction = direction,
-                    recordMeta = first.Meta,
-                    tcpPackets = tcpSegments
+                    Direction = direction,
+                    Metadata = new PacketMeta { Number = GetRecordNumber(first.Meta.Number, recordIndex), Timestamp = first.Meta.Timestamp },
+                    TcpPackets = tcpSegments
                 };
                 switch (tlsRecord.Packet.Fragment)
                 {
@@ -84,7 +91,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         private IEnumerable<(Range<long>, TlsPacket Packet)> ParseTlsPacket(KaitaiStream kaitaiStream)
         {
             var packets = new List<(Range<long>, TlsPacket Packet)>();
-            //try
+            try
             {
                 while (!kaitaiStream.IsEof)
                 {
@@ -93,9 +100,9 @@ namespace Tarzan.Nfx.Samples.TlsClassification
                     packets.Add((new Range<long>(tlsOffset, kaitaiStream.Pos), tlsPacket));
                 }
             }
-            //catch (Exception e)
+            catch (Exception e)
             {
-                //    Console.Error.WriteLine(e);
+                Console.Error.WriteLine(e);
             }
             return packets;
         }

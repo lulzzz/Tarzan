@@ -46,7 +46,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             m_conversationModel.ClientRandom = ByteString.ByteArrayToString(clientHello.Random.RandomBytes);
             m_conversationModel.ClientCipherSuites = GetCipherSuites(clientHello.CipherSuites);
             m_conversationModel.ClientExtensions = GetExtensions(clientHello.Extensions);
-            m_conversationModel.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(packetContext.recordMeta.Timestamp);
+            m_conversationModel.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(packetContext.Metadata.Timestamp);
         }
 
         public void SetServerHello(TlsPacket.TlsServerHello serverHello, TlsPacketContext packetContext)
@@ -96,27 +96,35 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         /// <param name="tcpPackets">A collection of TCP segments caryying the record's data.</param>
         public void AddApplicationDataRecord(TlsPacket.TlsApplicationData applicationData, TlsPacketContext packetContext)
         {
-            TcpSegmentModel CreateModel((PacketMeta Meta, TcpPacket Packet) packet)
+            TcpSegmentModel GetOrCreateModel((PacketMeta Meta, TcpPacket Packet) packet)
             {
-                var newSegmentModel = new TcpSegmentModel
+                var segmentModel = m_modelContext.Find<TcpSegmentModel>(packet.Meta.Number);
+                if (segmentModel != null)
                 {
-                    TimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(packet.Meta.Timestamp) - m_conversationModel.Timestamp,
-                    PacketId = packet.Meta.Number,
-                    Flags = TcpFlags(packet.Packet),
-                    Length = packet.Packet.PayloadData?.Length ?? 0,
-                    Window = packet.Packet.WindowSize
-                };
-                m_modelContext.Add(newSegmentModel);
-                return newSegmentModel;
+                    return segmentModel;
+                }
+                else
+                {
+                    var newSegmentModel = new TcpSegmentModel
+                    {
+                        TimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(packet.Meta.Timestamp) - m_conversationModel.Timestamp,
+                        PacketId = packet.Meta.Number,
+                        Flags = TcpFlags(packet.Packet),
+                        Length = packet.Packet.PayloadData?.Length ?? 0,
+                        Window = packet.Packet.WindowSize
+                    };
+                    m_modelContext.Add(newSegmentModel);
+                    return newSegmentModel;
+                }
             }
 
             var newRecordModel = new TlsRecordModel
             {
-                RecordId = packetContext.recordMeta.Number,
-                Direction = packetContext.direction,
-                TimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(packetContext.recordMeta.Timestamp) - m_conversationModel.Timestamp,
+                RecordId = packetContext.Metadata.Number,
+                Direction = packetContext.Direction,
+                TimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(packetContext.Metadata.Timestamp) - m_conversationModel.Timestamp,
                 Length = applicationData.Body.Length,
-                Segments = packetContext.tcpPackets.Select(CreateModel).ToList(),
+                Segments = packetContext.TcpPackets.Select(GetOrCreateModel).ToList(),
             };
             m_modelContext.Add(newRecordModel);
             m_conversationModel.Records.Add(newRecordModel);

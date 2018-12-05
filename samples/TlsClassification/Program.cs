@@ -30,9 +30,10 @@ namespace Tarzan.Nfx.Samples.TlsClassification
             {
                 var filepath = args[1];
                 var frameKeyProvider = new FrameKeyProvider();
-                var secretMap = TlsMasterSecretMap.LoadFromFile(Path.ChangeExtension(filepath, "key"));
-                var packets = FastPcapFileReaderDevice.ReadAll(args[1]);
-                var flows = from packet in packets.Select((p, i) => (Key: frameKeyProvider.GetKey(p), Value: (Nunber: i, Packet: p)))
+                var keyFile = Path.ChangeExtension(filepath, "key");
+                var secretMap = File.Exists(keyFile) ? TlsMasterSecretMap.LoadFromFile(keyFile): new TlsMasterSecretMap();
+                var packets = FastPcapFileReaderDevice.ReadAll(args[1]).Select((p, i) => (Key: frameKeyProvider.GetKey(p), Value: (Meta: new PacketMeta { Number = i + 1, Timestamp = p.Timestamp }, Packet: p)));
+                var flows = from packet in packets
                             group packet by packet.Key;
 
                 var conversations = TcpStreamConversation.CreateConversations(flows.ToDictionary(x => x.Key, x => x.Select(y => y.Value)));
@@ -47,15 +48,19 @@ namespace Tarzan.Nfx.Samples.TlsClassification
 
                     var model = modelBuilder.ToModel();
                     modelContext.SaveChanges();
-                    
+
 
                     var tlsDecoder = decoderBuilder.ToDecoder();
-                    tlsDecoder.MasterSecret = ByteString.StringToByteArray(secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom)));
-                    var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString(), tlsDecoder.Compression);
-                    tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
+                    var masterSecret = secretMap.GetMasterSecret(ByteString.ByteArrayToString(tlsDecoder.ClientRandom));
+                    if (masterSecret != null)
+                    {
+                        tlsDecoder.MasterSecret = ByteString.StringToByteArray(masterSecret);
+                        var tlsSecurityParameters = TlsSecurityParameters.Create(tlsDecoder.ProtocolVersion, tlsDecoder.CipherSuite.ToString(), tlsDecoder.Compression);
+                        tlsDecoder.InitializeKeyBlock(tlsSecurityParameters);
 
-                    // USE TLS DECODER
-                    DumpConversationContent(tlsDecoder, conversation, processor.ClientDataRecords, processor.ServerDataRecords);
+                        // USE TLS DECODER
+                        DumpConversationContent(tlsDecoder, conversation, processor.ClientDataRecords, processor.ServerDataRecords);
+                    }
                 }
                 CsvFeatureWriter.WriteCsv(Path.ChangeExtension(filepath, "csv"), modelContext);
             }

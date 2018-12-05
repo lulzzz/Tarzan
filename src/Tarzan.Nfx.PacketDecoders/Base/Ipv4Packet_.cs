@@ -115,6 +115,9 @@ namespace Tarzan.Nfx.Packets.Base
         {
             var hdrLen = GetHeaderLength(ipBytes) * 4;
             var totalLen = GetTotalLength(ipBytes);
+            // found ip packet with totallen=0 but actual size was more than 1500 bytes.
+            // this packet was created by TCP segmentation offload feature.
+            if (totalLen == 0) totalLen = (ushort)ipBytes.Length;
             return ipBytes.Slice(hdrLen, totalLen - hdrLen);
         }
                                             
