@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tarzan.Nfx.Samples.TlsClassification
+namespace Tarzan.Nfx.Tls
 {
     public class TlsKeyBlock
     {

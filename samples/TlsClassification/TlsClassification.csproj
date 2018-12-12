@@ -10,12 +10,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
+    <ProjectReference Include="..\..\src\Tarzan.Nfx.Tls\Tarzan.Nfx.Tls.csproj" />
+    <ProjectReference Include="..\..\src\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <Folder Include="Data\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="10.0.0-beta02" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0-preview3-35497" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.4" />
   </ItemGroup>
 </Project>

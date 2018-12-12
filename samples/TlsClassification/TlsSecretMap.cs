@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
@@ -14,7 +15,7 @@ namespace Tarzan.Nfx.Samples.TlsClassification
         }
         public string GetMasterSecret(string clientRandom)
         {
-
+            if (clientRandom == null) return null;
             if (m_dictionary.TryGetValue(clientRandom, out string value))
                 return value;
             else

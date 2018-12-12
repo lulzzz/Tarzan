@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Tarzan.Nfx.Samples.TlsClassification
+namespace Tarzan.Nfx.Utils
 {
     public static class ByteString
     {

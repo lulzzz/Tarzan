@@ -3,8 +3,9 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
+using Tarzan.Nfx.Utils;
 
-namespace Tarzan.Nfx.Samples.TlsClassification
+namespace Tarzan.Nfx.Tls
 {
     /// <summary>
     /// Implements PRF algorithm for TLSv1.2. (https://tools.ietf.org/html/rfc5246#section-5)
