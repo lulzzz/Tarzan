@@ -7,6 +7,8 @@ The following technologies form the basic environment for implementation of the 
 
 * Apache Spark -- provides a scalable data processing engine suitable for specific types of operations.
 
+* Apache Flink -- real-time processing engine used for input stream processing. 
+
 * Cassandra -- provides persistence layer for data in rest.
 
 
