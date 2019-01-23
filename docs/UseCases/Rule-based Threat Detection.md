@@ -1,0 +1,10 @@
+# Automating Network Security Analysis at Packet-level by using Rule-based Detection Engine
+
+## Annotation
+Detection of security events by monitoring internal network communication is one of the pillars for good security strategy. Functional on-line monitoring is important for securing network environments. Great research and development effort bring us network monitoring systems, including IDS systems, Anomaly Detection Systems, Flow-based monitoring, and SIEMs. Though these systems can successfully detect and avoid most of the security incidents, sometimes it is necessary to perform post-mortem analysis in order to identify attack vectors. Network administrators are thus required to investigate the network traffic. Although tools such as Wireshark can be applied to discover network attacks, this approach requires the time-consuming phase of incident localization in a possible big amount of network communication data. In this project, we propose an approach to security event detection in captured network communication. The method uses a predefined set of rules to identify patterns of attacks. The rules are specified by the security expert and can be used automatically in security analyses to identify known attack vectors. Though this principle is used by many security tools, the new aspect is that the rule language is expressive enough to specify complex relations among source data thus being able to detect quite sophisticated attacks. 
+
+## Approach
+Analyze and describe threats and attacks by rules that can be applied to network traffic. The rules can be quite complicated as opposed to rules used by IDS/IPS systems. 
+
+## Goal
+To invent a system of rules that can be used for practical detection of selected security events and attacks in network communication. Demonstrate and evaluate the proposed system for a reasonable big dataset and number of attacks described. 
