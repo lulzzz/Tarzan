@@ -34,3 +34,5 @@ Depending on the hardware and cluster configuration the different value may lead
 
 
 * ```-DisableProgressBar``` - By defalt the progress bar is shown, which may be not useful or wanted in some situations. This option disables showint the progress bar.
+
+## Examples
