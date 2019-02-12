@@ -1,16 +1,15 @@
-﻿using System;
-using System.Linq;
-using Tarzan.Nfx.PacketDecoders;
-using System.IO;
-using System.Text;
-using System.Security.Cryptography.X509Certificates;
+﻿using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
-using Org.BouncyCastle.Crypto.Engines;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Tarzan.Nfx.PacketDecoders;
+using Tarzan.Nfx.Packets.Common;
+using Tarzan.Nfx.Samples.TlsClassification.Writers;
 using Tarzan.Nfx.Tls;
 using Tarzan.Nfx.Utils;
-using Tarzan.Nfx.Packets.Common;
-using System.Collections.Generic;
-using Tarzan.Nfx.Samples.TlsClassification.Writers;
 
 namespace Tarzan.Nfx.Samples.TlsClassification
 {
