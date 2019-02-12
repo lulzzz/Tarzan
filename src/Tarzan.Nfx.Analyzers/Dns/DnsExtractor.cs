@@ -107,7 +107,7 @@ namespace Tarzan.Nfx.Analyzers
                 }
                 catch(Exception e)
                 {
-                    m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Error, "InpsectPackets error", null, null, "Error", "", e);
+                    m_ignite.Logger.Log(Apache.Ignite.Core.Log.LogLevel.Error, "ExtractDnsObjects error", null, null, "Error", "", e);
                 }
             }
             return result;
