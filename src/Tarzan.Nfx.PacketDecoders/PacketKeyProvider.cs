@@ -1,5 +1,6 @@
 ﻿using PacketDotNet;
 using System.Net;
+using System.Net.Sockets;
 using Tarzan.Nfx.Model;
 
 namespace Tarzan.Nfx.PacketDecoders
@@ -28,7 +29,7 @@ namespace Tarzan.Nfx.PacketDecoders
             FlowKey GetIpFlowKey(IPPacket ip)
             {
                 return FlowKey.Create(
-                    (byte)(ip.Version == IPVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
+                    (byte)(ip.Version == IPVersion.IPv4 ? ProtocolType.IPv4 : ProtocolType.IPv6),
                     ip.SourceAddress.GetAddressBytes(), 0,
                     ip.DestinationAddress.GetAddressBytes(), 0
                 );

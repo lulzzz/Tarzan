@@ -161,7 +161,7 @@ namespace Tarzan.Nfx.IgniteServer
             {
                 if (disposing)
                 {
-                    Ignite.Dispose();    
+                    Ignite?.Dispose();    
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Tarzan.Nfx.Model;
 using Tarzan.Nfx.PacketDecoders;
@@ -42,7 +43,7 @@ namespace PacketDecodersTest
         {
             FlowKey GetUdpFlowKey(UdpPacket udp)
             {
-                return FlowKey.Create((byte)IPProtocolType.UDP,
+                return FlowKey.Create((byte)ProtocolType.Udp,
                     (udp.ParentPacket as IPPacket).SourceAddress.GetAddressBytes(),
                     udp.SourcePort,
                     (udp.ParentPacket as IPPacket).DestinationAddress.GetAddressBytes(),
@@ -51,7 +52,7 @@ namespace PacketDecodersTest
             FlowKey GetTcpFlowKey(TcpPacket tcp)
             {
                 return FlowKey.Create(
-                    (byte)IPProtocolType.TCP,
+                    (byte)ProtocolType.Tcp,
                     (tcp.ParentPacket as IPPacket).SourceAddress.GetAddressBytes(),
                     tcp.SourcePort,
                     (tcp.ParentPacket as IPPacket).DestinationAddress.GetAddressBytes(),
@@ -60,7 +61,7 @@ namespace PacketDecodersTest
             FlowKey GetIpFlowKey(IPPacket ip)
             {
                 return FlowKey.Create(
-                    (byte)(ip.Version == IPVersion.IPv4 ? IPProtocolType.IP : IPProtocolType.IPV6),
+                    (byte)(ip.Version == IPVersion.IPv4 ? ProtocolType.IPv4 : ProtocolType.IPv6),
                     ip.SourceAddress.GetAddressBytes(), 0,
                     ip.DestinationAddress.GetAddressBytes(), 0
                 );

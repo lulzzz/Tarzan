@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

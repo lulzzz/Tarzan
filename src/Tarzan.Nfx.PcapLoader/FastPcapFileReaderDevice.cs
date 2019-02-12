@@ -25,7 +25,6 @@ namespace Tarzan.Nfx.PcapLoader
 
         public string Filter { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public ICaptureStatistics Statistics => throw new NotImplementedException();
 
         public PhysicalAddress MacAddress => throw new NotImplementedException();
 
@@ -34,6 +33,8 @@ namespace Tarzan.Nfx.PcapLoader
         public TimeSpan StopCaptureTimeout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public LinkLayers LinkType => throw new NotImplementedException();
+
+        public ICaptureStatistics Statistics => throw new NotImplementedException();
 
         public event PacketArrivalEventHandler OnPacketArrival;
         public event CaptureStoppedEventHandler OnCaptureStopped;
@@ -94,21 +95,6 @@ namespace Tarzan.Nfx.PcapLoader
             var stream = File.OpenRead(m_filename);
             m_reader = new BinaryReader(stream);
             ReadHeader();
-        }
-
-        public void Open(DeviceMode mode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Open(DeviceMode mode, int read_timeout)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Open(DeviceMode mode, int read_timeout, MonitorMode monitor_mode)
-        {
-            throw new NotImplementedException();
         }
 
         public void SendPacket(Packet p)
@@ -185,6 +171,21 @@ namespace Tarzan.Nfx.PcapLoader
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
+        }
+
+        public void Open(DeviceMode mode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Open(DeviceMode mode, int read_timeout)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Open(DeviceMode mode, int read_timeout, MonitorMode monitor_mode)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

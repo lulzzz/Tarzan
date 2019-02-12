@@ -22,8 +22,8 @@ namespace Tarzan.Nfx.IgniteServer
             commandLineApplication.Name = "Tarzan.Nfx.IgniteServer";
             commandLineApplication.HelpOption("-?|-Help");
             var configFileArgument = commandLineApplication.Option("-ConfigFile", "XML configuration file. If not file is specified then default configuration is used.", CommandOptionType.SingleValue);
-            var offheapArgument = commandLineApplication.Option("-Offheap", "Size of off-heap memory given in megabytes.", CommandOptionType.SingleValue);
-            var onheapArgument = commandLineApplication.Option("-Onheap", "Size of on-heap memory given in megabytes.", CommandOptionType.SingleValue);
+            var offheapArgument = commandLineApplication.Option("-OffHeap", "Size of off-heap memory given in megabytes.", CommandOptionType.SingleValue);
+            var onheapArgument = commandLineApplication.Option("-OnHeap", "Size of on-heap memory given in megabytes.", CommandOptionType.SingleValue);
             var leaderNodeArgument = commandLineApplication.Option("-SetLeader", "Set this node as the leader of the cluster.", CommandOptionType.NoValue);
             var serverPortArgument = commandLineApplication.Option("-SpiPort", "Specifies port for Discovery Spi.", CommandOptionType.SingleValue);
             var clusterEnpointArgument = commandLineApplication.Option("-Cluster", "Specifies IP address and port of a cluster node. Multiple nodes can be specified.", CommandOptionType.MultipleValue);
