@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
-    <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite" Version="2.7.0" />
+    <PackageReference Include="Apache.Ignite.Linq" Version="2.7.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
@@ -19,8 +19,8 @@
     <PackageReference Include="SharpPcap.Standard" Version="4.4.0" />
     <PackageReference Include="ShellProgressBar" Version="4.2.0" />
 
-    <PackageReference Include="Apache.Ignite.NLog" Version="2.6.0" />
-    <PackageReference Include="NLog" Version="4.5.10" />
+    <PackageReference Include="Apache.Ignite.NLog" Version="2.7.0" />
+    <PackageReference Include="NLog" Version="4.5.11" />
   </ItemGroup>
 
   <ItemGroup>

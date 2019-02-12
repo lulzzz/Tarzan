@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apache.Ignite" Version="2.6.0" />
-    <PackageReference Include="Apache.Ignite.Linq" Version="2.6.0" />
+    <PackageReference Include="Apache.Ignite" Version="2.7.0" />
+    <PackageReference Include="Apache.Ignite.Linq" Version="2.7.0" />
   </ItemGroup>
 
   <ItemGroup>

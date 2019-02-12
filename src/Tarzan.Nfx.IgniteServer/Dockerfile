@@ -1,4 +1,4 @@
-﻿# Build with docker build -t tarzan/ignite-server .
+﻿# Build with docker build -t tarzan/nfx-server .
 FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 # Copy csproj and restore as distinct layers
@@ -26,7 +26,7 @@ RUN apt-get install apt-transport-https
 RUN apt-get install -y dotnet-runtime-2.0.0
 
 # Install IGNITE
-ENV IGNITE_VERSION 2.6.0
+ENV IGNITE_VERSION 2.7.0
 
 # Ignite home
 ENV IGNITE_HOME /opt/ignite/apache-ignite-fabric-${IGNITE_VERSION}-bin
@@ -49,6 +49,6 @@ ENTRYPOINT ["dotnet", "Tarzan.Nfx.IgniteServer.dll"]
 
 EXPOSE 10800 47100 47500 49112
 
-LABEL image="tarzan/ignite-server" \
+LABEL image="tarzan/nfx-server" \
       maintainer="rysavy@vutbr.cz" \
       version="1.0"
