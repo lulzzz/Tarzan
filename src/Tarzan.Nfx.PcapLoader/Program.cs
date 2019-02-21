@@ -13,7 +13,7 @@ namespace Tarzan.Nfx.PcapLoader
     class Program
     {
 
-        enum ProgramMode { Put, Stream, Verify }
+        enum ProgramMode { Put, Stream, Verify, Track }
         static void Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(true);
@@ -21,7 +21,7 @@ namespace Tarzan.Nfx.PcapLoader
             var clusterOption = commandLineApplication.Option("-Cluster", "Enpoint string of any cluster node.", CommandOptionType.SingleValue);
             var sourceFileOption = commandLineApplication.Option("-SourceFile", "Source pcap file to be loaded to the cluster.", CommandOptionType.MultipleValue);
             var sourceFolderOption = commandLineApplication.Option("-SourceFolder", "Folder where to read source pcap files to be loaded to the cluster.", CommandOptionType.MultipleValue);
-            var modeOption = commandLineApplication.Option("-Mode", "Mode of loading data to Ignite cluster. It can be either 'put' or 'stream'. Mode verify is available to test data integrity.", CommandOptionType.SingleValue);
+            var modeOption = commandLineApplication.Option("-Mode", "Mode of loading data to Ignite cluster. It can be either 'put', 'stream' or 'track'. Mode verify is available to test data integrity.", CommandOptionType.SingleValue);
             var writeToOption = commandLineApplication.Option("-WriteTo", "Name of the cache where the loader stores the loaded frames. If not specified, the cache will have the same name of the name of the source file.", CommandOptionType.SingleValue);
             var disableProgressBarOption = commandLineApplication.Option("-DisableProgressBar", "Disables progress bar.", CommandOptionType.NoValue);
             commandLineApplication.OnExecute(async () =>
@@ -31,12 +31,13 @@ namespace Tarzan.Nfx.PcapLoader
                 if (sourceFileOption.HasValue() || sourceFolderOption.HasValue())
                 {
                     string verb = "";
-                    IPcapProcessor loader = null;
+                    PcapProcessor loader = null;
                     switch (mode)
                     {
                         case ProgramMode.Put: loader = new PcapLoader(); verb = "Putting";  break;
                         case ProgramMode.Stream: loader = new PcapStreamer(); verb = "Streaming"; break;
                         case ProgramMode.Verify: loader = new PcapVerifier(); verb = "Verifying"; break;
+                        case ProgramMode.Track: loader = new PacketFlow.TrafficStreamer(); verb = "Tracking"; break;
                         default: loader = new PcapLoader(); break;
                     }
                     foreach (var file in sourceFileOption.Values)
@@ -128,11 +129,11 @@ namespace Tarzan.Nfx.PcapLoader
                                 pbError.Message = $"Error packets {errorPackets}:";
                             }
 
-                            loader.OnFileOpen += Loader_OnFileOpen;
-                            loader.OnFileCompleted += Loader_OnFileCompleted;
-                            loader.OnChunkLoaded += Loader_OnChunkLoaded;
-                            loader.OnChunkStored += Loader_OnChunkStored;
-                            loader.OnErrorFrame += Loader_OnErrorFrame;
+                            loader.FileOpened += Loader_OnFileOpen;
+                            loader.FileCompleted += Loader_OnFileCompleted;
+                            loader.ChunkLoaded += Loader_OnChunkLoaded;
+                            loader.ChunkStored += Loader_OnChunkStored;
+                            loader.ErrorFrameOccured += Loader_OnErrorFrame;
                             await loader.Invoke();
                         }
                     }

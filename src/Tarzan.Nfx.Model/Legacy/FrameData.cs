@@ -12,6 +12,38 @@ namespace Tarzan.Nfx.Model
 
         public byte[] Data { get; set; }
 
+        /// <summary>
+        /// Serializes <see cref="FrameData"/> to byte array. It has the following format: | LinkLayer(4) | TimeStamp (8) | DataLen (4) | Data (DataLen) |.
+        /// </summary>
+        /// <returns></returns>
+        public byte[] GetBytes()
+        {
+            var buffer = new byte[Data.Length + sizeof(long) + sizeof(int) + sizeof(int)];
+            BitConverter.GetBytes((int)LinkLayer).CopyTo(buffer, 0);
+            BitConverter.GetBytes(Timestamp).CopyTo(buffer, sizeof(int));
+            BitConverter.GetBytes(Data.Length).CopyTo(buffer, sizeof(long) + sizeof(int));
+            Data.CopyTo(buffer, sizeof(long) + sizeof(int) + sizeof(int));
+            return buffer;
+        }
+
+        /// <summary>
+        /// Reads the <see cref="FrameData"/> object from the provided byte array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static FrameData FromBytes(byte[] array, int offset)
+        {
+            var bytes = new byte[BitConverter.ToInt32(array, sizeof(long) + sizeof(int))];
+            Buffer.BlockCopy(array, offset + sizeof(long) + sizeof(int) + sizeof(int), bytes, 0, bytes.Length);
+            return new FrameData
+            {
+                Timestamp = BitConverter.ToInt64(array, offset),
+                LinkLayer = (LinkLayerType)BitConverter.ToInt32(array, offset + sizeof(long)),
+                Data = bytes
+            };
+        }
+
         public void ReadBinary(IBinaryReader reader)
         {
             this.Timestamp = reader.ReadLong(nameof(Timestamp));

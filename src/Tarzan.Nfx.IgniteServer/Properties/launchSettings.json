@@ -3,6 +3,10 @@
     "Tarzan.Nfx.IgniteServer": {
       "commandName": "Project",
       "commandLineArgs": "-OnHeap 1024 -OffHeap 4024"
+    },
+    "Server x4": {
+      "commandName": "Project",
+      "commandLineArgs": "-OnHeap 1024 -OffHeap 4024 -Instances 4"
     }
   }
 }

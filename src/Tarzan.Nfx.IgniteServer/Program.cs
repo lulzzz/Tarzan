@@ -4,6 +4,7 @@ using NLog.Config;
 using NLog.Layouts;
 using NLog.Targets;
 using System;
+using System.Threading.Tasks;
 
 namespace Tarzan.Nfx.IgniteServer
 {
@@ -29,21 +30,32 @@ namespace Tarzan.Nfx.IgniteServer
             var clusterEnpointArgument = commandLineApplication.Option("-Cluster", "Specifies IP address and port of a cluster node. Multiple nodes can be specified.", CommandOptionType.MultipleValue);
             var consistentIdArgument = commandLineApplication.Option("-ConsistentId", "Specifies as a consistent id of the node. This value is used in topology.", CommandOptionType.SingleValue);
             var persistenceEnabled = commandLineApplication.Option("-PersistenceEnabled", "If set, it enables persistence mode.", CommandOptionType.NoValue);
+            var serverInstances = commandLineApplication.Option("-Instances", "Specifies number of instances creared. Default is 1.", CommandOptionType.SingleValue);
+
             commandLineApplication.OnExecute(async () =>
             {
                 var configFile = configFileArgument.HasValue() ? configFileArgument.Value() : null;
-
-                using (var server = new IgniteServerRunner(configFile))
+                var serverInstancesNumber = serverInstances.HasValue() ? Int32.Parse(serverInstances.Value()) : 1;
+                if (serverInstancesNumber > 0 && serverInstancesNumber <= 16)
                 {
-                    if (offheapArgument.HasValue()) server.SetOffHeapMemoryLimit(Int32.Parse(offheapArgument.Value()));
-                    if (onheapArgument.HasValue()) server.SetOnHeapMemoryLimit(Int32.Parse(onheapArgument.Value()));
-                    if (serverPortArgument.HasValue()) server.SetServerPort(Int32.Parse(serverPortArgument.Value()));
-                    if (clusterEnpointArgument.HasValue()) server.SetClusterEnpoints(clusterEnpointArgument.Values);
-                    if (consistentIdArgument.HasValue()) server.SetConsistentId(consistentIdArgument.Value());
-                    if (persistenceEnabled.HasValue()) server.SetPersistence(true);
-                    await server.Run();
+                    var servers = new IgniteServerRunner[serverInstancesNumber];
+                    var serverTasks = new Task[serverInstancesNumber];
+                    for (int i = 0; i < serverInstancesNumber; i++)
+                    {
+                        var server = new IgniteServerRunner(configFile);
+                        
+                        if (offheapArgument.HasValue()) server.SetOffHeapMemoryLimit(Int32.Parse(offheapArgument.Value()));
+                        if (onheapArgument.HasValue()) server.SetOnHeapMemoryLimit(Int32.Parse(onheapArgument.Value()));
+                        if (serverPortArgument.HasValue()) server.SetServerPort(Int32.Parse(serverPortArgument.Value()));
+                        if (clusterEnpointArgument.HasValue()) server.SetClusterEnpoints(clusterEnpointArgument.Values);
+                        if (consistentIdArgument.HasValue()) server.SetConsistentId(consistentIdArgument.Value());
+                        if (persistenceEnabled.HasValue()) server.SetPersistence(true);
+                        serverTasks[i] = server.Run();
+                    }
+                    Task.WaitAll(serverTasks);
+                    return 0;
                 }
-                return 0;
+                throw new ArgumentOutOfRangeException($"Number of server instances {serverInstancesNumber} is out of bounds. It must be less than or equal to 16.");
             });
 
 

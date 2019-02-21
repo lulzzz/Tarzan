@@ -9,7 +9,7 @@ namespace Tarzan.Nfx.Analyzers.Tcp
     /// The space-time model (inspired by Lamport) represents a Tcp communication between two endpoints.
     /// </summary>
     /// <remarks>
-    /// Each message represents an event. The event has assigned the time as the offset of the message occurence form the 
+    /// Each message represents an event. The event has assigned the time as the offset of the message occurrence form the 
     /// start of the conversations. The space axis shows the size of the message. The size is positive if the message is from 
     /// client to the server or negative for the other direction. 
     /// </remarks>

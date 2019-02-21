@@ -102,11 +102,8 @@ Number of baseline nodes: 4
 Other nodes not found.
 ```
 
-## Running compute jobs on cluster nodes
-The compute jobs are represented by classes that can be disseminated on demands.
-The following needs to be satisfied in order to run compute jobs that relies on package distribution:
-
-* All nodes must be executed with configuration that enables to assembly loading:
+## Loading assemblies on-demand
+First, all nodes must be executed with configuration that enables assembly loading:
 
 ```csharp
 var cfg = new IgniteConfiguration
@@ -120,11 +117,25 @@ var cfg = new IgniteConfiguration
 </igniteConfiguration>
 ```
 
-* If new version of assembly is available the old one needs to be removed. The storage, by default located in ```work``` folder 
-contains for each node a subfolder ```binary_metadata```.
+Auto assembly loading does not work as expected for streaming and data processors. In this case the required assembly is not loaded and
+thus streaming may not functioned properly. Either the error occured explaining that the  type of cache processor instance is not found or 
+the application just hung. 
 
-* Although auto assembly loading is enabled, assembly containing the code should be located in the server's directory or on the path as specified in ```Tarzan.Nfx.IgniteServer.runtimeconfig.dev.json```. If the assembly cannot be found
-the client hangs in job execution. 
+The workaround is simple:
+For every assembly that should be loaded to the server create an empty action class. 
+Then on start up when this dummy action is broadcasted , it causes the loading of the containing assembly. 
+
+```
+class AssemblyLoadingAction : IComputeAction
+{
+    public static string Assembly = Assemlby
+    public void Invoke()
+    {
+        Console.WriteLine($"Loading assembly {m_message}");
+    }
+}
+```
+
 
 ## ETL Workload
 

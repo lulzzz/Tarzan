@@ -20,27 +20,11 @@ using FrameCache = Apache.Ignite.Core.Client.Cache.ICacheClient<Tarzan.Nfx.Model
 
 namespace Tarzan.Nfx.PcapLoader
 {
-    public class PcapLoader : IPcapProcessor
+    public class PcapLoader : PcapProcessor
     {
         private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public const int DEFAULT_PORT = 10800;
-        public const int CHUNK_SIZE = 100;
-    
-        public int ChunkSize { get; set; } = CHUNK_SIZE;
-
-        public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
-
-        public IPEndPoint ClusterNode { get; set; } = new IPEndPoint(IPAddress.Loopback, DEFAULT_PORT);
-        public string FrameCacheName { get; set; } = null; 
-
-        public event FileOpenHandler OnFileOpen;
-        public event FileCompletedHandler OnFileCompleted;
-        public event ChunkCompletedHandler OnChunkLoaded;
-        public event ChunkCompletedHandler OnChunkStored;
-        public event ErrorFrameHandler OnErrorFrame;
-
-        public async Task Invoke()
+        public override async Task Invoke()
         {
             var cfg = new IgniteClientConfiguration
             {
@@ -52,12 +36,12 @@ namespace Tarzan.Nfx.PcapLoader
                 
                 foreach (var fileInfo in SourceFiles)
                 {
-                    OnFileOpen?.Invoke(this, fileInfo);
+                    OnFileOpened(fileInfo);
                     using (var device = new FastPcapFileReaderDevice(fileInfo.FullName))
                     {
                         await ProcessFile(client, fileInfo, device);
                     }
-                    OnFileCompleted?.Invoke(this, fileInfo);
+                    OnFileCompleted(fileInfo);
                 }
             }
         }
@@ -93,7 +77,7 @@ namespace Tarzan.Nfx.PcapLoader
                 // Is CHUNK full?
                 if (frameIndex % ChunkSize == ChunkSize - 1)
                 {
-                    OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+                    OnChunkLoaded(currentChunkNumber, currentChunkBytes);
                     cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(packetCache, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
                     frameArray = new KeyValuePair<FrameKey, FrameData>[ChunkSize];
                     currentChunkNumber++;
@@ -102,7 +86,7 @@ namespace Tarzan.Nfx.PcapLoader
                 frameIndex++;
             }
 
-            OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+            OnChunkLoaded(currentChunkNumber, currentChunkBytes);
             cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(packetCache, frameArray, frameIndex % ChunkSize, currentChunkNumber, currentChunkBytes));
 
             await cacheStoreTask;
@@ -117,7 +101,7 @@ namespace Tarzan.Nfx.PcapLoader
         private void StoreChunk(FrameCache packetCache, KeyValuePair<FrameKey, FrameData>[] frameArray, int count, int currentChunkNumber, int currentChunkBytes)
         {
             packetCache.PutAll(frameArray.Take(count));
-            OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);
+            OnChunkStored(currentChunkNumber, currentChunkBytes);
         }
     }
 }

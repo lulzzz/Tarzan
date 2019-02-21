@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Tarzan.Nfx.Model;
-using Tarzan.Nfx.Model.Cassandra;
 namespace Tarzan.Nfx.Dashboard.Controllers
 {
 

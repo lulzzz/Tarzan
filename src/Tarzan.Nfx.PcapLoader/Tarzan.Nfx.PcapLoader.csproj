@@ -9,16 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apache.Ignite" Version="2.7.0" />
-    <PackageReference Include="Apache.Ignite.Linq" Version="2.7.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
-    <PackageReference Include="PacketDotNet.Standard" Version="0.16.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="PacketDotNet" Version="0.20.0" />
     <PackageReference Include="ShellProgressBar" Version="4.2.0" />
-
-    <PackageReference Include="Apache.Ignite.NLog" Version="2.7.0" />
     <PackageReference Include="NLog" Version="4.5.11" />
   </ItemGroup>
 
@@ -27,6 +24,15 @@
     <ProjectReference Include="..\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
     <ProjectReference Include="..\Tarzan.Nfx.Utils\Tarzan.Nfx.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Apache.Ignite.Core">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.Ignite.NLog">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

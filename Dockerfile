@@ -23,8 +23,21 @@ RUN mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
 RUN chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
 RUN chown root:root /etc/apt/sources.list.d/microsoft-prod.list
 RUN apt-get update
-
 RUN apt-get install -y dotnet-runtime-2.0.0
+
+# download and install Ignite
+# Ignite version
+ENV IGNITE_VERSION 2.7.0
+
+# Ignite home
+ENV IGNITE_HOME /opt/ignite/apache-ignite-${IGNITE_VERSION}-bin
+
+WORKDIR /opt/ignite
+
+RUN curl https://www-us.apache.org/dist/ignite/${IGNITE_VERSION}/apache-ignite-${IGNITE_VERSION}-bin.zip -o ignite.zip \
+    && unzip ignite.zip \
+    && rm ignite.zip
+
 
 WORKDIR /nfx-server
 COPY --from=build-env /Tarzan/src/Tarzan.Nfx.IgniteServer/out .

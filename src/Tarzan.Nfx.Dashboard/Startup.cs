@@ -9,7 +9,6 @@ using NSwag.AspNetCore;
 using System.Net;
 using System.Reflection;
 using Tarzan.Nfx.Model;
-using Tarzan.Nfx.Model.Cassandra;
 
 namespace Tarzan.Nfx.Dashboard
 {
@@ -29,7 +28,7 @@ namespace Tarzan.Nfx.Dashboard
             services.AddSwagger();
 
             var keyspace = "testbed";
-            var dataset = new AffDataset(new IPEndPoint(IPAddress.Loopback, 9042), keyspace);
+            IAffDataset dataset = null; // new AffDataset(new IPEndPoint(IPAddress.Loopback, 9042), keyspace);
             dataset.Connect();
 
             services.AddSingleton<IAffDataset>(dataset);

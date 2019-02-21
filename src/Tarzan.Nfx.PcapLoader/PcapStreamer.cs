@@ -20,61 +20,27 @@ using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.PcapLoader
 {
-    public class PcapStreamer : IPcapProcessor
-    {   private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
-        const int maxOnHeap = 1024;
-        const int maxOffHeap = 1024;
-        public const int DEFAULT_PORT = 47500;
-        public const int CHUNK_SIZE = 200;
+    [Serializable]
+    public class PcapStreamer : PcapProcessor
+    {
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         readonly ConsoleLogger m_logger = new ConsoleLogger("Loader", (s, ll) => true, true);
-
-        public int ChunkSize { get; set; } = CHUNK_SIZE;
-
-        public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
-        public string FrameCacheName { get; set; } = null;
-
-        public IPEndPoint ClusterNode { get; set; } = new IPEndPoint(IPAddress.Loopback, DEFAULT_PORT);
-
-        public event FileOpenHandler OnFileOpen;
-        public event FileCompletedHandler OnFileCompleted;
-        public event ChunkCompletedHandler OnChunkLoaded;
-        public event ChunkCompletedHandler OnChunkStored;
-        public event ErrorFrameHandler OnErrorFrame;
-
-        public async Task Invoke()
+        
+        public override async Task Invoke()
         {
-            
-            var cfg = new IgniteConfiguration
-            {
-                JvmOptions = new[] { //"-Xms256m",
-                                     $"-Xmx{maxOnHeap}m",
-                                     "-XX:+AlwaysPreTouch",
-                                     "-XX:+UseG1GC",
-                                     "-XX:+ScavengeBeforeFullGC",
-                                     "-XX:+DisableExplicitGC",
-                                     $"-XX:MaxDirectMemorySize={maxOffHeap}m" },
-                DiscoverySpi = new Apache.Ignite.Core.Discovery.Tcp.TcpDiscoverySpi
-                {
-                    
-                    IpFinder = new TcpDiscoveryStaticIpFinder
-                    {
-                        Endpoints = new[] { $"{ClusterNode.Address}:{(ClusterNode.Port != 0 ? ClusterNode.Port : DEFAULT_PORT)}" }
-                    },
-                },
-            };
             Ignition.ClientMode = true;
+            var cfg = GetIgniteConfiguration();
             cfg.Logger = new IgniteNLogLogger();
             using (var client = Ignition.Start(cfg))
             {
                 foreach (var fileInfo in SourceFiles)
                 {
-                    OnFileOpen?.Invoke(this, fileInfo);
+                    OnFileOpened(fileInfo);
                     using (var device = new FastPcapFileReaderDevice(fileInfo.FullName))
                     {
                         await ProcessFile(client, fileInfo, device);
                     }
-                    OnFileCompleted?.Invoke(this, fileInfo);
+                    OnFileCompleted(fileInfo);
                 }
             }
         }
@@ -110,7 +76,7 @@ namespace Tarzan.Nfx.PcapLoader
                     // Is CHUNK full?
                     if (frameIndex % ChunkSize == ChunkSize - 1)
                     {
-                        OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+                        OnChunkLoaded(currentChunkNumber, currentChunkBytes);
                         cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, ChunkSize, currentChunkNumber, currentChunkBytes));
                         currentChunkNumber++;
                         currentChunkBytes = 0;
@@ -118,7 +84,7 @@ namespace Tarzan.Nfx.PcapLoader
                     frameIndex++;
                 }
 
-                OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
+                OnChunkLoaded(currentChunkNumber, currentChunkBytes);
 
                 cacheStoreTask = cacheStoreTask.ContinueWith(CreateStoreAction(dataStreamer, frameArray, frameIndex % ChunkSize, currentChunkNumber, currentChunkBytes));
 
@@ -139,7 +105,7 @@ namespace Tarzan.Nfx.PcapLoader
         private async Task StoreChunk(IDataStreamer<FrameKey, FrameData> dataStreamer, KeyValuePair<FrameKey, FrameData>[] frameArray, int currentChunkNumber, int currentChunkBytes)
         {
             await dataStreamer.AddData(frameArray);
-            OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);
+            this.OnChunkStored(currentChunkNumber, currentChunkBytes);
         }
     }
 }

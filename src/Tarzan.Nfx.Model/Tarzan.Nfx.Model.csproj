@@ -17,11 +17,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apache.Ignite" Version="2.7.0" />
-    <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
     <PackageReference Include="Tnidea.Thrift" Version="0.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Apache.Ignite.Core">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <!--
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

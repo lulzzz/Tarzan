@@ -8,13 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apache.Ignite" Version="2.7.0" />
-    <PackageReference Include="Apache.Ignite.Linq" Version="2.7.0" />
+    <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
+    <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tarzan.Nfx.Model\Tarzan.Nfx.Model.csproj" />
-    <ProjectReference Include="..\Tarzan.Nfx.PacketDecoders\Tarzan.Nfx.PacketDecoders.csproj" />
+    <Reference Include="Apache.Ignite.Core">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.Ignite.Linq">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.Ignite.NLog">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <!--
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

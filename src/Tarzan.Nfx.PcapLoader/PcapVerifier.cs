@@ -13,57 +13,23 @@ using Tarzan.Nfx.Utils;
 
 namespace Tarzan.Nfx.PcapLoader
 {
-    internal class PcapVerifier : IPcapProcessor
+    internal class PcapVerifier : PcapProcessor
     {
-        public const int DEFAULT_PORT = 47500;
-        public const int CHUNK_SIZE = 100;
 
-        public int ChunkSize { get; set; } = CHUNK_SIZE;
-
-        public IPEndPoint ClusterNode { get; set; } = new IPEndPoint(IPAddress.Loopback, DEFAULT_PORT);
-        public IList<FileInfo> SourceFiles { get; private set; } = new List<FileInfo>();
-        public string FrameCacheName { get; set; } = null;
-
-        public event ChunkCompletedHandler OnChunkLoaded;
-        public event ChunkCompletedHandler OnChunkStored;
-        public event FileCompletedHandler OnFileCompleted;
-        public event FileOpenHandler OnFileOpen;
-        public event ErrorFrameHandler OnErrorFrame;
-
-        const int maxOnHeap = 1024;
-        const int maxOffHeap = 1024;
-
-        public async Task Invoke()
+        public override async Task Invoke()
         {
-            var cfg = new IgniteConfiguration
-            {
-                JvmOptions = new[] { //"-Xms256m",
-                                     $"-Xmx{maxOnHeap}m",
-                                     "-XX:+AlwaysPreTouch",
-                                     "-XX:+UseG1GC",
-                                     "-XX:+ScavengeBeforeFullGC",
-                                     "-XX:+DisableExplicitGC",
-                                     $"-XX:MaxDirectMemorySize={maxOffHeap}m" },
-                DiscoverySpi = new Apache.Ignite.Core.Discovery.Tcp.TcpDiscoverySpi
-                {
-
-                    IpFinder = new TcpDiscoveryStaticIpFinder
-                    {
-                        Endpoints = new[] { $"{ClusterNode.Address}:{(ClusterNode.Port != 0 ? ClusterNode.Port : DEFAULT_PORT)}" }
-                    },
-                }
-            };
+            var cfg = GetIgniteConfiguration();
             Ignition.ClientMode = true;
             using (var client = Ignition.Start(cfg))
             {
                 foreach (var fileInfo in SourceFiles)
                 {
-                    OnFileOpen?.Invoke(this, fileInfo);
+                    OnFileOpened(fileInfo);
                     using (var device = new FastPcapFileReaderDevice(fileInfo.FullName))
                     {
                         await ProcessFile(client, fileInfo, device);
                     }
-                    OnFileCompleted?.Invoke(this, fileInfo);
+                    OnFileCompleted(fileInfo);
                 }
             }
         }
@@ -88,13 +54,13 @@ namespace Tarzan.Nfx.PcapLoader
                 };
                 var frameKey = new FrameKey(frameIndex, frameKeyProvider.GetKeyHash(frame));
                 var storedFrame = await cache.GetAsync(frameKey);
-                if (storedFrame == null) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, null);
-                if (storedFrame != null && frame.Timestamp != storedFrame.Timestamp) OnErrorFrame?.Invoke(this, fileInfo, frameIndex, storedFrame);
+                if (storedFrame == null) OnErrorFrameOccured(fileInfo, frameIndex, null);
+                if (storedFrame != null && frame.Timestamp != storedFrame.Timestamp) OnErrorFrameOccured(fileInfo, frameIndex, storedFrame);
 
                 if (frameIndex % ChunkSize == ChunkSize - 1)
                 {
-                    OnChunkLoaded?.Invoke(this, currentChunkNumber, currentChunkBytes);
-                    OnChunkStored?.Invoke(this, currentChunkNumber, currentChunkBytes);
+                    OnChunkLoaded(currentChunkNumber, currentChunkBytes);
+                    OnChunkStored(currentChunkNumber, currentChunkBytes);
                     currentChunkNumber++;
                     currentChunkBytes = 0;
                 }

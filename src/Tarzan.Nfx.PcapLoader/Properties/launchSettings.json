@@ -23,6 +23,10 @@
     "stream-file-32": {
       "commandName": "Project",
       "commandLineArgs": "-Cluster 127.0.0.1 -SourceFile D:\\Captures\\ids\\testbed-12jun-32\\testbed-12jun-000.pcap -Mode stream"
+    },
+    "track-file-32": {
+      "commandName": "Project",
+      "commandLineArgs": "-Cluster 127.0.0.1 -SourceFile D:\\Captures\\ids\\testbed-12jun-32\\testbed-12jun-000.pcap -Mode track -DisableProgressBar"
     }
   }
 }

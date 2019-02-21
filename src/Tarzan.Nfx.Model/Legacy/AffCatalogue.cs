@@ -1,0 +1,4 @@
+﻿namespace Tarzan.Nfx.Model
+{
+
+}

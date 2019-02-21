@@ -18,4 +18,13 @@
     <ProjectReference Include="..\..\src\Tarzan.Nfx.Ignite\Tarzan.Nfx.Ignite.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Apache.Ignite.Core">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.Ignite.Linq">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

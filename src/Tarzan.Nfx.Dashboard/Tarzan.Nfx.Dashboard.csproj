@@ -12,11 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NSwag.AspNetCore" Version="11.17.20" />
+    <PackageReference Include="Remotion.Linq" Version="2.2.0" />
     <PackageReference Include="Tnidea.Thrift" Version="0.9.3" />
   </ItemGroup>
 
@@ -56,7 +57,7 @@
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="wwwroot\dist\**" />
-      <ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>

@@ -160,22 +160,6 @@ namespace Tarzan.Nfx.Analyzers
         }
 
         [Serializable]
-        public sealed class FrameStreamVisitor : IStreamReceiver<FrameKey, FrameData>
-        {
-            private readonly FlowTracker m_flowTracker;
-
-            public FrameStreamVisitor(FlowTracker flowTracker)
-            {
-                m_flowTracker = flowTracker;
-            }
-
-            public void Receive(ICache<FrameKey, FrameData> cache, ICollection<ICacheEntry<FrameKey, FrameData>> entries)
-            {
-                m_flowTracker.ProcessFrames(entries.Select(x => x.Value));
-            }
-        }
-
-        [Serializable]
         public sealed class FlowStreamVisitor : IStreamReceiver<FlowKey, FlowData>
         {
             private MergePacketFlowProcessor m_updateProcessor;

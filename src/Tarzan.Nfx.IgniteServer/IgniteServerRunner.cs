@@ -4,7 +4,6 @@ using Apache.Ignite.Core.Deployment;
 using Apache.Ignite.Core.Discovery.Tcp;
 using Apache.Ignite.Core.Discovery.Tcp.Multicast;
 using Apache.Ignite.Core.Discovery.Tcp.Static;
-using Apache.Ignite.NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +19,8 @@ namespace Tarzan.Nfx.IgniteServer
 
         public IIgnite Ignite { get; private set; }
 
+
+
         public IgniteServerRunner(string configurationFile=null)
         {
             m_igniteConfiguration = new IgniteConfiguration();
@@ -31,7 +32,8 @@ namespace Tarzan.Nfx.IgniteServer
             {
                 m_igniteConfiguration = GetDefaultConfiguration();
             }
-            m_igniteConfiguration.Logger = new IgniteNLogLogger();
+            m_igniteConfiguration.IgniteInstanceName = Guid.NewGuid().ToString();
+            // m_igniteConfiguration.Logger = new  IgniteNLogLogger();
         }
 
         private static IgniteConfiguration LoadConfiguration(string filename)
@@ -45,12 +47,6 @@ namespace Tarzan.Nfx.IgniteServer
         {
             var cfg = new IgniteConfiguration
             {
-                JvmOptions = new[] { 
-                                     "-XX:+AlwaysPreTouch",
-                                     "-XX:+UseG1GC",
-                                     "-XX:+ScavengeBeforeFullGC",
-                                     "-XX:+DisableExplicitGC",
-                },
                 PeerAssemblyLoadingMode = PeerAssemblyLoadingMode.CurrentAppDomain,
                
                 DataStorageConfiguration = new DataStorageConfiguration(),
@@ -63,7 +59,6 @@ namespace Tarzan.Nfx.IgniteServer
                     }
                 }
             };
-            
             return cfg;
         }
 

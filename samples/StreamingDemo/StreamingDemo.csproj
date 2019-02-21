@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Apache.Ignite.Core">
+      <HintPath>..\..\packages\ignite2.8.0-alpha\lib\netcoreapp2.0\Apache.Ignite.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
